@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ExternalUtilsCSharp.UI
 {
+    /// <summary>
+    /// A very basic class to use as a base for more complex controls
+    /// </summary>
     public abstract class Control
     {
         #region PROPERTIES

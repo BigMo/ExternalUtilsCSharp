@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ExternalUtilsCSharp.MathObjects
 {
+    /// <summary>
+    /// Class that holds information about a 3d-coordinate and offers some basic operations
+    /// </summary>
     public struct Vector3
     {
         #region VARIABLES
@@ -26,6 +29,9 @@ namespace ExternalUtilsCSharp.MathObjects
             get { return data[2]; }
             set { data[2] = value; }
         }
+        /// <summary>
+        /// Returns a new Vector3 at (0,0,0)
+        /// </summary>
         public static Vector3 Zero
         {
             get { return new Vector3(0, 0, 0); }
@@ -33,18 +39,37 @@ namespace ExternalUtilsCSharp.MathObjects
         #endregion
 
         #region CONSTRUCTOR
+        /// <summary>
+        /// Initializes a new Vector3 using the given values
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
         public Vector3(float x, float y, float z)
         {
             data = new float[] { x, y, z };
         }
+        /// <summary>
+        /// Initializes a new Vector3 by copying the values of the given Vector3
+        /// </summary>
+        /// <param name="vec"></param>
         public Vector3(Vector3 vec) : this(vec.X, vec.Y, vec.Z) { }
         #endregion
 
         #region METHODS
+        /// <summary>
+        /// Returns the length of this Vector3
+        /// </summary>
+        /// <returns></returns>
         public float Length()
         {
             return (float)System.Math.Sqrt(System.Math.Pow(X, 2) + System.Math.Pow(Y, 2) + System.Math.Pow(Z, 2));
         }
+        /// <summary>
+        /// Returns the distance from this Vector3 to the given Vector3
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public float DistanceTo(Vector3 other)
         {
             return (this + other).Length();

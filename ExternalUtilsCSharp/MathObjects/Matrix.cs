@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ExternalUtilsCSharp.MathObjects
 {
+    /// <summary>
+    /// A matrix.
+    /// </summary>
     public class Matrix
     {
         #region VARIABLES
@@ -26,6 +29,14 @@ namespace ExternalUtilsCSharp.MathObjects
             for (int y = 0; y < rows; y++)
                 for (int x = 0; x < columns; x++)
                     this[y, x] = BitConverter.ToSingle(data, sizeof(float) * ((y * columns) + x));
+        }
+        public byte[] ToByteArray()
+        {
+            int sof = sizeof(float);
+            byte[] data = new byte[this.data.Length * sof];
+            for (int i = 0; i < this.data.Length; i++)
+                Array.Copy(BitConverter.GetBytes(this.data[i]), 0, data, i * sof, sof);
+            return data;
         }
         #endregion
 

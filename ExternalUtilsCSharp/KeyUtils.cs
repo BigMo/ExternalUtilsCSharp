@@ -6,6 +6,9 @@ using System.Windows.Forms;
 
 namespace ExternalUtilsCSharp
 {
+    /// <summary>
+    /// A class that handles key-input
+    /// </summary>
     public class KeyUtils
     {
         #region VARIABLES
@@ -45,6 +48,9 @@ namespace ExternalUtilsCSharp
         }
         #endregion
         #region METHODS
+        /// <summary>
+        /// Initializes and fills the hashtables
+        /// </summary>
         private void Init()
         {
             foreach (Int32 key in allKeys)
@@ -56,6 +62,9 @@ namespace ExternalUtilsCSharp
                 }
             }
         }
+        /// <summary>
+        /// Updates the key-states
+        /// </summary>
         public void Update()
         {
             prevKeys = (Hashtable)keys.Clone();
@@ -64,6 +73,10 @@ namespace ExternalUtilsCSharp
                 keys[key] = GetKeyDown(key);
             }
         }
+        /// <summary>
+        /// Returns an array of all keys that went up since the last Update-call
+        /// </summary>
+        /// <returns></returns>
         public Keys[] KeysThatWentUp()
         {
             List<Keys> keys = new List<Keys>();
@@ -74,6 +87,10 @@ namespace ExternalUtilsCSharp
             }
             return keys.ToArray();
         }
+        /// <summary>
+        /// Returns an array of all keys that went down since the last Update-call
+        /// </summary>
+        /// <returns></returns>
         public Keys[] KeysThatWentDown()
         {
             List<Keys> keys = new List<Keys>();
@@ -84,6 +101,10 @@ namespace ExternalUtilsCSharp
             }
             return keys.ToArray();
         }
+        /// <summary>
+        /// Returns an array of all keys that went are down since the last Update-call
+        /// </summary>
+        /// <returns></returns>
         public Keys[] KeysThatAreDown()
         {
             List<Keys> keys = new List<Keys>();
@@ -94,36 +115,71 @@ namespace ExternalUtilsCSharp
             }
             return keys.ToArray();
         }
+        /// <summary>
+        /// Returns whether the given key went up since the last Update-call
+        /// </summary>
+        /// <param name="key">Key to check</param>
+        /// <returns></returns>
         public bool KeyWentUp(Keys key)
         {
             return KeyWentUp((Int32)key);
         }
+        /// <summary>
+        /// Returns whether the given key went up since the last Update-call
+        /// </summary>
+        /// <param name="key">Key to check</param>
+        /// <returns></returns>
         public bool KeyWentUp(Int32 key)
         {
             if (!KeyExists(key))
                 return false;
             return (bool)prevKeys[key] && !(bool)keys[key];
         }
+        /// <summary>
+        /// Returns whether the given key went down since the last Update-call
+        /// </summary>
+        /// <param name="key">Key to check</param>
+        /// <returns></returns>
         public bool KeyWentDown(Keys key)
         {
             return KeyWentDown((Int32)key);
         }
+        /// <summary>
+        /// Returns whether the given key went down since the last Update-call
+        /// </summary>
+        /// <param name="key">Key to check</param>
+        /// <returns></returns>
         public bool KeyWentDown(Int32 key)
         {
             if (!KeyExists(key))
                 return false;
             return !(bool)prevKeys[key] && (bool)keys[key];
         }
+        /// <summary>
+        /// Returns whether the given key was down at time of the last Update-call
+        /// </summary>
+        /// <param name="key">Key to check</param>
+        /// <returns></returns>
         public bool KeyIsDown(Keys key)
         {
             return KeyIsDown((Int32)key);
         }
+        /// <summary>
+        /// Returns whether the given key was down at time of the last Update-call
+        /// </summary>
+        /// <param name="key">Key to check</param>
+        /// <returns></returns>
         public bool KeyIsDown(Int32 key)
         {
             if (!KeyExists(key))
                 return false;
             return (bool)prevKeys[key] || (bool)keys[key];
         }
+        /// <summary>
+        /// Returns whether the given key is contained in the used hashtables
+        /// </summary>
+        /// <param name="key">Key to check</param>
+        /// <returns></returns>
         private bool KeyExists(Int32 key)
         {
             return (prevKeys.ContainsKey(key) && keys.ContainsKey(key));

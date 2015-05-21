@@ -6,24 +6,29 @@ using System.Text;
 
 namespace ExternalUtilsCSharp
 {
+    /// <summary>
+    /// A class that simplifies read- and write-operations to processes
+    /// </summary>
     public class MemUtils
     {
         #region CONSTANTS
-        private const int SIZE_BYTE = sizeof(byte);
-        private const int SIZE_INT16 = sizeof(short);
-        private const int SIZE_INT32 = sizeof(int);
-        private const int SIZE_INT64 = sizeof(long);
-        private const int SIZE_UINT16 = sizeof(ushort);
-        private const int SIZE_UINT32 = sizeof(uint);
-        private const int SIZE_UINT64 = sizeof(ulong);
         private const int SIZE_FLOAT = sizeof(float);
-        private const int SIZE_DOUBLE = sizeof(double);
         #endregion
         #region PROPERTIES
+        /// <summary>
+        /// The handle to the process this class reads memory from/writes memory to
+        /// </summary>
         public static IntPtr Handle { get; set; }
         #endregion
         #region METHODS
         #region PRIMITIVE WRAPPERS
+        /// <summary>
+        /// Reads a chunk of memory
+        /// </summary>
+        /// <param name="address">The address of the chunk of memory</param>
+        /// <param name="data">The byte-array to write the read data to</param>
+        /// <param name="length">The number (in bytes) of bytes to read</param>
+        /// <returns>True if successful, false if not</returns>
         public static bool Read( IntPtr address, out byte[] data, int length)
         {
             IntPtr numBytes = IntPtr.Zero;
@@ -34,6 +39,12 @@ namespace ExternalUtilsCSharp
             return numBytes.ToInt32() == length;
         }
 
+        /// <summary>
+        /// Writes a chunk of memory
+        /// </summary>
+        /// <param name="address">The address to write to</param>
+        /// <param name="data">A byte-array of data to write</param>
+        /// <returns>True if successful, false if not</returns>
         public static bool Write(IntPtr address, byte[] data)
         {
             IntPtr numBytes = IntPtr.Zero;
@@ -45,73 +56,13 @@ namespace ExternalUtilsCSharp
         #endregion
         #region SPECIALIZED FUNCTIONS
         #region READ
-        public static byte ReadByte(IntPtr address, byte defaultValue = 0)
-        {
-            byte[] data;
-            if (Read(address, out data, SIZE_BYTE))
-                return data[0];
-            return defaultValue;
-        }
-        public static char ReadChar(IntPtr address, char defaultValue = '\x0')
-        {
-            return (char)ReadByte(address, (byte)defaultValue);
-        }
-        public static short ReadInt16(IntPtr address, short defaultValue = 0)
-        {
-            byte[] data;
-            if (Read(address, out data, SIZE_INT16))
-                return BitConverter.ToInt16(data, 0);
-            return defaultValue;
-        }
-        public static ushort ReadUInt16(IntPtr address, ushort defaultValue = 0)
-        {
-            byte[] data;
-            if (Read(address, out data, SIZE_UINT16))
-                return BitConverter.ToUInt16(data, 0);
-            return defaultValue;
-        }
-        public static int ReadInt32(IntPtr address, int defaultValue = 0)
-        {
-            byte[] data;
-            if (Read(address, out data, SIZE_INT32))
-                return BitConverter.ToInt32(data, 0);
-            return defaultValue;
-        }
-        public static uint ReadUInt32(IntPtr address, uint defaultValue = 0)
-        {
-            byte[] data;
-            if (Read(address, out data, SIZE_UINT32))
-                return BitConverter.ToUInt32(data, 0);
-            return defaultValue;
-        }
-        public static long ReadInt64(IntPtr address, long defaultValue = 0)
-        {
-            byte[] data;
-            if (Read(address, out data, SIZE_INT64))
-                return BitConverter.ToInt64(data, 0);
-            return defaultValue;
-        }
-        public static ulong ReadUInt64(IntPtr address, ulong defaultValue = 0)
-        {
-            byte[] data;
-            if (Read(address, out data, SIZE_UINT64))
-                return BitConverter.ToUInt64(data, 0);
-            return defaultValue;
-        }
-        public static float ReadFloat(IntPtr address, float defaultValue = 0)
-        {
-            byte[] data;
-            if (Read(address, out data, SIZE_FLOAT))
-                return BitConverter.ToSingle(data, 0);
-            return defaultValue;
-        }
-        public static double ReadDouble(IntPtr address, double defaultValue = 0)
-        {
-            byte[] data;
-            if (Read(address, out data, SIZE_DOUBLE))
-                return BitConverter.ToDouble(data, 0);
-            return defaultValue;
-        }
+        /// <summary>
+        /// Reads a string from memory using the given encoding
+        /// </summary>
+        /// <param name="address">The address of the string to read</param>
+        /// <param name="length">The length of the string</param>
+        /// <param name="encoding">The encoding of the string</param>
+        /// <returns>The string read from memory</returns>
         public static String ReadString(IntPtr address, int length, Encoding encoding)
         {
             byte[] data;
@@ -119,25 +70,35 @@ namespace ExternalUtilsCSharp
                 return encoding.GetString(data);
             return null;
         }
-        public static T ReadStruct<T>(IntPtr address, int structSize = 0) where T : struct
+        /// <summary>
+        /// Generic function to read data from memory using the given type
+        /// </summary>
+        /// <typeparam name="T">The type of the value</typeparam>
+        /// <param name="address">The address to read data at</param>
+        /// <param name="defVal">The default value of this operation (which is returned in case the Read-operation fails)</param>
+        /// <returns>The value read from memory</returns>
+        public static T Read<T>(IntPtr address, T defVal = default(T)) where T : struct
         {
             byte[] data;
-            if (structSize == 0)
-                structSize = Marshal.SizeOf(typeof(T));
-            Read(address, out data, structSize);
-            GCHandle gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            T structure = (T)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(T));
-            gcHandle.Free();
+            int size = Marshal.SizeOf(typeof(T));
+            T structure = defVal;
+
+            if (Read(address, out data, size))
+            {
+                GCHandle gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                structure = (T)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(T));
+                gcHandle.Free();
+            }
+
             return structure;
         }
-        public static Vector2 ReadVector2(IntPtr address)
-        {
-            return ReadStruct<Vector2>(address);
-        }
-        public static Vector3 ReadVector3(IntPtr address)
-        {
-            return ReadStruct<Vector3>(address);
-        }
+        /// <summary>
+        /// Reads a matrix from memory
+        /// </summary>
+        /// <param name="address">The address of the matrix in memory</param>
+        /// <param name="rows">The number of rows of this matrix</param>
+        /// <param name="columns">The number of columns of this matrix</param>
+        /// <returns>The matrix read from memory</returns>
         public static Matrix ReadMatrix(IntPtr address, int rows, int columns)
         {
             Matrix matrix = new Matrix(rows, columns);
@@ -148,64 +109,45 @@ namespace ExternalUtilsCSharp
         }
         #endregion
         #region WRITE
-        public bool WriteByte(IntPtr address, byte value)
-        {
-            return Write(address, new byte[] { value });
-        }
-        public bool WriteChar(IntPtr address, char value)
-        {
-            return Write(address, new byte[] { (byte)value });
-        }
-        public bool WriteInt16(IntPtr address, short value)
-        {
-            return Write(address, BitConverter.GetBytes(value));
-        }
-        public bool WriteUInt16(IntPtr address, ushort value)
-        {
-            return Write(address, BitConverter.GetBytes(value));
-        }
-        public bool WriteInt32(IntPtr address, int value)
-        {
-            return Write(address, BitConverter.GetBytes(value));
-        }
-        public bool WriteUInt32(IntPtr address, uint value)
-        {
-            return Write(address, BitConverter.GetBytes(value));
-        }
-        public bool WriteInt64(IntPtr address, long value)
-        {
-            return Write(address, BitConverter.GetBytes(value));
-        }
-        public bool WriteUInt64(IntPtr address, ulong value)
-        {
-            return Write(address, BitConverter.GetBytes(value));
-        }
-        public bool WriteFloat(IntPtr address, float value)
-        {
-            return Write(address, BitConverter.GetBytes(value));
-        }
-        public bool WriteDouble(IntPtr address, double value)
-        {
-            return Write(address, BitConverter.GetBytes(value));
-        }
+        /// <summary>
+        /// Writes a string to memory using the given encoding
+        /// </summary>
+        /// <param name="address">The address to write the string to</param>
+        /// <param name="text">The text to write</param>
+        /// <param name="encoding">The encoding of the string</param>
+        /// <returns>True if successful, false if not</returns>
         public bool WriteString(IntPtr address, string text, Encoding encoding)
         {
             return Write(address, encoding.GetBytes(text));
         }
-        public bool WriteVector2(IntPtr address, Vector2 vec)
+        /// <summary>
+        /// Generic function to write data to memory using the given type
+        /// </summary>
+        /// <typeparam name="T">The type that of the value</typeparam>
+        /// <param name="address">The address to write data to</param>
+        /// <param name="value">The value to write to memory</param>
+        /// <returns>True if successful, false if not</returns>
+        public static bool Write<T>(IntPtr address, T value) where T : struct
         {
-            byte[] data = new byte[SIZE_FLOAT * 2];
-            Array.Copy(BitConverter.GetBytes(vec.X), 0, data, 0, SIZE_FLOAT);
-            Array.Copy(BitConverter.GetBytes(vec.Y), 0, data, SIZE_FLOAT, SIZE_FLOAT);
+            int size = Marshal.SizeOf(typeof(T));
+            byte[] data = new byte[size];
+
+            IntPtr ptr = Marshal.AllocHGlobal(size);
+            Marshal.StructureToPtr(value, ptr, false);
+            Marshal.Copy(ptr, data, 0, size);
+            Marshal.FreeHGlobal(ptr);
+
             return Write(address, data);
         }
-        public bool WriteVector3(IntPtr address, Vector3 vec)
+        /// <summary>
+        /// Writes a matrix to memory
+        /// </summary>
+        /// <param name="address">The address to write the matrix to</param>
+        /// <param name="matrix">The matrix to write to memory</param>
+        /// <returns>True if successful, false if not</returns>
+        public static bool WriteMatrix(IntPtr address, Matrix matrix)
         {
-            byte[] data = new byte[SIZE_FLOAT * 3];
-            Array.Copy(BitConverter.GetBytes(vec.X), 0, data, 0, SIZE_FLOAT);
-            Array.Copy(BitConverter.GetBytes(vec.Y), 0, data, SIZE_FLOAT, SIZE_FLOAT);
-            Array.Copy(BitConverter.GetBytes(vec.Z), 0, data, SIZE_FLOAT * 2, SIZE_FLOAT);
-            return Write(address, data);
+            return Write(address, matrix.ToByteArray());
         }
         #endregion
         #endregion

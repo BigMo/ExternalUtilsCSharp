@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ExternalUtilsCSharp.UI
 {
+    /// <summary>
+    /// A structure that holds information about location and size of a rectangle
+    /// </summary>
     public struct Rectangle
     {
         #region PROPERTIES
@@ -19,6 +22,13 @@ namespace ExternalUtilsCSharp.UI
         #endregion
 
         #region CONSTRUCTOR
+        /// <summary>
+        /// Initializes a new rectangle using the given values
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="width"></param>
+        /// <param name="height"></param>
         public Rectangle(float x, float y, float width, float height)
         {
             X = x;
@@ -26,13 +36,28 @@ namespace ExternalUtilsCSharp.UI
             Width = width;
             Height = height;
         }
+        /// <summary>
+        /// Initializes a new rectangle by copying the values of the given rectangle
+        /// </summary>
+        /// <param name="rect"></param>
+        public Rectangle(Rectangle rect) : this(rect.X, rect.Y, rect.Width, rect.Height) { }
         #endregion
 
         #region METHODS
+        /// <summary>
+        /// Returns whether this rectangle intersects with the given rectangle
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <returns></returns>
         public bool IntersectsWith(Rectangle rect)
         {
             return rect.X < this.X + this.Width && this.X < rect.X + rect.Width && rect.Y < this.Y + this.Height && this.Y < rect.Y + rect.Height;
         }
+        /// <summary>
+        /// Returns the intersection of this rectangle and the given rectangle
+        /// </summary>
+        /// <param name="rect"></param>
+        /// <returns></returns>
         public Rectangle Intersect(Rectangle rect)
         {
             float x = Math.Max(this.X, rect.X);

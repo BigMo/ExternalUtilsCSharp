@@ -5,6 +5,9 @@ using System.Text;
 
 namespace ExternalUtilsCSharp
 {
+    /// <summary>
+    /// This class holds DllImports of various winapi-functions
+    /// </summary>
     public class WinAPI
     {
         #region OpenProcess/CloseProcess
