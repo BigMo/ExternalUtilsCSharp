@@ -16,6 +16,22 @@ namespace ExternalUtilsCSharp
         /// The (opened) handle to the process of this ProcUtils
         /// </summary>
         public IntPtr Handle { get; private set; }
+        public bool IsRunning
+        {
+            get
+            {
+                if (Process == null)
+                    return false;
+                if (Process.HasExited)
+                {
+                    Process.Dispose();
+                    Process = null;
+                    CloseHandleToProcess(Handle);
+                    return false;
+                }
+                return true;
+            }
+        }
         #endregion
         #region STATIC METHODS
         /// <summary>
@@ -105,6 +121,19 @@ namespace ExternalUtilsCSharp
         ~ProcUtils()
         {
             CloseHandleToProcess(Handle);
+        }
+        #endregion
+        #region METHODS
+        public ProcessModule GetModuleByName(string name)
+        {
+            try
+            {
+                foreach (ProcessModule module in Process.Modules)
+                    if (module.FileName.EndsWith(name))
+                        return module;
+            }
+            catch { }
+            return null;
         }
         #endregion
     }

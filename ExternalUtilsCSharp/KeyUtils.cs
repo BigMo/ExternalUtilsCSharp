@@ -13,10 +13,10 @@ namespace ExternalUtilsCSharp
     {
         #region VARIABLES
         private Hashtable keys, prevKeys;
-        private int[] allKeys;
+        private short[] allKeys;
         #endregion
         #region STATIC METHODS
-        public static bool GetKeyDown(Keys key)
+        public static bool GetKeyDown(WinAPI.VirtualKeyShort key)
         {
             return GetKeyDown((Int32)key);
         }
@@ -26,9 +26,9 @@ namespace ExternalUtilsCSharp
         }
         public static bool GetKeyDownAsync(Int32 key)
         {
-            return GetKeyDownAsync((Keys)key);
+            return GetKeyDownAsync((WinAPI.VirtualKeyShort)key);
         }
-        public static bool GetKeyDownAsync(Keys key)
+        public static bool GetKeyDownAsync(WinAPI.VirtualKeyShort key)
         {
             return Convert.ToBoolean(WinAPI.GetAsyncKeyState(key) & WinAPI.KEY_PRESSED);
         }
@@ -38,13 +38,17 @@ namespace ExternalUtilsCSharp
         {
             keys = new Hashtable();
             prevKeys = new Hashtable();
-            allKeys = (int[])Enum.GetValues(typeof(Keys));
+            WinAPI.VirtualKeyShort[] _keys = (WinAPI.VirtualKeyShort[])Enum.GetValues(typeof(WinAPI.VirtualKeyShort));
+            allKeys = new short[_keys.Length];
+            for (int i = 0; i < allKeys.Length; i++)
+                allKeys[i] = (short)_keys[i];
+
+            Init();
         }
         ~KeyUtils()
         {
             keys.Clear();
             prevKeys.Clear();
-            Init();
         }
         #endregion
         #region METHODS
@@ -77,10 +81,10 @@ namespace ExternalUtilsCSharp
         /// Returns an array of all keys that went up since the last Update-call
         /// </summary>
         /// <returns></returns>
-        public Keys[] KeysThatWentUp()
+        public WinAPI.VirtualKeyShort[] KeysThatWentUp()
         {
-            List<Keys> keys = new List<Keys>();
-            foreach (Keys key in allKeys)
+            List<WinAPI.VirtualKeyShort> keys = new List<WinAPI.VirtualKeyShort>();
+            foreach (WinAPI.VirtualKeyShort key in allKeys)
             {
                 if (KeyWentUp(key))
                     keys.Add(key);
@@ -91,10 +95,10 @@ namespace ExternalUtilsCSharp
         /// Returns an array of all keys that went down since the last Update-call
         /// </summary>
         /// <returns></returns>
-        public Keys[] KeysThatWentDown()
+        public WinAPI.VirtualKeyShort[] KeysThatWentDown()
         {
-            List<Keys> keys = new List<Keys>();
-            foreach (Keys key in allKeys)
+            List<WinAPI.VirtualKeyShort> keys = new List<WinAPI.VirtualKeyShort>();
+            foreach (WinAPI.VirtualKeyShort key in allKeys)
             {
                 if (KeyWentDown(key))
                     keys.Add(key);
@@ -105,10 +109,10 @@ namespace ExternalUtilsCSharp
         /// Returns an array of all keys that went are down since the last Update-call
         /// </summary>
         /// <returns></returns>
-        public Keys[] KeysThatAreDown()
+        public WinAPI.VirtualKeyShort[] KeysThatAreDown()
         {
-            List<Keys> keys = new List<Keys>();
-            foreach (Keys key in allKeys)
+            List<WinAPI.VirtualKeyShort> keys = new List<WinAPI.VirtualKeyShort>();
+            foreach (WinAPI.VirtualKeyShort key in allKeys)
             {
                 if (KeyIsDown(key))
                     keys.Add(key);
@@ -120,7 +124,7 @@ namespace ExternalUtilsCSharp
         /// </summary>
         /// <param name="key">Key to check</param>
         /// <returns></returns>
-        public bool KeyWentUp(Keys key)
+        public bool KeyWentUp(WinAPI.VirtualKeyShort key)
         {
             return KeyWentUp((Int32)key);
         }
@@ -140,7 +144,7 @@ namespace ExternalUtilsCSharp
         /// </summary>
         /// <param name="key">Key to check</param>
         /// <returns></returns>
-        public bool KeyWentDown(Keys key)
+        public bool KeyWentDown(WinAPI.VirtualKeyShort key)
         {
             return KeyWentDown((Int32)key);
         }
@@ -160,7 +164,7 @@ namespace ExternalUtilsCSharp
         /// </summary>
         /// <param name="key">Key to check</param>
         /// <returns></returns>
-        public bool KeyIsDown(Keys key)
+        public bool KeyIsDown(WinAPI.VirtualKeyShort key)
         {
             return KeyIsDown((Int32)key);
         }

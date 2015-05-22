@@ -113,6 +113,8 @@ namespace ExternalUtilsCSharp
         #region Input-functions
         [DllImport("User32.dll")]
         public static extern short GetAsyncKeyState(System.Windows.Forms.Keys vKey);
+        [DllImport("User32.dll")]
+        public static extern short GetAsyncKeyState(VirtualKeyShort vKey);
         public const int KEY_PRESSED = 0x8000;
 
         [DllImport("user32.dll")]
@@ -120,6 +122,9 @@ namespace ExternalUtilsCSharp
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint cButtons, uint dwExtraInfo);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+        public static extern void mouse_event(MOUSEEVENTF dwFlags, uint dx, uint dy, uint cButtons, uint dwExtraInfo);
 
         [DllImport("user32.dll")]
         static extern bool keybd_event(byte bVk, byte bScan, uint dwFlags,
@@ -135,52 +140,52 @@ namespace ExternalUtilsCSharp
         [StructLayout(LayoutKind.Sequential)]
         public struct INPUT
         {
-            internal uint type;
-            internal InputUnion U;
-            internal static int Size
+            public uint type;
+            public InputUnion U;
+            public static int Size
             {
                 get { return Marshal.SizeOf(typeof(INPUT)); }
             }
         }
         #region [Structs+Enums]
         [StructLayout(LayoutKind.Explicit)]
-        internal struct InputUnion
+        public struct InputUnion
         {
             [FieldOffset(0)]
-            internal MOUSEINPUT mi;
+            public MOUSEINPUT mi;
             [FieldOffset(0)]
-            internal KEYBDINPUT ki;
+            public KEYBDINPUT ki;
             [FieldOffset(0)]
-            internal HARDWAREINPUT hi;
+            public HARDWAREINPUT hi;
         }
         [StructLayout(LayoutKind.Sequential)]
-        internal struct MOUSEINPUT
+        public struct MOUSEINPUT
         {
-            internal int dx;
-            internal int dy;
-            internal int mouseData;
-            internal MOUSEEVENTF dwFlags;
-            internal uint time;
-            internal UIntPtr dwExtraInfo;
+            public int dx;
+            public int dy;
+            public int mouseData;
+            public MOUSEEVENTF dwFlags;
+            public uint time;
+            public UIntPtr dwExtraInfo;
         }
         [StructLayout(LayoutKind.Sequential)]
-        internal struct KEYBDINPUT
+        public struct KEYBDINPUT
         {
-            internal VirtualKeyShort wVk;
-            internal ScanCodeShort wScan;
-            internal KEYEVENTF dwFlags;
-            internal int time;
-            internal UIntPtr dwExtraInfo;
+            public VirtualKeyShort wVk;
+            public ScanCodeShort wScan;
+            public KEYEVENTF dwFlags;
+            public int time;
+            public UIntPtr dwExtraInfo;
         }
         [StructLayout(LayoutKind.Sequential)]
-        internal struct HARDWAREINPUT
+        public struct HARDWAREINPUT
         {
-            internal int uMsg;
-            internal short wParamL;
-            internal short wParamH;
+            public int uMsg;
+            public short wParamL;
+            public short wParamH;
         }
         [Flags]
-        internal enum KEYEVENTF : uint
+        public enum KEYEVENTF : uint
         {
             EXTENDEDKEY = 0x0001,
             KEYUP = 0x0002,
@@ -188,7 +193,7 @@ namespace ExternalUtilsCSharp
             UNICODE = 0x0004
         }
         [Flags]
-        internal enum MOUSEEVENTF : uint
+        public enum MOUSEEVENTF : uint
         {
             ABSOLUTE = 0x8000,
             HWHEEL = 0x01000,
@@ -205,7 +210,7 @@ namespace ExternalUtilsCSharp
             XDOWN = 0x0080,
             XUP = 0x0100
         }
-        internal enum VirtualKeyShort : short
+        public enum VirtualKeyShort : short
         {
             ///<summary>
             ///Left mouse button
@@ -898,7 +903,7 @@ namespace ExternalUtilsCSharp
             ///</summary>
             OEM_CLEAR = 0xFE
         }
-        internal enum ScanCodeShort : short
+        public enum ScanCodeShort : short
         {
             LBUTTON = 0,
             RBUTTON = 0,

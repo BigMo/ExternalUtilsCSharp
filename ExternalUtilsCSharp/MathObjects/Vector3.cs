@@ -10,25 +10,12 @@ namespace ExternalUtilsCSharp.MathObjects
     public struct Vector3
     {
         #region VARIABLES
-        private float[] data;
+        public float X;
+        public float Y;
+        public float Z;
         #endregion
 
         #region PROPERTIES
-        public float X
-        {
-            get { return data[0]; }
-            set { data[0] = value; }
-        }
-        public float Y
-        {
-            get { return data[1]; }
-            set { data[1] = value; }
-        }
-        public float Z
-        {
-            get { return data[2]; }
-            set { data[2] = value; }
-        }
         /// <summary>
         /// Returns a new Vector3 at (0,0,0)
         /// </summary>
@@ -47,7 +34,9 @@ namespace ExternalUtilsCSharp.MathObjects
         /// <param name="z"></param>
         public Vector3(float x, float y, float z)
         {
-            data = new float[] { x, y, z };
+            this.X = x;
+            this.Y = y;
+            this.Z = z;
         }
         /// <summary>
         /// Initializes a new Vector3 by copying the values of the given Vector3
@@ -85,10 +74,51 @@ namespace ExternalUtilsCSharp.MathObjects
         {
             return new Vector3(v1.X - v2.X, v1.Y - v2.Y, v1.Z - v2.Z);
         }
+        public static Vector3 operator *(Vector3 v1, float scalar)
+        {
+            return new Vector3(v1.X * scalar, v1.Y * scalar, v1.Z * scalar);
+        }
+        public static bool operator ==(Vector3 v1, Vector3 v2)
+        {
+            return v1.X == v2.X && v1.Y == v2.Y && v1.Z == v2.Z;
+        }
+        public static bool operator !=(Vector3 v1, Vector3 v2)
+        {
+            return !(v1 == v2);
+        }
         public float this[int i]
         {
-            get { return data[i]; }
-            set { data[i] = value; }
+            get
+            {
+                switch (i)
+                {
+                    case 0:
+                        return this.X;
+                    case 1:
+                        return this.Y;
+                    case 2:
+                        return this.Z;
+                    default:
+                        throw new IndexOutOfRangeException();
+                }
+            }
+            set
+            {
+                switch (i)
+                {
+                    case 0:
+                        this.X = value;
+                        break;
+                    case 1:
+                        this.Y = value;
+                        break;
+                    case 2:
+                        this.Z = value;
+                        break;
+                    default:
+                        throw new IndexOutOfRangeException();
+                }
+            }
         }
         #endregion
     }

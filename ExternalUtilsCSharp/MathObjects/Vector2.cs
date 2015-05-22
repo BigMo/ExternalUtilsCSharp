@@ -10,20 +10,11 @@ namespace ExternalUtilsCSharp.MathObjects
     public struct Vector2
     {
         #region VARIABLES
-        private float[] data;
+        public float X;
+        public float Y;
         #endregion
 
         #region PROPERTIES
-        public float X
-        {
-            get { return data[0]; }
-            set { data[0] = value; }
-        }
-        public float Y
-        {
-            get { return data[1]; }
-            set { data[1] = value; }
-        }
         /// <summary>
         /// Returns a new Vector2 at (0,0)
         /// </summary>
@@ -41,7 +32,8 @@ namespace ExternalUtilsCSharp.MathObjects
         /// <param name="y"></param>
         public Vector2(float x, float y)
         {
-            data = new float[] { x, y };
+            this.X = x;
+            this.Y = y;
         }
         /// <summary>
         /// Initializes a new Vector2 by copying the values of the given Vector2
@@ -79,10 +71,46 @@ namespace ExternalUtilsCSharp.MathObjects
         {
             return new Vector2(v1.X - v2.X, v1.Y - v2.Y);
         }
+        public static Vector2 operator *(Vector2 v1, float scalar)
+        {
+            return new Vector2(v1.X * scalar, v1.Y * scalar);
+        }
+        public static bool operator ==(Vector2 v1, Vector2 v2)
+        {
+            return v1.X == v2.X && v1.Y == v2.Y;
+        }
+        public static bool operator !=(Vector2 v1, Vector2 v2)
+        {
+            return !(v1 == v2);
+        }
         public float this[int i]
         {
-            get { return data[i]; }
-            set { data[i] = value; }
+            get
+            {
+                switch (i)
+                {
+                    case 0:
+                        return this.X;
+                    case 1:
+                        return this.Y;
+                    default:
+                        throw new IndexOutOfRangeException();
+                }
+            }
+            set
+            {
+                switch (i)
+                {
+                    case 0:
+                        this.X = value;
+                        break;
+                    case 1:
+                        this.Y = value;
+                        break;
+                    default:
+                        throw new IndexOutOfRangeException();
+                }
+            }
         }
         #endregion
     }
