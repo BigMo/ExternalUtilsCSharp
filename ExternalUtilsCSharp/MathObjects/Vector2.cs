@@ -40,6 +40,11 @@ namespace ExternalUtilsCSharp.MathObjects
         /// </summary>
         /// <param name="vec"></param>
         public Vector2(Vector2 vec) : this(vec.X, vec.Y) { }
+        /// <summary>
+        /// Initializes a new Vector2 using the given float-array
+        /// </summary>
+        /// <param name="values"></param>
+        public Vector2(float[] values) : this(values[0], values[1]) { }
         #endregion
 
         #region METHODS

@@ -38,6 +38,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigUtils.cs" />
     <Compile Include="KeyUtils.cs" />
     <Compile Include="MathUtils.cs" />
     <Compile Include="MathObjects\Matrix.cs" />

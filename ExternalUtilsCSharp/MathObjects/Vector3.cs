@@ -43,6 +43,11 @@ namespace ExternalUtilsCSharp.MathObjects
         /// </summary>
         /// <param name="vec"></param>
         public Vector3(Vector3 vec) : this(vec.X, vec.Y, vec.Z) { }
+        /// <summary>
+        /// Initializes a new Vector3 using the given float-array
+        /// </summary>
+        /// <param name="values"></param>
+        public Vector3(float[] values) : this(values[0], values[1], values[2]) { }
         #endregion
 
         #region METHODS

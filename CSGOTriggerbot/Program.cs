@@ -20,20 +20,28 @@ namespace CSGOTriggerbot
         private const int offsetJump = 0x04A7CE50;
         private const int offsetClientState = 0x5C71B4;
         private const int offsetSetViewAngles = 0x00004CE0;
+        private const int offsetGlowManager = 0x04AFEF74;
         #endregion
 
         #region VARIABLES
         private static bool m_bWork;
         private static Vector3 vecPunch = Vector3.Zero;
         private static KeyUtils keyUtils;
-        private static bool m_bRCSComplete, m_bRCSEnabled;
-        private static bool m_bBunnyhop;
+        private static CSGOConfigUtils configUtils;
         #endregion
 
         static void Main(string[] args)
         {
             m_bWork = true;
             keyUtils = new KeyUtils();
+            configUtils = new CSGOConfigUtils();
+            configUtils.SetValue("rcsFullCompensation", false);
+            configUtils.SetValue("rcsEnabled", true);
+            configUtils.SetValue("bunnyhopEnabled", true);
+            configUtils.SetValue("triggerbotKey", WinAPI.VirtualKeyShort.XBUTTON1);
+            configUtils.SetValue("aimlockEnabled", true);
+            configUtils.SetValue("glowEnabled", true);
+            configUtils.ReadSettingsFromFile("config.cfg");
             Thread thread = new Thread(new ThreadStart(Loop));
             thread.IsBackground = true;
             thread.Start();
@@ -52,6 +60,7 @@ namespace CSGOTriggerbot
             m_bWork = false;
             thread.Join();
 
+            configUtils.SaveSettingsToFile("config.ini");
             Console.WriteLine("Bye.");
         }
 
@@ -61,54 +70,66 @@ namespace CSGOTriggerbot
             ProcessModule clientDll = null;
             ProcessModule engineDll = null;
             byte[] data;
+            GlowObjectDefinition[] glowObjects = new GlowObjectDefinition[128];
             CSGOPlayer[] players = new CSGOPlayer[64];
+            int[] playerAddresses = new int[64];
             int entityListAddress;
             int localPlayerAddress;
             int clientStateAddress;
+            int glowAddress;
+            int glowCount;
             int setViewAnglesAddress;
             CSGOPlayer nullPlayer = new CSGOPlayer() { m_iID = 0, m_iHealth = 0, m_iTeam = 0 };
             CSGOLocalPlayer localPlayer;
-            m_bRCSComplete = false;
-            m_bRCSEnabled = true;
-            m_bBunnyhop = true;
+            int lastAimlockTargetIdx = 0;
+            Stopwatch lastSeen = new Stopwatch();
+            Bones[] aimlockBones = new Bones[] { Bones.Head, Bones.Neck, Bones.Spine1, Bones.Spine2, Bones.Spine3, Bones.Spine4, Bones.Spine5 };
 
             //Wait for process to spawn
-            while (!ProcUtils.ProcessIsRunning("csgo")) { Thread.Sleep(500); }
-            proc = new ProcUtils("csgo", WinAPI.ProcessAccessFlags.All);
+            while (!ProcUtils.ProcessIsRunning("csgo") && m_bWork) { Thread.Sleep(500); }
+            if (!m_bWork)
+                return;
+
+            proc = new ProcUtils("csgo", WinAPI.ProcessAccessFlags.VirtualMemoryRead | WinAPI.ProcessAccessFlags.VirtualMemoryWrite | WinAPI.ProcessAccessFlags.VirtualMemoryOperation);
             MemUtils.Handle = proc.Handle;
-            
+
             //Get client.dll & engine.dll
             while (clientDll == null) { clientDll = proc.GetModuleByName(@"bin\client.dll"); }
             while (engineDll == null) { engineDll = proc.GetModuleByName("engine.dll"); }
 
             int clientDllBase = clientDll.BaseAddress.ToInt32();
             int engineDllBase = engineDll.BaseAddress.ToInt32();
+
             //Run triggerbot
             while (proc.IsRunning && m_bWork)
             {
                 if (WinAPI.GetForegroundWindow() != proc.Process.MainWindowHandle)
                     continue;
+
+                #region Handling input
                 keyUtils.Update();
-
                 if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.NUMPAD0))
-                    m_bRCSEnabled = !m_bRCSEnabled;
+                    configUtils.SetValue("rcsEnabled", !configUtils.GetValue<bool>("rcsEnabled"));
                 if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.NUMPAD1))
-                    m_bRCSComplete = !m_bRCSComplete;
+                    configUtils.SetValue("rcsFullCompensation", !configUtils.GetValue<bool>("rcsFullCompensation"));
                 if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.NUMPAD2))
-                    m_bBunnyhop = !m_bBunnyhop;
-
-                //Let's use int as datatype for addresses&pointers since we're in a 32bit process...
+                    configUtils.SetValue("bunnyhopEnabled", !configUtils.GetValue<bool>("bunnyhopEnabled"));
+                if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.NUMPAD3))
+                    configUtils.SetValue("aimlockEnabled", !configUtils.GetValue<bool>("aimlockEnabled"));
+                #endregion
+                #region Various addresses
                 entityListAddress = clientDll.BaseAddress.ToInt32() + offsetEntityList;
                 localPlayerAddress = MemUtils.Read<int>((IntPtr)(offsetLocalPlayer + clientDllBase));
                 localPlayer = MemUtils.Read<CSGOLocalPlayer>((IntPtr)(localPlayerAddress));
                 clientStateAddress = MemUtils.Read<int>((IntPtr)(engineDllBase + offsetClientState));
                 setViewAnglesAddress = clientStateAddress + offsetSetViewAngles;
+                #endregion
 
                 //Sanity checks
                 if (!localPlayer.IsValid())
                     continue;
 
-                //Read entitylist
+                #region Reading entitylist and entities
                 if (!MemUtils.Read((IntPtr)(clientDllBase + offsetEntityList), out data, 16 * 64))
                 {
                     Console.WriteLine("ERROR: Failed to read entitylist!");
@@ -120,19 +141,20 @@ namespace CSGOTriggerbot
                 for (int i = 0; i < data.Length / 64; i++)
                 {
                     int address = BitConverter.ToInt32(data, i * 16);
-                    if(address != 0)
+                    playerAddresses[i] = address;
+                    if (address != 0)
                     {
                         players[i] = MemUtils.Read<CSGOPlayer>((IntPtr)(address), nullPlayer);
                     }
-                    else 
+                    else
                     {
                         players[i] = nullPlayer;
                     }
                 }
+                #endregion
 
-
-                //Triggerbot
-                if (keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.MBUTTON))
+                #region Triggerbot
+                if (keyUtils.KeyIsDown(configUtils.GetValue<WinAPI.VirtualKeyShort>("triggerbotKey")))
                 {
                     if (localPlayer.m_iCrosshairIdx > 0 && localPlayer.m_iCrosshairIdx <= players.Length)
                     {
@@ -142,6 +164,7 @@ namespace CSGOTriggerbot
                             if (target.m_iTeam != localPlayer.m_iTeam)
                             {
                                 Console.WriteLine("*Shoot*");
+                                Thread.Sleep(10);
                                 WinAPI.mouse_event(WinAPI.MOUSEEVENTF.LEFTDOWN, 0, 0, 0, 0);
                                 Thread.Sleep(10);
                                 WinAPI.mouse_event(WinAPI.MOUSEEVENTF.LEFTUP, 0, 0, 0, 0);
@@ -150,25 +173,25 @@ namespace CSGOTriggerbot
                         }
                     }
                 }
-
-                //RCS
-                if (m_bRCSEnabled)
+                #endregion
+                #region RCS
+                if (configUtils.GetValue<bool>("rcsEnabled"))
                 {
                     if (localPlayer.m_iShotsFired > 0)
                     {
                         Vector3 currentPunch = localPlayer.m_vecPunch - vecPunch;
                         Vector3 viewAngles = MemUtils.Read<Vector3>((IntPtr)(setViewAnglesAddress), Vector3.Zero);
-                        Vector3 newViewAngles = viewAngles - (m_bRCSComplete ? currentPunch * 2f : currentPunch);
+                        Vector3 newViewAngles = viewAngles - (configUtils.GetValue<bool>("rcsFullCompensation") ? currentPunch * 2f : currentPunch);
                         newViewAngles = MathUtils.ClampAngle(newViewAngles);
                         MemUtils.Write<Vector3>((IntPtr)(setViewAnglesAddress), newViewAngles);
                     }
                     vecPunch = localPlayer.m_vecPunch;
                 }
-
-                //Bunnyhop
-                if(m_bBunnyhop)
+                #endregion
+                #region Bunnyhop
+                if (configUtils.GetValue<bool>("bunnyhopEnabled"))
                 {
-                    if(keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.SPACE))
+                    if (keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.SPACE))
                     {
                         if ((localPlayer.m_iFlags & 1) == 1) //Stands (FL_ONGROUND)
                             MemUtils.Write<int>((IntPtr)(clientDllBase + offsetJump), 5);
@@ -176,6 +199,84 @@ namespace CSGOTriggerbot
                             MemUtils.Write<int>((IntPtr)(clientDllBase + offsetJump), 4);
                     }
                 }
+                #endregion
+                #region Glow
+                if (configUtils.GetValue<bool>("bunnyhopEnabled"))
+                {
+                    glowAddress = MemUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager));
+                    glowCount = MemUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager + 4));
+                    if (MemUtils.Read((IntPtr)(glowAddress), out data, GlowObjectDefinition.GetSize() * glowCount))
+                    {
+                        for (int i = 0; i < glowCount && i < glowObjects.Length; i++)
+                        {
+                            glowObjects[i] = GetStructure<GlowObjectDefinition>(data, i * GlowObjectDefinition.GetSize(), GlowObjectDefinition.GetSize());
+                            for (int idx = 0; idx < players.Length; idx++)
+                            {
+                                if (glowObjects[i].pEntity != 0 && playerAddresses[idx] == glowObjects[i].pEntity)
+                                {
+                                    glowObjects[i].a = 1f;
+                                    glowObjects[i].r = (players[idx].m_iTeam == 2 ? 1f : 0f);
+                                    glowObjects[i].g = 0;
+                                    glowObjects[i].b = (players[idx].m_iTeam == 3 ? 1f : 0f);
+                                    glowObjects[i].m_bRenderWhenOccluded = true;
+                                    glowObjects[i].m_bRenderWhenUnoccluded = true;
+                                    glowObjects[i].m_bFullBloom = false;
+                                    MemUtils.Write((IntPtr)(glowAddress + GlowObjectDefinition.GetSize() * i), glowObjects[i].GetBytes(), 4, GlowObjectDefinition.GetSize() - 14);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                #endregion
+                #region Aimlock
+                if (configUtils.GetValue<bool>("aimlockEnabled"))
+                {
+                    CSGOPlayer target = nullPlayer;
+                    //Is there a player in our crosshair?
+                    if (localPlayer.m_iCrosshairIdx > 0 && localPlayer.m_iCrosshairIdx <= players.Length)
+                    {
+                        lastAimlockTargetIdx = localPlayer.m_iCrosshairIdx;
+                        lastSeen.Reset();
+                        lastSeen.Start();
+                        target = players[lastAimlockTargetIdx - 1];
+                    }
+                    //Or is the last player we aimed at valid? (nonzero index)
+                    else if (lastAimlockTargetIdx != 0)
+                    {
+                        //Did we see him less than a half second ago?
+                        if (lastSeen.ElapsedMilliseconds < 500)
+                        {
+                            target = players[lastAimlockTargetIdx - 1];
+                        }
+                        else
+                        {
+                            lastAimlockTargetIdx = 0;
+                        }
+                    }
+                    if (target.IsValid())
+                    {
+                        if (target.m_iTeam != localPlayer.m_iTeam)
+                        {
+                            Vector3 sourceVector = localPlayer.m_vecOrigin + localPlayer.m_vecViewOffset;
+                            Vector3 originalAimAngles = MemUtils.Read<Vector3>((IntPtr)setViewAnglesAddress);
+                            Vector3 smallestAimAngles = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
+                            foreach (Bones bone in aimlockBones)
+                            {
+                                Vector3 targetVector = new Vector3(MemUtils.Read<float>((IntPtr)(target.GetBoneAddress((int)bone)), new int[] { 0x0c, 0x1C, 0x2C }));
+                                Vector3 aimAngles = MathUtils.CalcAngle(sourceVector, targetVector);
+                                aimAngles = MathUtils.ClampAngle(aimAngles);
+                                if((aimAngles - originalAimAngles).Length() < smallestAimAngles.Length())
+                                {
+                                    smallestAimAngles = aimAngles - originalAimAngles;
+                                }
+                            }
+                            MemUtils.Write<Vector3>((IntPtr)(setViewAnglesAddress), originalAimAngles + smallestAimAngles);
+                        }
+                    }
+                }
+                #endregion
+
                 Thread.Sleep((int)(1000f / 60f));
             }
         }

@@ -53,6 +53,12 @@ namespace ExternalUtilsCSharp
                 return false;
             return numBytes.ToInt32() == data.Length;
         }
+        public static bool Write(IntPtr address, byte[] data, int offset, int length)
+        {
+            byte[] writeData = new byte[length];
+            Array.Copy(data, offset, writeData, 0, writeData.Length);
+            return Write((IntPtr)(address.ToInt32() + offset), writeData);
+        }
         #endregion
         #region SPECIALIZED FUNCTIONS
         #region READ
@@ -106,6 +112,21 @@ namespace ExternalUtilsCSharp
             if (Read(address, out data, SIZE_FLOAT * rows * columns))
                 matrix.Read(data);
             return matrix;
+        }
+        /// <summary>
+        /// Generic function to read an array from memory using the given type and offsets.
+        /// Offsets will be added to the address. (They will not be summed up but rather applied individually)
+        /// </summary>
+        /// <typeparam name="T">The type of the value</typeparam>
+        /// <param name="address">The address to read data at</param>
+        /// <param name="offsets">Offsets that will be applied to the address</param>
+        /// <returns></returns>
+        public static T[] Read<T>(IntPtr address, params int[] offsets) where T : struct
+        {
+            T[] values = new T[offsets.Length];
+            for (int i = 0; i < offsets.Length; i++)
+                values[i] = Read<T>((IntPtr)(address.ToInt32() + offsets[i]));
+            return values;
         }
         #endregion
         #region WRITE

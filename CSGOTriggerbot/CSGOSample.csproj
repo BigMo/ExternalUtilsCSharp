@@ -42,8 +42,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bones.cs" />
+    <Compile Include="CSGOConfigUtils.cs" />
     <Compile Include="CSGOLocalPlayer.cs" />
     <Compile Include="CSGOPlayer.cs" />
+    <Compile Include="GlowObjectDefinition.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

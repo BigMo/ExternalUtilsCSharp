@@ -114,20 +114,35 @@ namespace ExternalUtilsCSharp
         public static Vector3 ClampAngle(Vector3 qaAng)
         {
 
-            if (qaAng.X > 89.0f && qaAng.X <= 180.0f)
-                qaAng.X = 89.0f;
+            //if (qaAng.X > 89.0f && qaAng.X <= 180.0f)
+            //    qaAng.X = 89.0f;
 
-            while (qaAng.X > 180.0f)
-                qaAng.X = qaAng.X - 360.0f;
+            //while (qaAng.X > 180.0f)
+            //    qaAng.X = qaAng.X - 360.0f;
 
-            if (qaAng.X < -89.0f)
-                qaAng.X = -89.0f;
+            //if (qaAng.X < -89.0f)
+            //    qaAng.X = -89.0f;
 
-            while (qaAng.Y > 180.0f)
-                qaAng.Y = qaAng.Y - 360.0f;
+            //while (qaAng.Y > 180.0f)
+            //    qaAng.Y = qaAng.Y - 360.0f;
 
-            while (qaAng.Y < -180.0f)
-                qaAng.Y = qaAng.Y + 360.0f;
+            //while (qaAng.Y < -180.0f)
+            //    qaAng.Y = qaAng.Y + 360.0f;
+
+            //return qaAng;
+            if (qaAng[0] > 89.0f)
+                qaAng[0] = 89.0f;
+
+            if (qaAng[0] < -89.0f)
+                qaAng[0] = -89.0f;
+
+            while (qaAng[1] > 180)
+                qaAng[1] -= 360;
+
+            while (qaAng[1] < -180)
+                qaAng[1] += 360;
+
+            qaAng.Z = 0;
 
             return qaAng;
         }

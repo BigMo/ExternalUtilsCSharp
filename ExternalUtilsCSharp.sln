@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExternalUtilsCSharp", "Exte
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{20B2DC66-F8DC-495A-8E47-E96FB612E8C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSGOTriggerbot", "CSGOTriggerbot\CSGOTriggerbot.csproj", "{0C392DB2-895E-4F2A-B2A0-1D79849FC5B2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSGOSample", "CSGOTriggerbot\CSGOSample.csproj", "{0C392DB2-895E-4F2A-B2A0-1D79849FC5B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
