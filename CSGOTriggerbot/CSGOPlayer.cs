@@ -31,11 +31,7 @@ namespace CSGOTriggerbot
 
         public bool IsValid()
         {
-            bool val = this.m_iID != 0 && this.m_iDormant != 1 && this.m_iHealth > 0 /*&& (m_iTeam == 2 || m_iTeam == 3)*/;
-            if (val)
-                return val;
-            else
-                return val;
+            return this.m_iID != 0 && this.m_iDormant != 1 && this.m_iHealth > 0 && (m_iTeam == 2 || m_iTeam == 3);
         }
 
         public int GetBoneAddress(int boneIndex)
