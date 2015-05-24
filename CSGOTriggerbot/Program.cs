@@ -44,6 +44,7 @@ namespace CSGOTriggerbot
             configUtils.SetValue("aimlockEnabled", true);
             configUtils.SetValue("glowEnabled", true);
             configUtils.ReadSettingsFromFile("config.cfg");
+            MemUtils.UseUnsafeReadWrite = true;
 
             Thread thread = new Thread(new ThreadStart(Loop));
             thread.IsBackground = true;
@@ -77,7 +78,7 @@ namespace CSGOTriggerbot
             ProcessModule engineDll = null;
             byte[] data;
             GlowObjectDefinition[] glowObjects = new GlowObjectDefinition[128];
-            CSGOPlayer[] players = new CSGOPlayer[64];
+            CSGOPlayer[] players = new CSGOPlayer[8192];
             int[] playerAddresses = new int[players.Length];
             int entityListAddress;
             int localPlayerAddress;
@@ -265,7 +266,7 @@ namespace CSGOTriggerbot
                 if (configUtils.GetValue<bool>("bunnyhopEnabled"))
                 {
                     glowAddress = MemUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager));
-                    glowCount = MemUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager + 4));
+                    glowCount = MemUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager + 0x0C));
                     if (MemUtils.Read((IntPtr)(glowAddress), out data, GlowObjectDefinition.GetSize() * glowCount))
                     {
                         for (int i = 0; i < glowCount && i < glowObjects.Length; i++)

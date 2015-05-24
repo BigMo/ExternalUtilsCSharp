@@ -1,4 +1,5 @@
-﻿using ExternalUtilsCSharp.MathObjects;
+﻿using ExternalUtilsCSharp;
+using ExternalUtilsCSharp.MathObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,9 @@ namespace CSGOTriggerbot
     [StructLayout(LayoutKind.Explicit)]
     struct CSGOPlayer
     {
+        [FieldOffset(0x8)]
+        public int m_iVirtualTable;
+
         [FieldOffset(0x64)]
         public int m_iID;
 
@@ -31,12 +35,28 @@ namespace CSGOTriggerbot
 
         public bool IsValid()
         {
-            return this.m_iID != 0 && this.m_iDormant != 1 && this.m_iHealth > 0 && (m_iTeam == 2 || m_iTeam == 3);
+            return this.m_iID != 0 && this.m_iDormant != 1 && this.m_iHealth > 0 && (m_iTeam == 2 || m_iTeam == 3) && GetClassID() == 34;
         }
 
         public int GetBoneAddress(int boneIndex)
         {
             return m_pBoneMatrix + boneIndex * 0x30;
+        }
+
+        public int GetClientClass()
+        {
+            int function = MemUtils.Read<int>((IntPtr)(m_iVirtualTable + 2 * 0x04));
+            return  MemUtils.Read<int>((IntPtr)(function + 0x01));
+        }
+        public int GetClassID()
+        {
+            return MemUtils.Read<int>((IntPtr)(GetClientClass() + 20));
+        }
+
+        public String GetName()
+        {
+            int ptr = MemUtils.Read<int>((IntPtr)(GetClassID() + 8));
+            return MemUtils.ReadString((IntPtr)(ptr + 8), 32, Encoding.ASCII);
         }
     }
 }

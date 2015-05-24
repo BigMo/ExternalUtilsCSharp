@@ -19,6 +19,12 @@ namespace ExternalUtilsCSharp
         /// The handle to the process this class reads memory from/writes memory to
         /// </summary>
         public static IntPtr Handle { get; set; }
+        /// <summary>
+        /// Determines whether data will be read/written using unsafe code or not.
+        /// Implementation of unsafe code comes from:
+        /// https://github.com/Aevitas/bluerain/blob/master/src/BlueRain/ExternalProcessMemory.cs
+        /// </summary>
+        public static bool UseUnsafeReadWrite { get; set; }
         #endregion
         #region METHODS
         #region PRIMITIVE WRAPPERS
@@ -83,7 +89,7 @@ namespace ExternalUtilsCSharp
         /// <param name="address">The address to read data at</param>
         /// <param name="defVal">The default value of this operation (which is returned in case the Read-operation fails)</param>
         /// <returns>The value read from memory</returns>
-        public static T Read<T>(IntPtr address, T defVal = default(T)) where T : struct
+        public unsafe static T Read<T>(IntPtr address, T defVal = default(T)) where T : struct
         {
             byte[] data;
             int size = Marshal.SizeOf(typeof(T));
@@ -91,9 +97,17 @@ namespace ExternalUtilsCSharp
 
             if (Read(address, out data, size))
             {
-                GCHandle gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
-                structure = (T)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(T));
-                gcHandle.Free();
+                if (UseUnsafeReadWrite)
+                {
+                    fixed (byte* b = data)
+                        structure = (T)Marshal.PtrToStructure((IntPtr)b, typeof(T));
+                }
+                else
+                {
+                    GCHandle gcHandle = GCHandle.Alloc(data, GCHandleType.Pinned);
+                    structure = (T)Marshal.PtrToStructure(gcHandle.AddrOfPinnedObject(), typeof(T));
+                    gcHandle.Free();
+                }
             }
 
             return structure;
@@ -148,15 +162,23 @@ namespace ExternalUtilsCSharp
         /// <param name="address">The address to write data to</param>
         /// <param name="value">The value to write to memory</param>
         /// <returns>True if successful, false if not</returns>
-        public static bool Write<T>(IntPtr address, T value) where T : struct
+        public static unsafe bool Write<T>(IntPtr address, T value) where T : struct
         {
             int size = Marshal.SizeOf(typeof(T));
             byte[] data = new byte[size];
 
-            IntPtr ptr = Marshal.AllocHGlobal(size);
-            Marshal.StructureToPtr(value, ptr, false);
-            Marshal.Copy(ptr, data, 0, size);
-            Marshal.FreeHGlobal(ptr);
+            if (UseUnsafeReadWrite) 
+            {
+                fixed (byte* b = data)
+                    Marshal.StructureToPtr(value, (IntPtr)b, true);
+            }
+            else
+            {
+                IntPtr ptr = Marshal.AllocHGlobal(size);
+                Marshal.StructureToPtr(value, ptr, true);
+                Marshal.Copy(ptr, data, 0, size);
+                Marshal.FreeHGlobal(ptr);
+            }
 
             return Write(address, data);
         }
