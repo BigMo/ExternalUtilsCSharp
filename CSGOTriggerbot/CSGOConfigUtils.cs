@@ -23,13 +23,17 @@ namespace CSGOTriggerbot
                 //Skip invalid ones
                 if (tmpLine.StartsWith("#")) // comment
                     continue;
-                else if (!tmpLine.Contains("=")) // key-value pair
+                else if (!tmpLine.Contains("=")) // it's no key-value pair!
                     continue;
 
                 //Trim both parts of the key-value pair
                 string[] parts = tmpLine.Split('=');
                 parts[0] = parts[0].Trim();
                 parts[1] = parts[1].Trim();
+                if (string.IsNullOrEmpty(parts[0]) || string.IsNullOrEmpty(parts[1]))
+                    continue;
+                if (parts[1].Contains('#')) //If value-part contains comment, split it
+                    parts[1] = parts[1].Split('#')[0];
                 InterpretSetting(parts[0], parts[1]);
             }
         }
@@ -65,13 +69,16 @@ namespace CSGOTriggerbot
         public override byte[] SaveSettings()
         {
             StringBuilder builder = new StringBuilder();
-            builder.AppendLine(@"#    _________   _________ ________ ___________________      .__                          ___.           __   ");
-            builder.AppendLine(@"#    \_   ___ \ /   _____//  _____/ \_____  \__    ___/______|__| ____   ____   __________\_ |__   _____/  |_ ");
-            builder.AppendLine(@"#    /    \  \/ \_____  \/   \  ___  /   |   \|    |  \_  __ \  |/ ___\ / ___\_/ __ \_  __ \ __ \ /  _ \   __\");
-            builder.AppendLine(@"#    \     \____/        \    \_\  \/    |    \    |   |  | \/  / /_/  > /_/  >  ___/|  | \/ \_\ (  <_> )  |  ");
-            builder.AppendLine(@"#     \______  /_______  /\______  /\_______  /____|   |__|  |__\___  /\___  / \___  >__|  |___  /\____/|__|  ");
-            builder.AppendLine(@"#            \/        \/        \/         \/                 /_____//_____/      \/          \/             ");
-            builder.AppendLine(@"# [Sick ascii art from http://patorjk.com/software/taag/]");
+            builder.AppendLine(@"###################################################################################################################");
+            builder.AppendLine(@"#    _________   _________ ________ ___________________      .__   *puddin tells lies*    ___.           __       #");
+            builder.AppendLine(@"#    \_   ___ \ /   _____//  _____/ \_____  \__    ___/______|__| ____   ____   __________\_ |__   _____/  |_     #");
+            builder.AppendLine(@"#    /    \  \/ \_____  \/   \  ___  /   |   \|    |  \_  __ \  |/ ___\ / ___\_/ __ \_  __ \ __ \ /  _ \   __\    #");
+            builder.AppendLine(@"#    \     \____/        \    \_\  \/    |    \    |   |  | \/  / /_/  > /_/  >  ___/|  | \/ \_\ (  <_> )  |      #");
+            builder.AppendLine(@"#     \______  /_______  /\______  /\_______  /____|   |__|  |__\___  /\___  / \___  >__|  |___  /\____/|__|      #");
+            builder.AppendLine(@"# *u w0t m8* \/        \/        \/         \/  uc exclusive   /_____//_____/      \/          \/  (C) by Zat     #");
+            builder.AppendLine(@"###################################################################################################################");
+            builder.AppendLine(@"#                              [Sick ascii art from http://patorjk.com/software/taag/]                            #");
+            builder.AppendLine(@"###################################################################################################################");
             foreach (string key in this.GetKeys())
             {
                 builder.AppendFormat("{0} = {1}\n", key, this.GetValue(key));

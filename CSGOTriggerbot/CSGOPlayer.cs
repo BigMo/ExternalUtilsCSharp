@@ -15,7 +15,7 @@ namespace CSGOTriggerbot
         public int m_iID;
 
         [FieldOffset(0xE9)]
-        public bool m_bDormant;
+        public byte m_iDormant;
 
         [FieldOffset(0xF0)]
         public int m_iTeam;
@@ -31,7 +31,11 @@ namespace CSGOTriggerbot
 
         public bool IsValid()
         {
-            return this.m_iID != 0 && this.m_iHealth > 0 && (m_iTeam == 2 || m_iTeam == 3);
+            bool val = this.m_iID != 0 && this.m_iDormant != 1 && this.m_iHealth > 0 /*&& (m_iTeam == 2 || m_iTeam == 3)*/;
+            if (val)
+                return val;
+            else
+                return val;
         }
 
         public int GetBoneAddress(int boneIndex)
