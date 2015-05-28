@@ -15,13 +15,13 @@ namespace CSGOTriggerbot
     class Program
     {
         #region OFFSETS
-        private const int offsetEntityList = 0x049EE2E4;
-        private const int offsetLocalPlayer = 0x00A4CA5C;
-        private const int offsetJump = 0x04A7CE50;
-        private const int offsetClientState = 0x5C71B4;
-        private const int offsetSetViewAngles = 0x00004CE0;
-        private const int offsetGlowManager = 0x04AFEF74;
-        private const int offsetSignOnState = 0xE8;
+        private static int offsetEntityList = 0x00;
+        private static int offsetLocalPlayer = 0x00;
+        private static int offsetJump = 0x00;
+        private static int offsetClientState = 0x00;
+        private static int offsetSetViewAngles = 0x00;
+        private static int offsetGlowManager = 0x00;
+        private static int offsetSignOnState = 0xE8;
         #endregion
 
         #region VARIABLES
@@ -58,13 +58,9 @@ namespace CSGOTriggerbot
             Console.WriteLine("Hold SPACE for bunnyhop");
             Console.WriteLine("Hold {0} for triggerbot", configUtils.GetValue<WinAPI.VirtualKeyShort>("triggerbotKey"));
 
-            while (Console.ReadKey().Key != ConsoleKey.Escape)
-            {
-                Thread.Sleep(100);
-            }
+            while (!m_bWork) Thread.Sleep(250);
 
             Console.WriteLine("Waiting for thread to exit...");
-            m_bWork = false;
             thread.Join();
 
             configUtils.SaveSettingsToFile("config.cfg");
@@ -108,7 +104,55 @@ namespace CSGOTriggerbot
             int clientDllBase = clientDll.BaseAddress.ToInt32();
             int engineDllBase = engineDll.BaseAddress.ToInt32();
 
-            //Run triggerbot
+            #region OFFSETS
+            MemUtils.ScanResult scan;
+            //EntityList
+            scan = MemUtils.PerformSignatureScan(new byte[] { 0x05, 0x00, 0x00, 0x00, 0x00, 0xC1, 0xe9, 0x00, 0x39, 0x48, 0x04 }, "x????xx?xxx", clientDll);
+            if (scan.Success)
+            {
+                int tmp = MemUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 1));
+                byte tmp2 = MemUtils.Read<byte>((IntPtr)(scan.Address.ToInt32() + 7));
+                offsetEntityList = tmp + tmp2 - clientDllBase;
+            }
+            //LocalPlayer
+            scan = MemUtils.PerformSignatureScan(new byte[] { 0x8D, 0x34, 0x85, 0x00, 0x00, 0x00, 0x00, 0x89, 0x15, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x41, 0x08, 0x8B, 0x48 }, "xxx????xx????xxxxx", clientDll);
+            if (scan.Success)
+            {
+                int tmp = MemUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 3));
+                byte tmp2 = MemUtils.Read<byte>((IntPtr)(scan.Address.ToInt32() + 18));
+                offsetLocalPlayer = tmp + tmp2 - clientDllBase;
+            }
+            //+jump
+            scan = MemUtils.PerformSignatureScan(new byte[] { 0x89, 0x15, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x15, 0x00, 0x00, 0x00, 0x00, 0xF6, 0xC2, 0x03, 0x74, 0x03, 0x83, 0xCE, 0x08, 0xA8, 0x08, 0xBF }, "xx????xx????xxxxxxxxxxx", clientDll);
+            if (scan.Success)
+            {
+                int tmp = MemUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 2));
+                offsetJump = tmp - clientDllBase;
+            }
+            //ClientState
+            scan = MemUtils.PerformSignatureScan(new byte[] { 0xC2, 0x00, 0x00, 0xCC, 0xCC, 0x8B, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x33, 0xC0, 0x83, 0xB9 }, "x??xxxx????xxxx", engineDll);
+            if (scan.Success)
+            {
+                int tmp = MemUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 7));
+                offsetClientState = tmp - engineDllBase;
+            }
+            //SetViewAngles
+            scan = MemUtils.PerformSignatureScan(new byte[] { 0x8B, 0x15, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x4D, 0x08, 0x8B, 0x82, 0x00, 0x00, 0x00, 0x00, 0x89, 0x01, 0x8B, 0x82, 0x00, 0x00, 0x00, 0x00, 0x89, 0x41, 0x04 }, "xx????xxxxx????xxxx????xxx", engineDll);
+            if (scan.Success)
+            {
+                int tmp = MemUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 11));
+                offsetSetViewAngles = tmp;
+            }
+            //GlowObject
+            scan = MemUtils.PerformSignatureScan(new byte[] { 0x8D, 0x8F, 0x00, 0x00, 0x00, 0x00, 0xA1, 0x00, 0x00, 0x00, 0x00, 0xC7, 0x04, 0x02, 0x00, 0x00, 0x00, 0x00, 0x89, 0x35, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x51 }, "xx????x????xxx????xx????xx", clientDll);
+            if (scan.Success)
+            {
+                int tmp = MemUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 7));
+                offsetGlowManager = tmp - clientDllBase;
+            }
+            #endregion
+
+            //Run hack
             while (proc.IsRunning && m_bWork)
             {
                 Thread.Sleep((int)(1000f / 60f));
@@ -266,7 +310,7 @@ namespace CSGOTriggerbot
                 if (configUtils.GetValue<bool>("bunnyhopEnabled"))
                 {
                     glowAddress = MemUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager));
-                    glowCount = MemUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager + 0x0C));
+                    glowCount = MemUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager + 0x04));
                     if (MemUtils.Read((IntPtr)(glowAddress), out data, GlowObjectDefinition.GetSize() * glowCount))
                     {
                         for (int i = 0; i < glowCount && i < glowObjects.Length; i++)
