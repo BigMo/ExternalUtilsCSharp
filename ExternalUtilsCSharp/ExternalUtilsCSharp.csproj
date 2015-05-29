@@ -45,6 +45,11 @@
     <Compile Include="KeyUtils.cs" />
     <Compile Include="MathUtils.cs" />
     <Compile Include="MathObjects\Matrix.cs" />
+    <Compile Include="MemObjects\PE\COFFHeader.cs" />
+    <Compile Include="MemObjects\PE\DOSHeader.cs" />
+    <Compile Include="MemObjects\PE\PEInfo.cs" />
+    <Compile Include="MemObjects\PE\PEOptHeader.cs" />
+    <Compile Include="MemObjects\ScanResult.cs" />
     <Compile Include="MemUtils.cs" />
     <Compile Include="ProcUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

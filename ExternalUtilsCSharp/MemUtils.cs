@@ -1,4 +1,6 @@
 ﻿using ExternalUtilsCSharp.MathObjects;
+using ExternalUtilsCSharp.MemObjects;
+using ExternalUtilsCSharp.MemObjects.PE;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -213,11 +215,30 @@ namespace ExternalUtilsCSharp
         /// <param name="pattern">Byte-pattern to scan for</param>
         /// <param name="mask">Mask to scan for ('?' is the wildcard)</param>
         /// <param name="module">Module to scan</param>
+        /// <param name="codeSectionOnly">If true, MemUtils will parse the module's headers and scan the .code-section only</param>
         /// <param name="wildcard">Char that is used as wildcard in the mask</param>
         /// <returns></returns>
-        public static ScanResult PerformSignatureScan(byte[] pattern, string mask, ProcessModule module, char wildcard = '?')
+        public static ScanResult PerformSignatureScan(byte[] pattern, string mask, ProcessModule module, bool codeSectionOnly = true, char wildcard = '?')
         {
-            return PerformSignatureScan(pattern, mask, module.BaseAddress, module.ModuleMemorySize, wildcard);
+            if (codeSectionOnly)
+            {
+                PEInfo info = new PEInfo(module);
+                return PerformSignatureScan(
+                    pattern,
+                    mask,
+                    (IntPtr)(info.PEOptHeaderAddress.ToInt64() + info.PEOptHeader.BaseOfCode),
+                    info.PEOptHeader.SizeOfCode,
+                    wildcard);
+            }
+            else
+            {
+                return PerformSignatureScan(
+                    pattern,
+                    mask,
+                    module.BaseAddress,
+                    module.ModuleMemorySize,
+                    wildcard);
+            }
         }
         /// <summary>
         /// Performs a signature-scan using for the given pattern and mask in the given range of the process' address space
@@ -326,18 +347,6 @@ namespace ExternalUtilsCSharp
                 chr[i] = pattern[i] == wildcardByte ? wildcardChar : matchChar;
             return new string(chr);
         }
-        #region STRUCTS
-        /// <summary>
-        /// Struct that holds basic data about the outcome of a signature-scan
-        /// </summary>
-        public struct ScanResult
-        {
-            public bool Success;
-            public IntPtr Address;
-            public IntPtr Base;
-            public IntPtr Offset;
-        }
-        #endregion
         #endregion
         #endregion
     }

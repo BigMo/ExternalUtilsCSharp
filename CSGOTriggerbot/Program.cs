@@ -1,5 +1,6 @@
 ﻿using ExternalUtilsCSharp;
 using ExternalUtilsCSharp.MathObjects;
+using ExternalUtilsCSharp.MemObjects;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -105,7 +106,7 @@ namespace CSGOTriggerbot
             int engineDllBase = engineDll.BaseAddress.ToInt32();
 
             #region OFFSETS
-            MemUtils.ScanResult scan;
+            ScanResult scan;
             //EntityList
             scan = MemUtils.PerformSignatureScan(new byte[] { 0x05, 0x00, 0x00, 0x00, 0x00, 0xC1, 0xe9, 0x00, 0x39, 0x48, 0x04 }, "x????xx?xxx", clientDll);
             if (scan.Success)
