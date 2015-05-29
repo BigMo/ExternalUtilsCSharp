@@ -16,8 +16,18 @@
   </Class>
   <Class Name="ExternalUtilsCSharp.MemUtils">
     <Position X="5.75" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Struct Name="ExternalUtilsCSharp.MemUtils.ScanResult">
+        <TypeIdentifier>
+          <NewMemberFileName>MemUtils.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAABAAAAAAgAAAAAiAAAAAQIQAAAAAAEAAAA=</HashCode>
+      <HashCode>AAAgAAAAAABAAAAAAiAAAAAiAAAAgwIQAAAAAAEIAAA=</HashCode>
       <FileName>MemUtils.cs</FileName>
     </TypeIdentifier>
   </Class>

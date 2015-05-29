@@ -32,10 +32,10 @@ namespace CSGOTriggerbot
         [FieldOffset(0x13E8)]
         public Vector3 m_vecPunch;
 
-        [FieldOffset(0x1d60)]
+        [FieldOffset(0x1d6C)]
         public int m_iShotsFired;
 
-        [FieldOffset(0x2400)]
+        [FieldOffset(0x2410)]
         public int m_iCrosshairIdx;
 
         public bool IsValid()

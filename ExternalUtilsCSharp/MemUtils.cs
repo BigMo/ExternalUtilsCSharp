@@ -1,6 +1,7 @@
 ﻿using ExternalUtilsCSharp.MathObjects;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -8,11 +9,13 @@ namespace ExternalUtilsCSharp
 {
     /// <summary>
     /// A class that simplifies read- and write-operations to processes
+    /// Includes signature-scanning
     /// </summary>
     public class MemUtils
     {
         #region CONSTANTS
         private const int SIZE_FLOAT = sizeof(float);
+        private const int MAX_DUMP_SIZE = 0xFFFF;
         #endregion
         #region PROPERTIES
         /// <summary>
@@ -35,7 +38,7 @@ namespace ExternalUtilsCSharp
         /// <param name="data">The byte-array to write the read data to</param>
         /// <param name="length">The number (in bytes) of bytes to read</param>
         /// <returns>True if successful, false if not</returns>
-        public static bool Read( IntPtr address, out byte[] data, int length)
+        public static bool Read(IntPtr address, out byte[] data, int length)
         {
             IntPtr numBytes = IntPtr.Zero;
             data = new byte[length];
@@ -59,6 +62,15 @@ namespace ExternalUtilsCSharp
                 return false;
             return numBytes.ToInt32() == data.Length;
         }
+        /// <summary>
+        /// Writes a chunk of memory using the given offset and length of data
+        /// It will apply the offset to the address as well as to the data, length defines the number of bytes to write (beginning at offset)
+        /// </summary>
+        /// <param name="address">The address to write to</param>
+        /// <param name="data">A byte-array of data to write</param>
+        /// <param name="offset">Skips the given number of bytes (applies to address and data)</param>
+        /// <param name="length">Number of bytes to write (beginning at offset)</param>
+        /// <returns>True if successful, false if not</returns>
         public static bool Write(IntPtr address, byte[] data, int offset, int length)
         {
             byte[] writeData = new byte[length];
@@ -167,7 +179,7 @@ namespace ExternalUtilsCSharp
             int size = Marshal.SizeOf(typeof(T));
             byte[] data = new byte[size];
 
-            if (UseUnsafeReadWrite) 
+            if (UseUnsafeReadWrite)
             {
                 fixed (byte* b = data)
                     Marshal.StructureToPtr(value, (IntPtr)b, true);
@@ -191,6 +203,139 @@ namespace ExternalUtilsCSharp
         public static bool WriteMatrix(IntPtr address, Matrix matrix)
         {
             return Write(address, matrix.ToByteArray());
+        }
+        #endregion
+        #endregion
+        #region SIGSCANNING
+        /// <summary>
+        /// Performs a signature-scan using for the given pattern and mask in the given range of the process' address space
+        /// </summary>
+        /// <param name="pattern">Byte-pattern to scan for</param>
+        /// <param name="mask">Mask to scan for ('?' is the wildcard)</param>
+        /// <param name="module">Module to scan</param>
+        /// <param name="wildcard">Char that is used as wildcard in the mask</param>
+        /// <returns></returns>
+        public static ScanResult PerformSignatureScan(byte[] pattern, string mask, ProcessModule module, char wildcard = '?')
+        {
+            return PerformSignatureScan(pattern, mask, module.BaseAddress, module.ModuleMemorySize, wildcard);
+        }
+        /// <summary>
+        /// Performs a signature-scan using for the given pattern and mask in the given range of the process' address space
+        /// </summary>
+        /// <param name="pattern">Byte-pattern to scan for</param>
+        /// <param name="mask">Mask to scan for ('?' is the wildcard)</param>
+        /// <param name="from">Where to start scanning from</param>
+        /// <param name="length">The length of the range to scan in</param>
+        /// <param name="wildcard">Char that is used as wildcard in the mask</param>
+        /// <returns></returns>
+        public static ScanResult PerformSignatureScan(byte[] pattern, string mask, IntPtr from, int length, char wildcard = '?')
+        {
+            return PerformSignatureScan(pattern, mask, from, (IntPtr)(from.ToInt64() + length), wildcard);
+        }
+        /// <summary>
+        /// Performs a signature-scan using for the given pattern and mask in the given range of the process' address space
+        /// Returns the address of the beginning of the pattern if found, returns IntPtr.Zero if not found
+        /// </summary>
+        /// <param name="pattern">Byte-pattern to scan for</param>
+        /// <param name="mask">Mask to scan for</param>
+        /// <param name="from">Where to start scanning from</param>
+        /// <param name="to">Where to stop scanning at</param>
+        /// <param name="wildcard">Char that is used as wildcard in the mask</param>
+        /// <returns></returns>
+        public static ScanResult PerformSignatureScan(byte[] pattern, string mask, IntPtr from, IntPtr to, char wildcard = '?')
+        {
+            if (from.ToInt64() >= to.ToInt64())
+                throw new ArgumentException();
+            if (pattern == null)
+                throw new ArgumentNullException();
+            if (mask.Length != pattern.Length)
+                throw new ArgumentException();
+
+            long totalLength = to.ToInt64() - from.ToInt64();
+            int dumps = (int)Math.Ceiling((double)(totalLength) / (double)MAX_DUMP_SIZE);
+            int length = 0;
+            byte[] data;
+
+            for (int dmp = 0; dmp < dumps; dmp++)
+            {
+                if (totalLength - (dmp * MAX_DUMP_SIZE) < MAX_DUMP_SIZE)
+                    length = (int)(totalLength - (dmp * MAX_DUMP_SIZE));
+                else
+                    length = MAX_DUMP_SIZE;
+
+                if (Read((IntPtr)(from.ToInt64() + dmp * MAX_DUMP_SIZE), out data, length))
+                {
+                    int idx = ScanDump(data, pattern, mask, wildcard);
+                    if (idx != -1)
+                    {
+                        return new ScanResult()
+                            {
+                                Success = true,
+                                Base = from,
+                                Offset = (IntPtr)(dmp * MAX_DUMP_SIZE + idx),
+                                Address = (IntPtr)(from + dmp * MAX_DUMP_SIZE + idx)
+                            };
+                    }
+                }
+            }
+
+            return new ScanResult(){ Address = IntPtr.Zero, Base = IntPtr.Zero, Offset = IntPtr.Zero, Success = false };
+        }
+        /// <summary>
+        /// Scans a dumped chunk of memory and returns the index of the pattern if found
+        /// </summary>
+        /// <param name="data">Chunk of memory</param>
+        /// <param name="pattern">Byte-pattern to scan for</param>
+        /// <param name="mask">Mask to scan for</param>
+        /// <param name="wildcard">Char that is used as wildcard in the mask</param>
+        /// <returns>Index of pattern if found, -1 if not found</returns>
+        private static int ScanDump(byte[] data, byte[] pattern, string mask, char wildcard)
+        {
+            bool found = false;
+            for (int idx = 0; idx < data.Length - pattern.Length; idx++)
+            {
+                found = true;
+                for (int chr = 0; chr<mask.Length;chr++)
+                {
+                    if (mask[chr] != '?')
+                    {
+                        if(data[idx+chr] != pattern[chr])
+                        {
+                            found = false;
+                            break;
+                        }
+                    }
+                }
+                if (found)
+                    return idx;
+            }
+            return -1;
+        }
+        /// <summary>
+        /// Creates a mask from a given pattern, using the given chars
+        /// </summary>
+        /// <param name="pattern">The pattern this functions designs a mask for</param>
+        /// <param name="wildcardByte">Byte that is interpreted as a wildcard</param>
+        /// <param name="wildcardChar">Char that is used as wildcard</param>
+        /// <param name="matchChar">Char that is no wildcard</param>
+        /// <returns></returns>
+        public static string MaskFromPattern(byte[] pattern, byte wildcardByte, char wildcardChar = '?', char matchChar = 'x')
+        {
+            char[] chr = new char[pattern.Length];
+            for (int i = 0; i < chr.Length; i++)
+                chr[i] = pattern[i] == wildcardByte ? wildcardChar : matchChar;
+            return new string(chr);
+        }
+        #region STRUCTS
+        /// <summary>
+        /// Struct that holds basic data about the outcome of a signature-scan
+        /// </summary>
+        public struct ScanResult
+        {
+            public bool Success;
+            public IntPtr Address;
+            public IntPtr Base;
+            public IntPtr Offset;
         }
         #endregion
         #endregion

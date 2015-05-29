@@ -124,6 +124,11 @@ namespace ExternalUtilsCSharp
         }
         #endregion
         #region METHODS
+        /// <summary>
+        /// Retrieves the process-module with the given name, returns null if not found
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public ProcessModule GetModuleByName(string name)
         {
             try

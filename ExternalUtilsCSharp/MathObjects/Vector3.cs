@@ -68,6 +68,17 @@ namespace ExternalUtilsCSharp.MathObjects
         {
             return (this + other).Length();
         }
+
+        public override bool Equals(object obj)
+        {
+            Vector3 vec = (Vector3)obj;
+            return this.GetHashCode() == vec.GetHashCode();
+        }
+
+        public override int GetHashCode()
+        {
+            return this.X.GetHashCode() ^ this.Y.GetHashCode() ^ this.Z.GetHashCode();
+        }
         #endregion
 
         #region OPERATORS
