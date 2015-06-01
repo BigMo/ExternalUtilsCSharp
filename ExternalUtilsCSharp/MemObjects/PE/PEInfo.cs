@@ -13,6 +13,7 @@ namespace ExternalUtilsCSharp.MemObjects.PE
     /// </summary>
     public struct PEInfo
     {
+        private MemUtils MemUtils;
         /// <summary>
         /// DOS-header of the module
         /// </summary>
@@ -42,14 +43,18 @@ namespace ExternalUtilsCSharp.MemObjects.PE
         /// Initializes a new PEInfo using the given module
         /// </summary>
         /// <param name="module"></param>
-        public PEInfo(ProcessModule module) : this(module.BaseAddress) { }
+        /// <param name="memUtils">Instance of MemUtils to use in order to read data</param>
+        public PEInfo(ProcessModule module, MemUtils memUtils) : this(module.BaseAddress, memUtils) { }
 
         /// <summary>
         /// Initializes a new PEInfo using the given baseaddress of a module
         /// </summary>
         /// <param name="baseAddress"></param>
-        public PEInfo(IntPtr baseAddress)
+        /// <param name="memUtils">Instance of MemUtils to use in order to read data</param>
+        public PEInfo(IntPtr baseAddress, MemUtils memUtils)
         {
+            MemUtils = memUtils;
+
             DOSHeader = MemUtils.Read<DOSHeader>(baseAddress);
 
             COFFHeaderAddress = new IntPtr(baseAddress.ToInt64() + DOSHeader.e_lfanew + 4);

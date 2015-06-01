@@ -30,6 +30,7 @@ namespace CSGOTriggerbot
         private static Vector3 vecPunch = Vector3.Zero;
         private static KeyUtils keyUtils;
         private static CSGOConfigUtils configUtils;
+        private static MemUtils memUtils;
         #endregion
 
         static void Main(string[] args)
@@ -45,7 +46,8 @@ namespace CSGOTriggerbot
             configUtils.SetValue("aimlockEnabled", true);
             configUtils.SetValue("glowEnabled", true);
             configUtils.ReadSettingsFromFile("config.cfg");
-            MemUtils.UseUnsafeReadWrite = true;
+            memUtils = new MemUtils();
+            memUtils.UseUnsafeReadWrite = true;
 
             Thread thread = new Thread(new ThreadStart(Loop));
             thread.IsBackground = true;
@@ -96,7 +98,7 @@ namespace CSGOTriggerbot
                 return;
 
             proc = new ProcUtils("csgo", WinAPI.ProcessAccessFlags.VirtualMemoryRead | WinAPI.ProcessAccessFlags.VirtualMemoryWrite | WinAPI.ProcessAccessFlags.VirtualMemoryOperation);
-            MemUtils.Handle = proc.Handle;
+            memUtils.Handle = proc.Handle;
 
             //Get client.dll & engine.dll
             while (clientDll == null) { clientDll = proc.GetModuleByName(@"bin\client.dll"); }
@@ -108,47 +110,47 @@ namespace CSGOTriggerbot
             #region OFFSETS
             ScanResult scan;
             //EntityList
-            scan = MemUtils.PerformSignatureScan(new byte[] { 0x05, 0x00, 0x00, 0x00, 0x00, 0xC1, 0xe9, 0x00, 0x39, 0x48, 0x04 }, "x????xx?xxx", clientDll);
+            scan = memUtils.PerformSignatureScan(new byte[] { 0x05, 0x00, 0x00, 0x00, 0x00, 0xC1, 0xe9, 0x00, 0x39, 0x48, 0x04 }, "x????xx?xxx", clientDll);
             if (scan.Success)
             {
-                int tmp = MemUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 1));
-                byte tmp2 = MemUtils.Read<byte>((IntPtr)(scan.Address.ToInt32() + 7));
+                int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 1));
+                byte tmp2 = memUtils.Read<byte>((IntPtr)(scan.Address.ToInt32() + 7));
                 offsetEntityList = tmp + tmp2 - clientDllBase;
             }
             //LocalPlayer
-            scan = MemUtils.PerformSignatureScan(new byte[] { 0x8D, 0x34, 0x85, 0x00, 0x00, 0x00, 0x00, 0x89, 0x15, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x41, 0x08, 0x8B, 0x48 }, "xxx????xx????xxxxx", clientDll);
+            scan = memUtils.PerformSignatureScan(new byte[] { 0x8D, 0x34, 0x85, 0x00, 0x00, 0x00, 0x00, 0x89, 0x15, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x41, 0x08, 0x8B, 0x48 }, "xxx????xx????xxxxx", clientDll);
             if (scan.Success)
             {
-                int tmp = MemUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 3));
-                byte tmp2 = MemUtils.Read<byte>((IntPtr)(scan.Address.ToInt32() + 18));
+                int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 3));
+                byte tmp2 = memUtils.Read<byte>((IntPtr)(scan.Address.ToInt32() + 18));
                 offsetLocalPlayer = tmp + tmp2 - clientDllBase;
             }
             //+jump
-            scan = MemUtils.PerformSignatureScan(new byte[] { 0x89, 0x15, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x15, 0x00, 0x00, 0x00, 0x00, 0xF6, 0xC2, 0x03, 0x74, 0x03, 0x83, 0xCE, 0x08, 0xA8, 0x08, 0xBF }, "xx????xx????xxxxxxxxxxx", clientDll);
+            scan = memUtils.PerformSignatureScan(new byte[] { 0x89, 0x15, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x15, 0x00, 0x00, 0x00, 0x00, 0xF6, 0xC2, 0x03, 0x74, 0x03, 0x83, 0xCE, 0x08, 0xA8, 0x08, 0xBF }, "xx????xx????xxxxxxxxxxx", clientDll);
             if (scan.Success)
             {
-                int tmp = MemUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 2));
+                int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 2));
                 offsetJump = tmp - clientDllBase;
             }
             //ClientState
-            scan = MemUtils.PerformSignatureScan(new byte[] { 0xC2, 0x00, 0x00, 0xCC, 0xCC, 0x8B, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x33, 0xC0, 0x83, 0xB9 }, "x??xxxx????xxxx", engineDll);
+            scan = memUtils.PerformSignatureScan(new byte[] { 0xC2, 0x00, 0x00, 0xCC, 0xCC, 0x8B, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x33, 0xC0, 0x83, 0xB9 }, "x??xxxx????xxxx", engineDll);
             if (scan.Success)
             {
-                int tmp = MemUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 7));
+                int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 7));
                 offsetClientState = tmp - engineDllBase;
             }
             //SetViewAngles
-            scan = MemUtils.PerformSignatureScan(new byte[] { 0x8B, 0x15, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x4D, 0x08, 0x8B, 0x82, 0x00, 0x00, 0x00, 0x00, 0x89, 0x01, 0x8B, 0x82, 0x00, 0x00, 0x00, 0x00, 0x89, 0x41, 0x04 }, "xx????xxxxx????xxxx????xxx", engineDll);
+            scan = memUtils.PerformSignatureScan(new byte[] { 0x8B, 0x15, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x4D, 0x08, 0x8B, 0x82, 0x00, 0x00, 0x00, 0x00, 0x89, 0x01, 0x8B, 0x82, 0x00, 0x00, 0x00, 0x00, 0x89, 0x41, 0x04 }, "xx????xxxxx????xxxx????xxx", engineDll);
             if (scan.Success)
             {
-                int tmp = MemUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 11));
+                int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 11));
                 offsetSetViewAngles = tmp;
             }
             //GlowObject
-            scan = MemUtils.PerformSignatureScan(new byte[] { 0x8D, 0x8F, 0x00, 0x00, 0x00, 0x00, 0xA1, 0x00, 0x00, 0x00, 0x00, 0xC7, 0x04, 0x02, 0x00, 0x00, 0x00, 0x00, 0x89, 0x35, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x51 }, "xx????x????xxx????xx????xx", clientDll);
+            scan = memUtils.PerformSignatureScan(new byte[] { 0x8D, 0x8F, 0x00, 0x00, 0x00, 0x00, 0xA1, 0x00, 0x00, 0x00, 0x00, 0xC7, 0x04, 0x02, 0x00, 0x00, 0x00, 0x00, 0x89, 0x35, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x51 }, "xx????x????xxx????xx????xx", clientDll);
             if (scan.Success)
             {
-                int tmp = MemUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 7));
+                int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 7));
                 offsetGlowManager = tmp - clientDllBase;
             }
             #endregion
@@ -156,7 +158,7 @@ namespace CSGOTriggerbot
             //Run hack
             while (proc.IsRunning && m_bWork)
             {
-                Thread.Sleep((int)(1000f / 60f));
+                Thread.Sleep((int)(1000f / 120f));
 
                 //Don't do anything if game is not in foreground
                 if (WinAPI.GetForegroundWindow() != proc.Process.MainWindowHandle)
@@ -178,25 +180,19 @@ namespace CSGOTriggerbot
 
                 #region Various addresses
                 entityListAddress = clientDll.BaseAddress.ToInt32() + offsetEntityList;
-                localPlayerAddress = MemUtils.Read<int>((IntPtr)(offsetLocalPlayer + clientDllBase));
-                localPlayer = MemUtils.Read<CSGOLocalPlayer>((IntPtr)(localPlayerAddress));
-                clientStateAddress = MemUtils.Read<int>((IntPtr)(engineDllBase + offsetClientState));
+                localPlayerAddress = memUtils.Read<int>((IntPtr)(offsetLocalPlayer + clientDllBase));
+                localPlayer = memUtils.Read<CSGOLocalPlayer>((IntPtr)(localPlayerAddress));
+                clientStateAddress = memUtils.Read<int>((IntPtr)(engineDllBase + offsetClientState));
                 setViewAnglesAddress = clientStateAddress + offsetSetViewAngles;
                 #endregion
 
-                signOnState = (SignOnState)MemUtils.Read<int>((IntPtr)(clientStateAddress + offsetSignOnState));
-
+                signOnState = (SignOnState)memUtils.Read<int>((IntPtr)(clientStateAddress + offsetSignOnState));
                 //Sanity checks
                 if (signOnState != SignOnState.SIGNONSTATE_FULL || !localPlayer.IsValid())
                     continue;
 
                 #region Reading entitylist and entities
-                if (!MemUtils.Read((IntPtr)(clientDllBase + offsetEntityList), out data, 16 * players.Length))
-                {
-                    Console.WriteLine("ERROR: Failed to read entitylist!");
-                    Thread.Sleep(1000);
-                    continue;
-                }
+                memUtils.Read((IntPtr)(clientDllBase + offsetEntityList), out data, 16 * players.Length);
 
                 //Read entities (players)
                 for (int i = 0; i < data.Length / players.Length; i++)
@@ -205,7 +201,9 @@ namespace CSGOTriggerbot
                     playerAddresses[i] = address;
                     if (address != 0)
                     {
-                        players[i] = MemUtils.Read<CSGOPlayer>((IntPtr)(address), nullPlayer);
+                        players[i] = memUtils.Read<CSGOPlayer>((IntPtr)(address), nullPlayer);
+                        if (players[i].GetClassID(memUtils) != 34)
+                            players[i] = nullPlayer;
                     }
                     else
                     {
@@ -219,7 +217,7 @@ namespace CSGOTriggerbot
                     if (localPlayer.m_iCrosshairIdx > 0 && localPlayer.m_iCrosshairIdx <= players.Length)
                     {
                         CSGOPlayer target = players[localPlayer.m_iCrosshairIdx - 1];
-                        if (target.IsValid())
+                        if (target.IsValid(memUtils))
                         {
                             if (target.m_iTeam != localPlayer.m_iTeam)
                             {
@@ -259,16 +257,16 @@ namespace CSGOTriggerbot
                             lastAimlockTargetIdx = 0;
                         }
                     }
-                    if (target.IsValid())
+                    if (target.IsValid(memUtils))
                     {
                         if (target.m_iTeam != localPlayer.m_iTeam)
                         {
                             Vector3 sourceVector = localPlayer.m_vecOrigin + localPlayer.m_vecViewOffset;
-                            Vector3 originalAimAngles = MemUtils.Read<Vector3>((IntPtr)setViewAnglesAddress);
+                            Vector3 originalAimAngles = memUtils.Read<Vector3>((IntPtr)setViewAnglesAddress);
                             Vector3 smallestAimAngles = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
                             foreach (Bones bone in aimlockBones)
                             {
-                                Vector3 targetVector = new Vector3(MemUtils.Read<float>((IntPtr)(target.GetBoneAddress((int)bone)), new int[] { 0x0c, 0x1C, 0x2C }));
+                                Vector3 targetVector = new Vector3(memUtils.Read<float>((IntPtr)(target.GetBoneAddress((int)bone)), new int[] { 0x0c, 0x1C, 0x2C }));
                                 Vector3 aimAngles = MathUtils.CalcAngle(sourceVector, targetVector);
                                 aimAngles = MathUtils.ClampAngle(aimAngles);
                                 if ((aimAngles - originalAimAngles).Length() < smallestAimAngles.Length())
@@ -276,7 +274,7 @@ namespace CSGOTriggerbot
                                     smallestAimAngles = aimAngles - originalAimAngles;
                                 }
                             }
-                            MemUtils.Write<Vector3>((IntPtr)(setViewAnglesAddress), originalAimAngles + smallestAimAngles);
+                            memUtils.Write<Vector3>((IntPtr)(setViewAnglesAddress), originalAimAngles + smallestAimAngles);
                         }
                     }
                 }
@@ -287,10 +285,10 @@ namespace CSGOTriggerbot
                     if (localPlayer.m_iShotsFired > 0)
                     {
                         Vector3 currentPunch = localPlayer.m_vecPunch - vecPunch;
-                        Vector3 viewAngles = MemUtils.Read<Vector3>((IntPtr)(setViewAnglesAddress), Vector3.Zero);
+                        Vector3 viewAngles = memUtils.Read<Vector3>((IntPtr)(setViewAnglesAddress), Vector3.Zero);
                         Vector3 newViewAngles = viewAngles - (configUtils.GetValue<bool>("rcsFullCompensation") ? currentPunch * 2f : currentPunch);
                         newViewAngles = MathUtils.ClampAngle(newViewAngles);
-                        MemUtils.Write<Vector3>((IntPtr)(setViewAnglesAddress), newViewAngles);
+                        memUtils.Write<Vector3>((IntPtr)(setViewAnglesAddress), newViewAngles);
                     }
                     vecPunch = localPlayer.m_vecPunch;
                 }
@@ -301,27 +299,27 @@ namespace CSGOTriggerbot
                     if (keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.SPACE))
                     {
                         if ((localPlayer.m_iFlags & 1) == 1) //Stands (FL_ONGROUND)
-                            MemUtils.Write<int>((IntPtr)(clientDllBase + offsetJump), 5);
+                            memUtils.Write<int>((IntPtr)(clientDllBase + offsetJump), 5);
                         else
-                            MemUtils.Write<int>((IntPtr)(clientDllBase + offsetJump), 4);
+                            memUtils.Write<int>((IntPtr)(clientDllBase + offsetJump), 4);
                     }
                 }
                 #endregion
                 #region Glow
-                if (configUtils.GetValue<bool>("bunnyhopEnabled"))
+                if (configUtils.GetValue<bool>("glowEnabled"))
                 {
-                    glowAddress = MemUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager));
-                    glowCount = MemUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager + 0x04));
-                    if (MemUtils.Read((IntPtr)(glowAddress), out data, GlowObjectDefinition.GetSize() * glowCount))
-                    {
+                    glowAddress = memUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager));
+                    glowCount = memUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager + 0x04));
+                    int size = Marshal.SizeOf(typeof(GlowObjectDefinition));
+                    memUtils.Read((IntPtr)(glowAddress), out data, size * glowCount);
                         for (int i = 0; i < glowCount && i < glowObjects.Length; i++)
                         {
-                            glowObjects[i] = GetStructure<GlowObjectDefinition>(data, i * GlowObjectDefinition.GetSize(), GlowObjectDefinition.GetSize());
+                            glowObjects[i] = GetStructure<GlowObjectDefinition>(data, i * size, size);
                             for (int idx = 0; idx < players.Length; idx++)
                             {
                                 if (glowObjects[i].pEntity != 0 && playerAddresses[idx] == glowObjects[i].pEntity)
                                 {
-                                    if (!players[idx].IsValid())
+                                    if (!players[idx].IsValid(memUtils))
                                         break;
                                     glowObjects[i].a = 1f;
                                     glowObjects[i].r = (players[idx].m_iTeam == 2 ? 1f : 0f);
@@ -330,13 +328,12 @@ namespace CSGOTriggerbot
                                     glowObjects[i].m_bRenderWhenOccluded = true;
                                     glowObjects[i].m_bRenderWhenUnoccluded = true;
                                     glowObjects[i].m_bFullBloom = false;
-                                    MemUtils.Write((IntPtr)(glowAddress + GlowObjectDefinition.GetSize() * i), glowObjects[i].GetBytes(), 4, GlowObjectDefinition.GetSize() - 14);
+                                    memUtils.Write<GlowObjectDefinition>((IntPtr)(glowAddress + size * i), glowObjects[i], 4, size - 14);
                                     break;
                                 }
                             }
                         }
                     }
-                }
                 #endregion
             }
         }

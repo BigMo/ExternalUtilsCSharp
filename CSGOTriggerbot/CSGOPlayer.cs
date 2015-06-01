@@ -33,9 +33,9 @@ namespace CSGOTriggerbot
         [FieldOffset(0xA78)]
         public int m_pBoneMatrix;
 
-        public bool IsValid()
+        public bool IsValid(MemUtils memUtils)
         {
-            return this.m_iID != 0 && this.m_iDormant != 1 && this.m_iHealth > 0 && (m_iTeam == 2 || m_iTeam == 3) && GetClassID() == 34;
+            return this.m_iID != 0 && this.m_iDormant != 1 && this.m_iHealth > 0 && (m_iTeam == 2 || m_iTeam == 3);
         }
 
         public int GetBoneAddress(int boneIndex)
@@ -43,20 +43,20 @@ namespace CSGOTriggerbot
             return m_pBoneMatrix + boneIndex * 0x30;
         }
 
-        public int GetClientClass()
+        public int GetClientClass(MemUtils memUtils)
         {
-            int function = MemUtils.Read<int>((IntPtr)(m_iVirtualTable + 2 * 0x04));
-            return  MemUtils.Read<int>((IntPtr)(function + 0x01));
+            int function = memUtils.Read<int>((IntPtr)(m_iVirtualTable + 2 * 0x04));
+            return memUtils.Read<int>((IntPtr)(function + 0x01));
         }
-        public int GetClassID()
+        public int GetClassID(MemUtils memUtils)
         {
-            return MemUtils.Read<int>((IntPtr)(GetClientClass() + 20));
+            return memUtils.Read<int>((IntPtr)(GetClientClass(memUtils) + 20));
         }
 
-        public String GetName()
+        public String GetName(MemUtils memUtils)
         {
-            int ptr = MemUtils.Read<int>((IntPtr)(GetClassID() + 8));
-            return MemUtils.ReadString((IntPtr)(ptr + 8), 32, Encoding.ASCII);
+            int ptr = memUtils.Read<int>((IntPtr)(GetClassID(memUtils) + 8));
+            return memUtils.ReadString((IntPtr)(ptr + 8), 32, Encoding.ASCII);
         }
     }
 }

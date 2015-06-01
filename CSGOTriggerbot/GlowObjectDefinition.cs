@@ -45,28 +45,5 @@ namespace CSGOTriggerbot
         public int junk06;
         [FieldOffset(0x32)]
         public short junk07;
-
-        public byte[] GetBytes()
-        {
-            byte[] data = new byte[0x34];
-            Array.Copy(BitConverter.GetBytes(pEntity), 0, data, 0x00, 4);
-            Array.Copy(BitConverter.GetBytes(r), 0, data, 0x04, 4);
-            Array.Copy(BitConverter.GetBytes(g), 0, data, 0x08, 4);
-            Array.Copy(BitConverter.GetBytes(b), 0, data, 0x0C, 4);
-            Array.Copy(BitConverter.GetBytes(a), 0, data, 0x10, 4);
-            Array.Copy(BitConverter.GetBytes(junk01), 0, data, 0x14, 4);
-            Array.Copy(BitConverter.GetBytes(junk02), 0, data, 0x18, 4);
-            Array.Copy(BitConverter.GetBytes(junk03), 0, data, 0x1C, 4);
-            Array.Copy(BitConverter.GetBytes(junk04), 0, data, 0x20, 4);
-            Array.Copy(BitConverter.GetBytes(m_bRenderWhenOccluded), 0, data, 0x24, 1);
-            Array.Copy(BitConverter.GetBytes(m_bRenderWhenUnoccluded), 0, data, 0x25, 1);
-            Array.Copy(BitConverter.GetBytes(m_bFullBloom), 0, data, 0x26, 1);
-            Array.Copy(BitConverter.GetBytes(junk05), 0, data, 0x2A, 4);
-            Array.Copy(BitConverter.GetBytes(junk06), 0, data, 0x2E, 4);
-            Array.Copy(BitConverter.GetBytes(junk07), 0, data, 0x32, 2);
-            return data;
-        }
-
-        public static int GetSize() { return 0x34; }
     }
 }
