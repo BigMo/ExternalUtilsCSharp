@@ -11,8 +11,8 @@ namespace ExternalUtilsCSharp
     public static class MathUtils
     {
         #region VARIABLES
-        private static const float DEG_2_RAD = (float)(Math.PI / 180f);
-        private static const float RAD_2_DEG = (float)(180f / Math.PI);
+        private static float DEG_2_RAD = (float)(Math.PI / 180f);
+        private static float RAD_2_DEG = (float)(180f / Math.PI);
         #endregion
         #region METHODS
         /// <summary>
