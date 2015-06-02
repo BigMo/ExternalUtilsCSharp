@@ -8,11 +8,11 @@ namespace ExternalUtilsCSharp
     /// <summary>
     /// A utility-class that offers several mathematical algorithms.
     /// </summary>
-    public class MathUtils
+    public static class MathUtils
     {
         #region VARIABLES
-        private const float DEG_2_RAD = (float)(Math.PI / 180f);
-        private const float RAD_2_DEG = (float)(180f / Math.PI);
+        private static float DEG_2_RAD = (float)(Math.PI / 180f);
+        private static float RAD_2_DEG = (float)(180f / Math.PI);
         #endregion
         #region METHODS
         /// <summary>
@@ -22,11 +22,11 @@ namespace ExternalUtilsCSharp
         /// <param name="screenSize">The size of the screen which is translated to</param>
         /// <param name="points">Array of 3d-coordinates</param>
         /// <returns>Array of translated screen-coodinates</returns>
-        public static Vector2[] WorldToScreen(Matrix viewMatrix, Vector2 screenSize, params Vector3[] points)
+        public static Vector2[] WorldToScreen(this Matrix viewMatrix, Vector2 screenSize, params Vector3[] points)
         {
             Vector2[] worlds = new Vector2[points.Length];
             for (int i = 0; i < worlds.Length; i++)
-                worlds[i] = WorldToScreen(viewMatrix, screenSize, points[i]);
+                worlds[i] = viewMatrix.WorldToScreen(screenSize, points[i]);
             return worlds;
         }
         /// <summary>
@@ -36,7 +36,7 @@ namespace ExternalUtilsCSharp
         /// <param name="screenSize">The size of the screen which is translated to</param>
         /// <param name="point3D">3d-coordinate of the point to translate</param>
         /// <returns>Translated screen-coodinate</returns>
-        public static Vector2 WorldToScreen(Matrix viewMatrix, Vector2 screenSize, Vector3 point3D)
+        public static Vector2 WorldToScreen(this Matrix viewMatrix, Vector2 screenSize, Vector3 point3D)
         {
             Vector2 returnVector = Vector2.Zero;
             float w = viewMatrix[3, 0] * point3D.X + viewMatrix[3, 1] * point3D.Y + viewMatrix[3, 2] * point3D.Z + viewMatrix[3, 3];
@@ -64,7 +64,7 @@ namespace ExternalUtilsCSharp
         /// <param name="offset">Offset to apply</param>
         /// <param name="points">Array if 3d-coordinates</param>
         /// <returns>Array of manipulated 3d-coordinates</returns>
-        public static Vector3[] OffsetVectors(Vector3 offset, params Vector3[] points)
+        public static Vector3[] OffsetVectors(this Vector3 offset, params Vector3[] points)
         {
             for (int i = 0; i < points.Length; i++)
                 points[i] += offset;
@@ -75,7 +75,7 @@ namespace ExternalUtilsCSharp
         /// </summary>
         /// <param name="source">Source-array to copy from</param>
         /// <returns>New array containing identical yet new Vector3s</returns>
-        public static Vector3[] CopyVectors(Vector3[] source)
+        public static Vector3[] CopyVectors(this Vector3[] source)
         {
             Vector3[] ret = new Vector3[source.Length];
             for (int i = 0; i < ret.Length; i++)
@@ -89,7 +89,7 @@ namespace ExternalUtilsCSharp
         /// <param name="centerPoint">Point to rotate around</param>
         /// <param name="angleInDegrees">Angle of rotation in degrees</param>
         /// <returns>Rotated point</returns>
-        public static Vector2 RotatePoint(Vector2 pointToRotate, Vector2 centerPoint, float angleInDegrees)
+        public static Vector2 RotatePoint(this Vector2 pointToRotate, Vector2 centerPoint, float angleInDegrees)
         {
             float angleInRadians = (float)(angleInDegrees * (Math.PI / 180f));
             float cosTheta = (float)Math.Cos(angleInRadians);
@@ -111,7 +111,7 @@ namespace ExternalUtilsCSharp
         /// </summary>
         /// <param name="qaAng">Angle to clamp</param>
         /// <returns>Clamped angle</returns>
-        public static Vector3 ClampAngle(Vector3 qaAng)
+        public static Vector3 ClampAngle(this Vector3 qaAng)
         {
 
             //if (qaAng.X > 89.0f && qaAng.X <= 180.0f)
@@ -152,7 +152,7 @@ namespace ExternalUtilsCSharp
         /// <param name="src">3d-coordinate of where to aim from</param>
         /// <param name="dst">3d-coordinate of where to aim to</param>
         /// <returns></returns>
-        public static Vector3 CalcAngle(Vector3 src, Vector3 dst)
+        public static Vector3 CalcAngle(this Vector3 src, Vector3 dst)
         {
             Vector3 ret = new Vector3();
             Vector3 vDelta = src - dst;
@@ -184,7 +184,7 @@ namespace ExternalUtilsCSharp
         /// <param name="circleCenter">Center of circle</param>
         /// <param name="radius">Radius of circle</param>
         /// <returns></returns>
-        public static bool PointInCircle(Vector2 point, Vector2 circleCenter, float radius)
+        public static bool PointInCircle(this Vector2 point, Vector2 circleCenter, float radius)
         {
             return (point - circleCenter).Length() < radius;
         }
