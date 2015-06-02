@@ -391,4 +391,30 @@ namespace ExternalUtilsCSharp
         #endregion
         #endregion
     }
+    /// <summary>
+    /// Generic object methods
+    /// </summary>
+    public static class MemStatic{
+        public static T GetStructure<T>(byte[] data)
+        {
+            GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+            T structure = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
+            handle.Free();
+            return structure;
+        }
+        public static T GetStructure<T>(this byte[] data, int offset, int length)
+        {
+            byte[] dt = new byte[length];
+            Array.Copy(data, offset, dt, 0, length);
+            return GetStructure<T>(dt);
+        }
+        /// <summary>
+        /// Gets size of T object
+        /// </summary>
+        /// <returns>Size of object</returns>
+        public static int SizeOf<T>(this T obj)
+        {
+            return Marshal.SizeOf(typeof(T));
+        }
+    }
 }

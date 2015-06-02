@@ -16,13 +16,15 @@ namespace CSGOTriggerbot
     class Program
     {
         #region OFFSETS
-        private static int offsetEntityList = 0x00;
+        public static int offsetEntityList = 0x00;
         private static int offsetLocalPlayer = 0x00;
         private static int offsetJump = 0x00;
         private static int offsetClientState = 0x00;
         private static int offsetSetViewAngles = 0x00;
         private static int offsetGlowManager = 0x00;
         private static int offsetSignOnState = 0xE8;
+        public static int offsetWeaponH = 0x12C0;   // m_hActiveWeapon
+        public static int offsetWeaponId = 0x1690;   // Search for weaponid
         #endregion
 
         #region VARIABLES
@@ -267,8 +269,8 @@ namespace CSGOTriggerbot
                             foreach (Bones bone in aimlockBones)
                             {
                                 Vector3 targetVector = new Vector3(memUtils.Read<float>((IntPtr)(target.GetBoneAddress((int)bone)), new int[] { 0x0c, 0x1C, 0x2C }));
-                                Vector3 aimAngles = MathUtils.CalcAngle(sourceVector, targetVector);
-                                aimAngles = MathUtils.ClampAngle(aimAngles);
+                                Vector3 aimAngles = sourceVector.CalcAngle(targetVector);
+                                aimAngles = aimAngles.ClampAngle();
                                 if ((aimAngles - originalAimAngles).Length() < smallestAimAngles.Length())
                                 {
                                     smallestAimAngles = aimAngles - originalAimAngles;
@@ -287,7 +289,7 @@ namespace CSGOTriggerbot
                         Vector3 currentPunch = localPlayer.m_vecPunch - vecPunch;
                         Vector3 viewAngles = memUtils.Read<Vector3>((IntPtr)(setViewAnglesAddress), Vector3.Zero);
                         Vector3 newViewAngles = viewAngles - (configUtils.GetValue<bool>("rcsFullCompensation") ? currentPunch * 2f : currentPunch);
-                        newViewAngles = MathUtils.ClampAngle(newViewAngles);
+                        newViewAngles = newViewAngles.ClampAngle();
                         memUtils.Write<Vector3>((IntPtr)(setViewAnglesAddress), newViewAngles);
                     }
                     vecPunch = localPlayer.m_vecPunch;
@@ -314,7 +316,7 @@ namespace CSGOTriggerbot
                     memUtils.Read((IntPtr)(glowAddress), out data, size * glowCount);
                         for (int i = 0; i < glowCount && i < glowObjects.Length; i++)
                         {
-                            glowObjects[i] = GetStructure<GlowObjectDefinition>(data, i * size, size);
+                            glowObjects[i] = data.GetStructure<GlowObjectDefinition>(i * size, size);
                             for (int idx = 0; idx < players.Length; idx++)
                             {
                                 if (glowObjects[i].pEntity != 0 && playerAddresses[idx] == glowObjects[i].pEntity)
@@ -337,21 +339,5 @@ namespace CSGOTriggerbot
                 #endregion
             }
         }
-
-        #region HELPER-METHODS
-        private static T GetStructure<T>(byte[] data)
-        {
-            GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            T structure = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
-            handle.Free();
-            return structure;
-        }
-        private static T GetStructure<T>(byte[] data, int offset, int length)
-        {
-            byte[] dt = new byte[length];
-            Array.Copy(data, offset, dt, 0, length);
-            return GetStructure<T>(dt);
-        }
-        #endregion
     }
 }
