@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{20B2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSGOSample", "CSGOTriggerbot\CSGOSample.csproj", "{0C392DB2-895E-4F2A-B2A0-1D79849FC5B2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickerHeroes", "ClickerHeroes\ClickerHeroes.csproj", "{42E7D8B0-97A4-4E33-B98B-50EC3E1C0A88}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,11 +25,16 @@ Global
 		{0C392DB2-895E-4F2A-B2A0-1D79849FC5B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C392DB2-895E-4F2A-B2A0-1D79849FC5B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C392DB2-895E-4F2A-B2A0-1D79849FC5B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42E7D8B0-97A4-4E33-B98B-50EC3E1C0A88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42E7D8B0-97A4-4E33-B98B-50EC3E1C0A88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42E7D8B0-97A4-4E33-B98B-50EC3E1C0A88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42E7D8B0-97A4-4E33-B98B-50EC3E1C0A88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{0C392DB2-895E-4F2A-B2A0-1D79849FC5B2} = {20B2DC66-F8DC-495A-8E47-E96FB612E8C1}
+		{42E7D8B0-97A4-4E33-B98B-50EC3E1C0A88} = {20B2DC66-F8DC-495A-8E47-E96FB612E8C1}
 	EndGlobalSection
 EndGlobal
