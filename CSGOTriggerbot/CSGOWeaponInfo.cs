@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace CSGOTriggerbot
 {
     [StructLayout(LayoutKind.Explicit)]
-    struct CSGOWeaponInfo
+    public struct CSGOWeaponInfo
     {
         [FieldOffset(0x748)]
         public int m_nType;

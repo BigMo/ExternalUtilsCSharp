@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace CSGOTriggerbot
 {
     [StructLayout(LayoutKind.Explicit)]
-    struct CSGOWeapon
+    public struct CSGOWeapon
     {
         public enum CSGO_Weapon_ID
         {

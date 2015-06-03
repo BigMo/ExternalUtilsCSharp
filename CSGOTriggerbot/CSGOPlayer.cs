@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace CSGOTriggerbot
 {
     [StructLayout(LayoutKind.Explicit)]
-    struct CSGOPlayer
+    public struct CSGOPlayer
     {
         [FieldOffset(0x8)]
         public int m_iVirtualTable;
