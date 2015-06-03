@@ -51,6 +51,7 @@
     <Compile Include="CSGOEntity.cs" />
     <Compile Include="CSGOLocalPlayer.cs" />
     <Compile Include="CSGOPlayer.cs" />
+    <Compile Include="CSGOScanner.cs" />
     <Compile Include="CSGOWeapon.cs" />
     <Compile Include="CSGOWeaponInfo.cs" />
     <Compile Include="GlowObjectDefinition.cs" />

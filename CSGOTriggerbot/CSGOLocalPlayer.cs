@@ -27,6 +27,9 @@ namespace CSGOTriggerbot
         [FieldOffset(0x104)]
         public Vector3 m_vecViewOffset;
 
+        [FieldOffset(0x110)]
+        public Vector3 m_vecVelocity;
+
         [FieldOffset(0x134)]
         public Vector3 m_vecOrigin;
 
