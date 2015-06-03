@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace ExternalUtilsCSharp
@@ -19,6 +20,12 @@ namespace ExternalUtilsCSharp
         public static bool GetKeyDown(WinAPI.VirtualKeyShort key)
         {
             return GetKeyDown((Int32)key);
+        }
+        public static void LMouseClick(int sleeptime)
+        {
+            WinAPI.mouse_event(WinAPI.MOUSEEVENTF.LEFTDOWN, 0, 0, 0, 0);
+            Thread.Sleep(sleeptime);
+            WinAPI.mouse_event(WinAPI.MOUSEEVENTF.LEFTUP, 0, 0, 0, 0);
         }
         public static bool GetKeyDown(Int32 key)
         {
