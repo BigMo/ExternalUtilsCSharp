@@ -19,15 +19,8 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Struct Name="ExternalUtilsCSharp.MemUtils.ScanResult">
-        <TypeIdentifier>
-          <NewMemberFileName>MemUtils.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAgAAAAAABAAAAAAiAAAAAiAAAAgwIQAAAAAAEIAAA=</HashCode>
+      <HashCode>AAAgAAAAAABAAAACAiAQAAgiAAAAgwIQAAAAAAEIAAA=</HashCode>
       <FileName>MemUtils.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -134,14 +127,14 @@
   <Struct Name="ExternalUtilsCSharp.MathObjects.Vector2">
     <Position X="0.5" Y="6.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAACAaAEAAABAAQAAAAAAAAAAAAAAYiA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAACA6AEAAABAAQAAAIAAAAAAAAAAYiA=</HashCode>
       <FileName>MathObjects\Vector2.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="ExternalUtilsCSharp.MathObjects.Vector3">
     <Position X="2.75" Y="6.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAACAaAEAAABAAQAAAAAAAAAAAAAAYiE=</HashCode>
+      <HashCode>AAAAAAAAAAAAAACA6AEAAABAAQAAAIAAAAAAAAAAYiE=</HashCode>
       <FileName>MathObjects\Vector3.cs</FileName>
     </TypeIdentifier>
   </Struct>
@@ -150,6 +143,41 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAABAAAAAAAAAIUAEAAAAAYAAAACACAAAAAYAA=</HashCode>
       <FileName>UI\Rectangle.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ExternalUtilsCSharp.MemObjects.PE.COFFHeader">
+    <Position X="13.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAAAAAAkCAEAAAAAEAABAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MemObjects\PE\COFFHeader.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ExternalUtilsCSharp.MemObjects.PE.DOSHeader">
+    <Position X="13.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAgiAQAQAAAAAAAIAAAAAAIAPiIAAACQCBAggIAAAEA=</HashCode>
+      <FileName>MemObjects\PE\DOSHeader.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ExternalUtilsCSharp.MemObjects.PE.PEOptHeader">
+    <Position X="15.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQQIAE0BAAQkAAINAhUAAEQAFAQEwIiCAAAgIJY=</HashCode>
+      <FileName>MemObjects\PE\PEOptHeader.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ExternalUtilsCSharp.MemObjects.PE.data_directory">
+    <Position X="15.25" Y="10.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAgAAAgAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>MemObjects\PE\PEOptHeader.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="ExternalUtilsCSharp.MemObjects.PE.PEInfo">
+    <Position X="11.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AIAAAAABEIAAAAAAAAAAAAAAAAAEABAAAAAAAAAAAAA=</HashCode>
+      <FileName>MemObjects\PE\PEInfo.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Font Name="Segoe UI" Size="9" />

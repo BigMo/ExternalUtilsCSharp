@@ -16,14 +16,23 @@ namespace CSGOTriggerbot
     class Program
     {
         #region OFFSETS
-        public static int offsetEntityList = 0x00;
-        private static int offsetLocalPlayer = 0x00;
-        private static int offsetJump = 0x00;
-        private static int offsetClientState = 0x00;
-        private static int offsetSetViewAngles = 0x00;
-        private static int offsetGlowManager = 0x00;
-        private static int offsetSignOnState = 0xE8;
-        public static int offsetWeaponH = 0x12C0;   // m_hActiveWeapon
+        public static int offsetMiscEntityList = 0x00;
+        public static int offsetMiscLocalPlayer = 0x00;
+        public static int offsetMiscJump = 0x00;
+        public static int offsetMiscClientState = 0x00;
+        public static int offsetMiscSetViewAngles = 0x00;
+        public static int offsetMiscGlowManager = 0x00;
+        public static int offsetMiscSignOnState = 0xE8;
+        public static int offsetMiscWeaponTable = 0x04a5aadc;
+
+        public static int offsetEntityID = 0x00;
+        public static int offsetEntityHealth = 0x00;
+        public static int offsetEntityVecOrigin = 0x00;
+
+        public static int offsetPlayerTeamNum = 0x00;
+        public static int offsetPlayerBoneMatrix = 0x00;
+
+        public static int offsetPlayerWeaponHandle = 0x12C0;   // m_hActiveWeapon
         public static int offsetWeaponId = 0x1690;   // Search for weaponid
         #endregion
 
@@ -33,6 +42,9 @@ namespace CSGOTriggerbot
         private static KeyUtils keyUtils;
         private static CSGOConfigUtils configUtils;
         private static MemUtils memUtils;
+
+        public static int[] entityAddresses;
+        public static CSGOWeaponInfo[] weaponInfos;
         #endregion
 
         static void Main(string[] args)
@@ -79,8 +91,9 @@ namespace CSGOTriggerbot
             ProcessModule engineDll = null;
             byte[] data;
             GlowObjectDefinition[] glowObjects = new GlowObjectDefinition[128];
-            CSGOPlayer[] players = new CSGOPlayer[8192];
-            int[] playerAddresses = new int[players.Length];
+            CSGOPlayer[] players = new CSGOPlayer[1024];
+            weaponInfos = new CSGOWeaponInfo[42];
+            entityAddresses = new int[players.Length];
             int entityListAddress;
             int localPlayerAddress;
             int clientStateAddress;
@@ -111,13 +124,14 @@ namespace CSGOTriggerbot
 
             #region OFFSETS
             ScanResult scan;
+            #region MISC
             //EntityList
             scan = memUtils.PerformSignatureScan(new byte[] { 0x05, 0x00, 0x00, 0x00, 0x00, 0xC1, 0xe9, 0x00, 0x39, 0x48, 0x04 }, "x????xx?xxx", clientDll);
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 1));
                 byte tmp2 = memUtils.Read<byte>((IntPtr)(scan.Address.ToInt32() + 7));
-                offsetEntityList = tmp + tmp2 - clientDllBase;
+                offsetMiscEntityList = tmp + tmp2 - clientDllBase;
             }
             //LocalPlayer
             scan = memUtils.PerformSignatureScan(new byte[] { 0x8D, 0x34, 0x85, 0x00, 0x00, 0x00, 0x00, 0x89, 0x15, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x41, 0x08, 0x8B, 0x48 }, "xxx????xx????xxxxx", clientDll);
@@ -125,35 +139,124 @@ namespace CSGOTriggerbot
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 3));
                 byte tmp2 = memUtils.Read<byte>((IntPtr)(scan.Address.ToInt32() + 18));
-                offsetLocalPlayer = tmp + tmp2 - clientDllBase;
+                offsetMiscLocalPlayer = tmp + tmp2 - clientDllBase;
             }
             //+jump
             scan = memUtils.PerformSignatureScan(new byte[] { 0x89, 0x15, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x15, 0x00, 0x00, 0x00, 0x00, 0xF6, 0xC2, 0x03, 0x74, 0x03, 0x83, 0xCE, 0x08, 0xA8, 0x08, 0xBF }, "xx????xx????xxxxxxxxxxx", clientDll);
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 2));
-                offsetJump = tmp - clientDllBase;
+                offsetMiscJump = tmp - clientDllBase;
             }
             //ClientState
             scan = memUtils.PerformSignatureScan(new byte[] { 0xC2, 0x00, 0x00, 0xCC, 0xCC, 0x8B, 0x0D, 0x00, 0x00, 0x00, 0x00, 0x33, 0xC0, 0x83, 0xB9 }, "x??xxxx????xxxx", engineDll);
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 7));
-                offsetClientState = tmp - engineDllBase;
+                offsetMiscClientState = tmp - engineDllBase;
             }
             //SetViewAngles
             scan = memUtils.PerformSignatureScan(new byte[] { 0x8B, 0x15, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x4D, 0x08, 0x8B, 0x82, 0x00, 0x00, 0x00, 0x00, 0x89, 0x01, 0x8B, 0x82, 0x00, 0x00, 0x00, 0x00, 0x89, 0x41, 0x04 }, "xx????xxxxx????xxxx????xxx", engineDll);
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 11));
-                offsetSetViewAngles = tmp;
+                offsetMiscSetViewAngles = tmp;
+            }
+            //SignOnState
+            scan = memUtils.PerformSignatureScan(
+                new byte[] { 0x51, 0xA1, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x51, 0x00, 0x83, 0xB8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7C, 0x40, 0x3B, 0xD1 },
+                "xx????xx?xx?????xxxx", engineDll);
+            if (scan.Success)
+            {
+                int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 11));
+                offsetMiscSignOnState = tmp;
             }
             //GlowObject
             scan = memUtils.PerformSignatureScan(new byte[] { 0x8D, 0x8F, 0x00, 0x00, 0x00, 0x00, 0xA1, 0x00, 0x00, 0x00, 0x00, 0xC7, 0x04, 0x02, 0x00, 0x00, 0x00, 0x00, 0x89, 0x35, 0x00, 0x00, 0x00, 0x00, 0x8B, 0x51 }, "xx????x????xxx????xx????xx", clientDll);
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 7));
-                offsetGlowManager = tmp - clientDllBase;
+                offsetMiscGlowManager = tmp - clientDllBase;
+            }
+            //WeaponTable
+            scan = memUtils.PerformSignatureScan(new byte[] { 0xA1, 0x00, 0x00, 0x00, 0x00, 0x0F, 0xB7, 0xC9, 0x03, 0xC9, 0x8B, 0x44, 0x00, 0x0C, 0xC3 }, "x????xxxxxxx?xx", clientDll);
+            if (scan.Success)
+            {
+                int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 1));
+                offsetMiscWeaponTable = tmp - clientDllBase;
+            }
+            #endregion
+            #region ENTITY
+            //m_iID
+            scan = memUtils.PerformSignatureScan(
+                new byte[] { 0x74, 0x72, 0x80, 0x79, 0x00, 0x00, 0x8B, 0x56, 0x00, 0x89, 0x55, 0x00, 0x74, 0x17 },
+                "xxxx??xx?xx?xx", clientDll);
+            if (scan.Success)
+            {
+                byte tmp = memUtils.Read<byte>((IntPtr)(scan.Address.ToInt32() + 8));
+                offsetEntityID = tmp;
+            }
+            //m_iHealth
+            scan = memUtils.PerformSignatureScan(
+                new byte[] { 0x8B, 0x41, 0x00, 0x89, 0x41, 0x00, 0x8B, 0x41, 0x00, 0x89, 0x41, 0x00, 0x8B, 0x41, 0x00, 0x89, 0x41, 0x00, 0x8B, 0x4F, 0x00, 0x83, 0xB9, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7F, 0x2E },
+                "xx?xx?xx?xx?xx?xx?xx?xx????xxx", clientDll);
+            if (scan.Success)
+            {
+                int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 23));
+                offsetEntityHealth = tmp;
+            }
+            //m_iVecOrigin
+            scan = memUtils.PerformSignatureScan(
+                new byte[] { 0x8A, 0x0E, 0x80, 0xE1, 0xFC, 0x0A, 0xC8, 0x88, 0x0E, 0xF3, 0x00, 0x00, 0x87, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x87, 0x00, 0x00, 0x00, 0x00, 0x9F },
+                "xxxxxxxxxx??x??????x????x", clientDll);
+            if (scan.Success)
+            {
+                int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 13));
+                offsetEntityVecOrigin = tmp;
+            }
+            #endregion
+            #region PLAYER
+            //m_iTeam
+            scan = memUtils.PerformSignatureScan(
+                new byte[] { 0xCC, 0xCC, 0xCC, 0x8B, 0x89, 0x00, 0x00, 0x00, 0x00, 0xE9, 0x00, 0x00, 0x00, 0x00, 0xCC, 0xCC, 0xCC, 0xCC, 0xCC, 0x8B, 0x81, 0x00, 0x00, 0x00, 0x00, 0xC3, 0xCC, 0xCC },
+                "xxxxx????x????xxxxxxx????xxx", clientDll);
+            if (scan.Success)
+            {
+                int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 5));
+                offsetPlayerTeamNum = tmp;
+            }
+            //m_pBoneMatrix
+            scan = memUtils.PerformSignatureScan(
+                new byte[] { 0x83, 0x3C, 0xB0, 0xFF, 0x75, 0x15, 0x8B, 0x87, 0x00, 0x00, 0x00, 0x00, 0x8B, 0xCF, 0x8B, 0x17, 0x03, 0x44, 0x24, 0x0C, 0x50 },
+                "xxxxxxxx????xxxxxxxxx", clientDll);
+            if (scan.Success)
+            {
+                int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 8));
+                offsetPlayerBoneMatrix = tmp;
+            }
+            //m_hActiveWeapon
+            scan = memUtils.PerformSignatureScan(
+                new byte[] { 0x0F, 0x45, 0xF7, 0x5F, 0x8B, 0x8E, 0x00, 0x00, 0x00, 0x00, 0x5E, 0x83, 0xF9, 0xFF },
+                "xxxxxx????xxxx", clientDll);
+            if (scan.Success)
+            {
+                int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 6));
+                offsetPlayerWeaponHandle = tmp;
+            }
+            #endregion
+            #endregion
+
+            #region READ WEAPON INFOS
+            int weaponTableAddress = memUtils.Read<int>((IntPtr)(clientDllBase + offsetMiscWeaponTable));
+
+            memUtils.Read((IntPtr)weaponTableAddress, out data, 16 * weaponInfos.Length);
+            for (int i = 0; i < weaponInfos.Length; i++)
+            {
+                uint address = BitConverter.ToUInt32(data, 16 * i + 0x0C);
+                if (address != 0xFFFFFFFF)
+                    weaponInfos[i] = memUtils.Read<CSGOWeaponInfo>((IntPtr)address);
+                else
+                    weaponInfos[i] = new CSGOWeaponInfo() { m_nID = -1 };
             }
             #endregion
 
@@ -181,31 +284,36 @@ namespace CSGOTriggerbot
                 #endregion
 
                 #region Various addresses
-                entityListAddress = clientDll.BaseAddress.ToInt32() + offsetEntityList;
-                localPlayerAddress = memUtils.Read<int>((IntPtr)(offsetLocalPlayer + clientDllBase));
+                entityListAddress = clientDll.BaseAddress.ToInt32() + offsetMiscEntityList;
+                localPlayerAddress = memUtils.Read<int>((IntPtr)(offsetMiscLocalPlayer + clientDllBase));
                 localPlayer = memUtils.Read<CSGOLocalPlayer>((IntPtr)(localPlayerAddress));
-                clientStateAddress = memUtils.Read<int>((IntPtr)(engineDllBase + offsetClientState));
-                setViewAnglesAddress = clientStateAddress + offsetSetViewAngles;
+                clientStateAddress = memUtils.Read<int>((IntPtr)(engineDllBase + offsetMiscClientState));
+                setViewAnglesAddress = clientStateAddress + offsetMiscSetViewAngles;
                 #endregion
 
-                signOnState = (SignOnState)memUtils.Read<int>((IntPtr)(clientStateAddress + offsetSignOnState));
+                signOnState = (SignOnState)memUtils.Read<int>((IntPtr)(clientStateAddress + offsetMiscSignOnState));
                 //Sanity checks
                 if (signOnState != SignOnState.SIGNONSTATE_FULL || !localPlayer.IsValid())
                     continue;
 
                 #region Reading entitylist and entities
-                memUtils.Read((IntPtr)(clientDllBase + offsetEntityList), out data, 16 * players.Length);
+                memUtils.Read((IntPtr)(clientDllBase + offsetMiscEntityList), out data, 16 * players.Length);
 
                 //Read entities (players)
-                for (int i = 0; i < data.Length / players.Length; i++)
+                for (int i = 0; i < data.Length / 16; i++)
                 {
                     int address = BitConverter.ToInt32(data, i * 16);
-                    playerAddresses[i] = address;
+                    entityAddresses[i] = address;
                     if (address != 0)
                     {
-                        players[i] = memUtils.Read<CSGOPlayer>((IntPtr)(address), nullPlayer);
-                        if (players[i].GetClassID(memUtils) != 34)
-                            players[i] = nullPlayer;
+                        CSGOEntity entity = memUtils.Read<CSGOEntity>((IntPtr)address);
+                        if (entity.IsValid(memUtils))
+                        {
+                            if (entity.GetClassID(memUtils) == 34)
+                            {
+                                players[i] = memUtils.Read<CSGOPlayer>((IntPtr)address);
+                            }
+                        }
                     }
                     else
                     {
@@ -213,6 +321,7 @@ namespace CSGOTriggerbot
                     }
                 }
                 #endregion
+
                 #region Triggerbot
                 if (keyUtils.KeyIsDown(configUtils.GetValue<WinAPI.VirtualKeyShort>("triggerbotKey")))
                 {
@@ -223,12 +332,19 @@ namespace CSGOTriggerbot
                         {
                             if (target.m_iTeam != localPlayer.m_iTeam)
                             {
-                                Console.WriteLine("*Shoot*");
-                                Thread.Sleep(10);
-                                WinAPI.mouse_event(WinAPI.MOUSEEVENTF.LEFTDOWN, 0, 0, 0, 0);
-                                Thread.Sleep(10);
-                                WinAPI.mouse_event(WinAPI.MOUSEEVENTF.LEFTUP, 0, 0, 0, 0);
-                                Thread.Sleep(10);
+                                CSGOWeapon weapon = localPlayer.GetActiveWeapon(memUtils);
+                                if (weapon.IsValid())
+                                {
+                                    if (!weapon.IsNonAim())
+                                    {
+                                        Console.WriteLine("*Shoot*");
+                                        Thread.Sleep(10);
+                                        WinAPI.mouse_event(WinAPI.MOUSEEVENTF.LEFTDOWN, 0, 0, 0, 0);
+                                        Thread.Sleep(10);
+                                        WinAPI.mouse_event(WinAPI.MOUSEEVENTF.LEFTUP, 0, 0, 0, 0);
+                                        Thread.Sleep(10);
+                                    }
+                                }
                             }
                         }
                     }
@@ -301,41 +417,41 @@ namespace CSGOTriggerbot
                     if (keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.SPACE))
                     {
                         if ((localPlayer.m_iFlags & 1) == 1) //Stands (FL_ONGROUND)
-                            memUtils.Write<int>((IntPtr)(clientDllBase + offsetJump), 5);
+                            memUtils.Write<int>((IntPtr)(clientDllBase + offsetMiscJump), 5);
                         else
-                            memUtils.Write<int>((IntPtr)(clientDllBase + offsetJump), 4);
+                            memUtils.Write<int>((IntPtr)(clientDllBase + offsetMiscJump), 4);
                     }
                 }
                 #endregion
                 #region Glow
                 if (configUtils.GetValue<bool>("glowEnabled"))
                 {
-                    glowAddress = memUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager));
-                    glowCount = memUtils.Read<int>((IntPtr)(clientDllBase + offsetGlowManager + 0x04));
+                    glowAddress = memUtils.Read<int>((IntPtr)(clientDllBase + offsetMiscGlowManager));
+                    glowCount = memUtils.Read<int>((IntPtr)(clientDllBase + offsetMiscGlowManager + 0x04));
                     int size = Marshal.SizeOf(typeof(GlowObjectDefinition));
                     memUtils.Read((IntPtr)(glowAddress), out data, size * glowCount);
-                        for (int i = 0; i < glowCount && i < glowObjects.Length; i++)
+                    for (int i = 0; i < glowCount && i < glowObjects.Length; i++)
+                    {
+                        glowObjects[i] = data.GetStructure<GlowObjectDefinition>(i * size, size);
+                        for (int idx = 0; idx < players.Length; idx++)
                         {
-                            glowObjects[i] = data.GetStructure<GlowObjectDefinition>(i * size, size);
-                            for (int idx = 0; idx < players.Length; idx++)
+                            if (glowObjects[i].pEntity != 0 && entityAddresses[idx] == glowObjects[i].pEntity)
                             {
-                                if (glowObjects[i].pEntity != 0 && playerAddresses[idx] == glowObjects[i].pEntity)
-                                {
-                                    if (!players[idx].IsValid(memUtils))
-                                        break;
-                                    glowObjects[i].a = 1f;
-                                    glowObjects[i].r = (players[idx].m_iTeam == 2 ? 1f : 0f);
-                                    glowObjects[i].g = 0;
-                                    glowObjects[i].b = (players[idx].m_iTeam == 3 ? 1f : 0f);
-                                    glowObjects[i].m_bRenderWhenOccluded = true;
-                                    glowObjects[i].m_bRenderWhenUnoccluded = true;
-                                    glowObjects[i].m_bFullBloom = false;
-                                    memUtils.Write<GlowObjectDefinition>((IntPtr)(glowAddress + size * i), glowObjects[i], 4, size - 14);
+                                if (!players[idx].IsValid(memUtils))
                                     break;
-                                }
+                                glowObjects[i].a = 1f;
+                                glowObjects[i].r = (players[idx].m_iTeam == 2 ? 1f : 0f);
+                                glowObjects[i].g = 0;
+                                glowObjects[i].b = (players[idx].m_iTeam == 3 ? 1f : 0f);
+                                glowObjects[i].m_bRenderWhenOccluded = true;
+                                glowObjects[i].m_bRenderWhenUnoccluded = true;
+                                glowObjects[i].m_bFullBloom = false;
+                                memUtils.Write<GlowObjectDefinition>((IntPtr)(glowAddress + size * i), glowObjects[i], 4, size - 14);
+                                break;
                             }
                         }
                     }
+                }
                 #endregion
             }
         }

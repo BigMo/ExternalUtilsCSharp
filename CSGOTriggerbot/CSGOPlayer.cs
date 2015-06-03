@@ -33,6 +33,9 @@ namespace CSGOTriggerbot
         [FieldOffset(0xA78)]
         public int m_pBoneMatrix;
 
+        [FieldOffset(0x12C0)]
+        public uint m_hActiveWeapon;
+
         public bool IsValid(MemUtils memUtils)
         {
             return this.m_iID != 0 && this.m_iDormant != 1 && this.m_iHealth > 0 && (m_iTeam == 2 || m_iTeam == 3);
@@ -42,7 +45,6 @@ namespace CSGOTriggerbot
         {
             return m_pBoneMatrix + boneIndex * 0x30;
         }
-
         public int GetClientClass(MemUtils memUtils)
         {
             int function = memUtils.Read<int>((IntPtr)(m_iVirtualTable + 2 * 0x04));
@@ -52,11 +54,19 @@ namespace CSGOTriggerbot
         {
             return memUtils.Read<int>((IntPtr)(GetClientClass(memUtils) + 20));
         }
-
         public String GetName(MemUtils memUtils)
         {
             int ptr = memUtils.Read<int>((IntPtr)(GetClassID(memUtils) + 8));
             return memUtils.ReadString((IntPtr)(ptr + 8), 32, Encoding.ASCII);
+        }
+        public CSGOWeapon GetActiveWeapon(MemUtils memUtils)
+        {
+            if (this.m_hActiveWeapon == 0xFFFFFFFF)
+                return new CSGOWeapon() { m_iItemDefinitionIndex = 0, m_iWeaponID = 0 };
+
+            uint handle = this.m_hActiveWeapon & 0xFFF;
+            int weapAddress = memUtils.Read<int>((IntPtr)(Program.entityAddresses[handle - 1]));
+            return memUtils.Read<CSGOWeapon>((IntPtr)weapAddress);
         }
     }
 }
