@@ -23,7 +23,7 @@ namespace CSGOTriggerbot
         public static int offsetMiscSetViewAngles = 0x00;
         public static int offsetMiscGlowManager = 0x00;
         public static int offsetMiscSignOnState = 0xE8;
-        public static int offsetMiscWeaponTable = 0x04a5aadc;        
+        public static int offsetMiscWeaponTable = 0x04A5DC4C;        
         public static int offsetvMatrix = 0x00;
 
         public static int offsetEntityID = 0x00;
@@ -191,9 +191,9 @@ namespace CSGOTriggerbot
                         //CSGOEntity entity = memUtils.Read<CSGOEntity>((IntPtr)address);
                         if(i<players.Length)
                             players[i] = memUtils.Read<CSGOPlayer>((IntPtr)address);
-//                        if (entity.IsValid(memUtils)){
-//                            if (entity.GetClassID(memUtils) == 34){}
-//                        }
+                        //if (entity.IsValid(memUtils)){
+                        //    if (entity.GetClassID(memUtils) == 34){}
+                        //}
                     }
                     else
                     {
