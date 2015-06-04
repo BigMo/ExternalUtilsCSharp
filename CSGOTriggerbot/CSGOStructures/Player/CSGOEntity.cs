@@ -39,7 +39,7 @@ namespace CSGOTriggerbot
                 return memUtils.Read<int>((IntPtr)(clientClass + 20));
             return clientClass;
         }
-        public String GetName(MemUtils memUtils)
+        public string GetName(MemUtils memUtils)
         {
             int clientClass = GetClientClass(memUtils);
             if (clientClass != -1)

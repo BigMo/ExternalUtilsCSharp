@@ -46,15 +46,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bones.cs" />
+    <Compile Include="CSGOStructures\Bones.cs" />
+    <Compile Include="CSGOStructures\CSGOClassID.cs" />
     <Compile Include="CSGOConfigUtils.cs" />
-    <Compile Include="CSGOEntity.cs" />
-    <Compile Include="CSGOLocalPlayer.cs" />
-    <Compile Include="CSGOPlayer.cs" />
+    <Compile Include="CSGOStructures\Player\CSGOEntity.cs" />
+    <Compile Include="CSGOStructures\Player\CSGOLocalPlayer.cs" />
+    <Compile Include="CSGOStructures\Player\CSGOPlayer.cs" />
     <Compile Include="CSGOScanner.cs" />
-    <Compile Include="CSGOWeapon.cs" />
-    <Compile Include="CSGOWeaponInfo.cs" />
-    <Compile Include="GlowObjectDefinition.cs" />
+    <Compile Include="CSGOStructures\CSGOWeapon.cs" />
+    <Compile Include="CSGOStructures\CSGOWeaponInfo.cs" />
+    <Compile Include="CSGOStructures\GlowObjectDefinition.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SignOnState.cs" />

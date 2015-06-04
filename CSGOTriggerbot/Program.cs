@@ -23,7 +23,8 @@ namespace CSGOTriggerbot
         public static int offsetMiscSetViewAngles = 0x00;
         public static int offsetMiscGlowManager = 0x00;
         public static int offsetMiscSignOnState = 0xE8;
-        public static int offsetMiscWeaponTable = 0x04a5aadc;
+        public static int offsetMiscWeaponTable = 0x04a5aadc;        
+        public static int offsetvMatrix = 0x00;
 
         public static int offsetEntityID = 0x00;
         public static int offsetEntityHealth = 0x00;
@@ -91,15 +92,16 @@ namespace CSGOTriggerbot
             ProcessModule engineDll = null;
             byte[] data;
             GlowObjectDefinition[] glowObjects = new GlowObjectDefinition[128];
-            CSGOPlayer[] players = new CSGOPlayer[1024];
+            CSGOPlayer[] players = new CSGOPlayer[64];
             weaponInfos = new CSGOWeaponInfo[42];
-            entityAddresses = new int[players.Length];
+            entityAddresses = new int[1024];
             int entityListAddress;
             int localPlayerAddress;
             int clientStateAddress;
             int glowAddress;
             int glowCount;
             int setViewAnglesAddress;
+            Matrix vMatrix;
             SignOnState signOnState;
             CSGOPlayer nullPlayer = new CSGOPlayer() { m_iID = 0, m_iHealth = 0, m_iTeam = 0 };
             CSGOLocalPlayer localPlayer;
@@ -175,9 +177,9 @@ namespace CSGOTriggerbot
                 //Sanity checks
                 if (signOnState != SignOnState.SIGNONSTATE_FULL || !localPlayer.IsValid())
                     continue;
-
+                vMatrix = memUtils.ReadMatrix((IntPtr)(clientDllBase + offsetvMatrix), 4, 4);
                 #region Reading entitylist and entities
-                memUtils.Read((IntPtr)(clientDllBase + offsetMiscEntityList), out data, 16 * players.Length);
+                memUtils.Read((IntPtr)(clientDllBase + offsetMiscEntityList), out data, 16 * entityAddresses.Length);
 
                 //Read entities (players)
                 for (int i = 0; i < data.Length / 16; i++)
@@ -186,14 +188,12 @@ namespace CSGOTriggerbot
                     entityAddresses[i] = address;
                     if (address != 0)
                     {
-                        CSGOEntity entity = memUtils.Read<CSGOEntity>((IntPtr)address);
-                        if (entity.IsValid(memUtils))
-                        {
-                            if (entity.GetClassID(memUtils) == 34)
-                            {
-                                players[i] = memUtils.Read<CSGOPlayer>((IntPtr)address);
-                            }
-                        }
+                        //CSGOEntity entity = memUtils.Read<CSGOEntity>((IntPtr)address);
+                        if(i<players.Length)
+                            players[i] = memUtils.Read<CSGOPlayer>((IntPtr)address);
+//                        if (entity.IsValid(memUtils)){
+//                            if (entity.GetClassID(memUtils) == 34){}
+//                        }
                     }
                     else
                     {
