@@ -81,10 +81,25 @@ namespace CSGOTriggerbot
         WeaponTaser = 228,
         WeaponTec9 = 229,
         WeaponUMP45 = 231,
+        WeaponUMP45x = 232,
         WeaponXM1014 = 233,
+        WeaponM4 = 211,
+        WeaponNova = 218,
+        WeaponMAG = 213,
         ParticleSmokeGrenade = 237,
         Weapon = 0xBEEF,
-        Unknown = 0xDEAD
+        Unknown = 0xDEAD,
+        ParticleDecoy = 40,
+        ParticleFlash = 9,
+        ParticleIncendiaryGrenade = 93,
+        WeaponG3SG1x = 204,
+        WeaponDualBerettas = 201,
+        WeaponTec9x = 230,
+        WeaponPPBizon = 197,
+        WeaponP90x = 221,
+        WeaponSCAR20x = 223,
+        WeaponXM1014x = 234,
+        WeaponM249x = 209,
     }
 
 }

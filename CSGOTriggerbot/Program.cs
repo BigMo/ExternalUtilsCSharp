@@ -188,11 +188,11 @@ namespace CSGOTriggerbot
                     entityAddresses[i] = address;
                     if (address != 0)
                     {
-                        //CSGOEntity entity = memUtils.Read<CSGOEntity>((IntPtr)address);
-                        if(i<players.Length)
+                        CSGOEntity entity = memUtils.Read<CSGOEntity>((IntPtr)address);
+                        if (entity.GetClassID(memUtils) == 34)
                             players[i] = memUtils.Read<CSGOPlayer>((IntPtr)address);
                         //if (entity.IsValid(memUtils)){
-                        //    if (entity.GetClassID(memUtils) == 34){}
+                        //    {}
                         //}
                     }
                     else
