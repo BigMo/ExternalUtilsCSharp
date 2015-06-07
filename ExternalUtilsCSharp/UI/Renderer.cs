@@ -12,7 +12,7 @@ namespace ExternalUtilsCSharp.UI
     /// <typeparam name="TColor">Color-type</typeparam>
     /// <typeparam name="TVector2">Vector2-/Point-type</typeparam>
     /// <typeparam name="TFont">Font-type</typeparam>
-    public abstract class Renderer<TColor, TVector2, TFont>
+    public abstract class Renderer<TColor, TVector2, TFont> : IDisposable
     {
         #region METHODS
         /// <summary>
@@ -25,6 +25,7 @@ namespace ExternalUtilsCSharp.UI
         /// Destroys the device
         /// </summary>
         public abstract void DestroyDevice();
+        public abstract void Dispose();
         #endregion
         #region DRAW-METHODS
         /// <summary>
@@ -86,7 +87,7 @@ namespace ExternalUtilsCSharp.UI
         /// <param name="position">Position of the rectangle</param>
         /// <param name="size">Size of the rectangle</param>
         /// <param name="strokeWidth">Strokewidth of the rectangle</param>
-        public abstract void DrawRectangle(TColor color, TVector2 position, TVector2 size, float strokeWidth = 0f);
+        public abstract void DrawRectangle(TColor color, TVector2 position, TVector2 size, float strokeWidth = 1f);
         /// <summary>
         /// Fills a rectangle
         /// </summary>
@@ -102,7 +103,7 @@ namespace ExternalUtilsCSharp.UI
         /// <param name="size">Size of the Ellipse</param>
         /// <param name="centered">Determines whether the position is the upperleft corner or the center of this ellipse</param>
         /// <param name="strokeWidth">Strokewidth of the Ellipse</param>
-        public abstract void DrawEllipse(TColor color, TVector2 position, TVector2 size, bool centered = false, float strokeWidth = 0f);
+        public abstract void DrawEllipse(TColor color, TVector2 position, TVector2 size, bool centered = false, float strokeWidth = 1f);
         /// <summary>
         /// Fills a Ellipse
         /// </summary>

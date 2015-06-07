@@ -25,9 +25,11 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
         private Factory factory;
         private Hashtable fonts;
         #endregion
-        #region CONSTRUCTORS
-        #endregion
         #region DESTRUCTOR
+        ~SharpDXRenderer()
+        {
+            this.Dispose();
+        }
         #endregion
         #region METHODS
         /// <summary>
@@ -39,6 +41,8 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
         /// <returns>New font</returns>
         public TextFormat CreateFont(string fontName, string fontFamilyName, float fontSize)
         {
+            if (device == null)
+                throw new SharpDXException("The device was not initialized yet");
             TextFormat font = new TextFormat(fontFactory, fontFamilyName, fontSize);
             fonts.Add(fontName, font);
             return font;
@@ -50,6 +54,8 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
         /// <returns></returns>
         public TextFormat GetFont(string fontName)
         {
+            if (device == null)
+                throw new SharpDXException("The device was not initialized yet");
             return (TextFormat)fonts[fontName];
         }
         public override void InitializeDevice(IntPtr hWnd, Vector2 size)
@@ -75,6 +81,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
             factory.Dispose();
             fontFactory.Dispose();
             device.Dispose();
+            this.device = null;
         }
         #endregion
         #region HELPER-METHODS
@@ -114,7 +121,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
             }
         }
 
-        public override void DrawRectangle(SharpDX.Color color, Vector2 position, Vector2 size, float strokeWidth = 0f)
+        public override void DrawRectangle(SharpDX.Color color, Vector2 position, Vector2 size, float strokeWidth = 1f)
         {
             if (device == null)
                 throw new SharpDXException("The device was not initialized yet");
@@ -134,7 +141,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
             }
         }
 
-        public override void DrawEllipse(SharpDX.Color color, Vector2 position, Vector2 size, bool centered = false, float strokeWidth = 0f)
+        public override void DrawEllipse(SharpDX.Color color, Vector2 position, Vector2 size, bool centered = false, float strokeWidth = 1f)
         {
             if (device == null)
                 throw new SharpDXException("The device was not initialized yet");
@@ -224,5 +231,11 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
             device.Resize(new Size2((int)size.X, (int)size.Y));
         }
         #endregion
+
+        public override void Dispose()
+        {
+            if (this.device != null)
+                this.DestroyDevice();
+        }
     }
 }

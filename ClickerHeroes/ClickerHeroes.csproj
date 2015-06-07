@@ -34,18 +34,39 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>ClickerHeroes.WithOverlay</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="SharpDX, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\mosHack\mosHack\bin\Debug\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct2D1, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\mosHack\mosHack\bin\Debug\SharpDX.Direct2D1.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\mosHack\mosHack\bin\Debug\SharpDX.DXGI.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CHConfig.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WithOverlay.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ExternalUtilsCSharp.SharpDXRenderer\ExternalUtilsCSharp.SharpDXRenderer.csproj">
+      <Project>{c6c9429e-9aad-4497-b589-a4c58b98efa5}</Project>
+      <Name>ExternalUtilsCSharp.SharpDXRenderer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ExternalUtilsCSharp\ExternalUtilsCSharp.csproj">
       <Project>{e294e4f8-de32-42c1-8bfd-a3e488ec5820}</Project>
       <Name>ExternalUtilsCSharp</Name>
