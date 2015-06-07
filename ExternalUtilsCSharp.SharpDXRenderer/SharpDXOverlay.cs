@@ -13,7 +13,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
     /// <summary>
     /// An implementation of the abstract Overlay-class utilizing SharpDX
     /// </summary>
-    public class SharpDXOverlay : ExternalUtilsCSharp.UI.Overlay<Color, Vector2, TextFormat>
+    public class SharpDXOverlay : ExternalUtilsCSharp.UI.Overlay<Color, Vector2, TextFormat>, IDisposable
     {
         #region CONSTRUCTORS
         public SharpDXOverlay() : base()
@@ -30,11 +30,27 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
 
             this.hWnd = hWnd;
             this.Renderer.InitializeDevice(hWnd, new Vector2(info.rcClient.Right - info.rcClient.Left, info.rcClient.Bottom - info.rcClient.Top));
+            base.Attach(hWnd);
         }
 
         public override void Detach()
         {
+            base.Detach();
             this.Renderer.DestroyDevice();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                this.Detach();
+                base.Dispose(disposing);
+            }
+        }
+
+        public override void OnResize()
+        {
+            this.Renderer.Resize(new Vector2(this.Width, this.Height));
         }
     }
 }

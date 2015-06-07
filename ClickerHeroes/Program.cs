@@ -1,10 +1,12 @@
 ﻿using ExternalUtilsCSharp;
+using ExternalUtilsCSharp.SharpDXRenderer;
 using ExternalUtilsCSharp.UI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace ClickerHeroes
 {
@@ -31,7 +33,7 @@ namespace ClickerHeroes
                     "F10: Terminate\n" +
                     "F9: Toggle auto-clicker\n" +
                     "F8: Toggle drawing\n" +
-                    "F7: Toggle randomization\n" + 
+                    "F7: Toggle randomization\n" +
                     "Num9/Num6: Increase/decrease clicker-offset (x)\n" +
                     "Num8/Num5: Increase/decrease clicker-offset (y)\n" +
                     "F6: Save window-size and -position and clicker-offsets\n" +
@@ -113,11 +115,6 @@ namespace ClickerHeroes
                         click_y += random.Next(0, randomD) * (random.Next(0, 2) == 1 ? 1 : -1);
                     }
 
-                    Point[] tmp = new Point[trail.Length];
-                    Array.Copy(trail, 1, tmp, 0, trail.Length - 1);
-                    trail = tmp;
-                    trail[trail.Length - 1] = new Point(click_x, click_y);
-
                     if (clicker)
                     {
 
@@ -142,6 +139,11 @@ namespace ClickerHeroes
 
                     if (drawing)
                     {
+
+                        Point[] tmp = new Point[trail.Length];
+                        Array.Copy(trail, 1, tmp, 0, trail.Length - 1);
+                        trail = tmp;
+                        trail[trail.Length - 1] = new Point(click_x, click_y);
                         try
                         {
                             using (Graphics g = Graphics.FromHwnd(proc.Process.MainWindowHandle))
@@ -178,7 +180,8 @@ namespace ClickerHeroes
                                 }
                                 g.FillEllipse(Brushes.Red, click_x - 8, click_y - 8, 16, 16);
                             }
-                        }catch(Exception ex)
+                        }
+                        catch (Exception ex)
                         {
                             Console.WriteLine("Drawing failed: {0}", ex.Message);
                         }
