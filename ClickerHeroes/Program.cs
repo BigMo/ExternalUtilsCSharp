@@ -1,4 +1,5 @@
 ﻿using ExternalUtilsCSharp;
+using ExternalUtilsCSharp.UI;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -22,7 +23,7 @@ namespace ClickerHeroes
                 castSpells = true;
             Random random = new Random();
             Point[] trail = new Point[16];
-            
+
             while (!keys.KeyIsDown(WinAPI.VirtualKeyShort.F10))
             {
                 Console.Clear();

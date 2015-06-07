@@ -133,7 +133,6 @@ namespace ExternalUtilsCSharp
             }
 
         }
-        #region WindowMessage-Constants
         public enum WindowMessage : uint
         {
             WM_ACTIVATE = 0x0006,
@@ -350,7 +349,31 @@ namespace ExternalUtilsCSharp
             WM_XBUTTONDOWN = 0x020B,
             WM_XBUTTONUP = 0x020C
         }
-        #endregion
+        public enum SetWindowPosFlags : ushort
+        {
+            NOSIZE = 0x0001,
+            NOMOVE = 0x0002,
+            NOZORDER = 0x0004,
+            NOREDRAW = 0x0008,
+            NOACTIVATE = 0x0010,
+            DRAWFRAME = 0x0020,
+            FRAMECHANGED = 0x0020,
+            SHOWWINDOW = 0x0040,
+            HIDEWINDOW = 0x0080,
+            NOCOPYBITS = 0x0100,
+            NOOWNERZORDER = 0x0200,
+            NOREPOSITION = 0x0200,
+            NOSENDCHANGING = 0x0400,
+            DEFERERASE = 0x2000,
+            ASYNCWINDOWPOS = 0x4000
+        }
+        public enum SetWindpwPosHWNDFlags
+        {
+            NoTopMost = -2,
+            TopMost = -1,
+            Top = 0,
+            Bottom = 1
+        }
         #endregion
         #region Input-functions
         [DllImport("User32.dll")]

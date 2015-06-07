@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace ExternalUtilsCSharp.UI
+namespace ExternalUtilsCSharp.UI.UIObjects
 {
     /// <summary>
     /// A structure that holds information about location and size of a rectangle

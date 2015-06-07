@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSGOSample", "CSGOTriggerbo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickerHeroes", "ClickerHeroes\ClickerHeroes.csproj", "{42E7D8B0-97A4-4E33-B98B-50EC3E1C0A88}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExternalUtilsCSharp.SharpDXRenderer", "ExternalUtilsCSharp.SharpDXRenderer\ExternalUtilsCSharp.SharpDXRenderer.csproj", "{C6C9429E-9AAD-4497-B589-A4C58B98EFA5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{42E7D8B0-97A4-4E33-B98B-50EC3E1C0A88}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42E7D8B0-97A4-4E33-B98B-50EC3E1C0A88}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42E7D8B0-97A4-4E33-B98B-50EC3E1C0A88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6C9429E-9AAD-4497-B589-A4C58B98EFA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6C9429E-9AAD-4497-B589-A4C58B98EFA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6C9429E-9AAD-4497-B589-A4C58B98EFA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6C9429E-9AAD-4497-B589-A4C58B98EFA5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
