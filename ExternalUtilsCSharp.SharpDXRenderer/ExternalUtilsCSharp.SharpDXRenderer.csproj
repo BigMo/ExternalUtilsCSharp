@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{E294E4F8-DE32-42C1-8BFD-A3E488EC5820}</ProjectGuid>
+    <ProjectGuid>{C6C9429E-9AAD-4497-B589-A4C58B98EFA5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ExternalUtilsCSharp</RootNamespace>
-    <AssemblyName>ExternalUtilsCSharp</AssemblyName>
+    <RootNamespace>ExternalUtilsCSharp.SharpDXRenderer</RootNamespace>
+    <AssemblyName>ExternalUtilsCSharp.SharpDXRenderer</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,9 +20,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,41 +28,41 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="SharpDX, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Downloads\Bin\DirectX11-net40\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct2D1, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Mo's ColorBot\Mo's ColorBot\bin\Debug\SharpDX.Direct2D1.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Mo's ColorBot\Mo's ColorBot\bin\Debug\SharpDX.DXGI.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
+    <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConfigUtils.cs" />
-    <Compile Include="KeyUtils.cs" />
-    <Compile Include="MathUtils.cs" />
-    <Compile Include="MathObjects\Matrix.cs" />
-    <Compile Include="MemObjects\PE\COFFHeader.cs" />
-    <Compile Include="MemObjects\PE\DOSHeader.cs" />
-    <Compile Include="MemObjects\PE\PEInfo.cs" />
-    <Compile Include="MemObjects\PE\PEOptHeader.cs" />
-    <Compile Include="MemObjects\ScanResult.cs" />
-    <Compile Include="MemUtils.cs" />
-    <Compile Include="ProcUtils.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MathObjects\Vector2.cs" />
-    <Compile Include="MathObjects\Vector3.cs" />
-    <Compile Include="UI\Overlay.cs">
+    <Compile Include="SharpDXOverlay.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="UI\UIObjects\Color.cs" />
-    <Compile Include="UI\Controls\Control.cs" />
-    <Compile Include="UI\UIObjects\Rectangle.cs" />
-    <Compile Include="UI\Renderer.cs" />
-    <Compile Include="WinAPI.cs" />
+    <Compile Include="SharpDXRenderer.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="classDiagram.cd" />
+    <ProjectReference Include="..\ExternalUtilsCSharp\ExternalUtilsCSharp.csproj">
+      <Project>{e294e4f8-de32-42c1-8bfd-a3e488ec5820}</Project>
+      <Name>ExternalUtilsCSharp</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
