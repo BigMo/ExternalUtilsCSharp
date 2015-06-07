@@ -20,6 +20,9 @@ namespace CSGOTriggerbot
         [FieldOffset(0xE9)]
         public byte m_iDormant;
 
+        [FieldOffset(0x148)]
+        public short m_hOwner;
+
         public bool IsValid(MemUtils memUtils)
         {
             return this.m_iID != 0 && this.m_iDormant != 1 && this.m_iVirtualTable != 0 && this.m_iVirtualTable != 0xFFFFFFFF;
@@ -39,7 +42,7 @@ namespace CSGOTriggerbot
                 return memUtils.Read<int>((IntPtr)(clientClass + 20));
             return clientClass;
         }
-        public String GetName(MemUtils memUtils)
+        public string GetName(MemUtils memUtils)
         {
             int clientClass = GetClientClass(memUtils);
             if (clientClass != -1)

@@ -38,12 +38,29 @@ namespace CSGOTriggerbot
             PlayerTeamNum(memUtils);
             PlayerBoneMatrix(memUtils);
             PlayerWeaponHandle(memUtils);
+            vMatrix(memUtils);
             clientDll = null;
             engineDll = null;
             clientDllBase = 0;
             engineDllBase = 0;
         }
         #region MISC
+        static void vMatrix(MemUtils memUtils)
+        {
+            scan = memUtils.PerformSignatureScan(new byte[] {                                 
+                0x53, 0x8B, 0xDC, 0x83, 0xEC, 0x08, 0x83, 0xE4,
+                0xF0, 0x83, 0xC4, 0x04, 0x55, 0x8B, 0x6B, 0x04,
+                0x89, 0x6C, 0x24, 0x04, 0x8B, 0xEC, 0xA1, 0x00,
+                0x00, 0x00, 0x00, 0x81, 0xEC, 0x98, 0x03, 0x00,
+                0x00 }, "xxxxxxxxxxxxxxxxxxxxxxx????xxxxxx", clientDll);
+            if (scan.Success)
+            {
+                int address = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + +0x4EE));
+                address -= clientDllBase;
+                address += 0x80;
+                Program.offsetvMatrix = address;
+            }
+        }
         static void EntityOff(MemUtils memUtils)
         {
             scan = memUtils.PerformSignatureScan(new byte[] { 0x05, 0x00, 0x00, 0x00, 0x00, 0xC1, 0xe9, 0x00, 0x39, 0x48, 0x04 }, "x????xx?xxx", clientDll);
