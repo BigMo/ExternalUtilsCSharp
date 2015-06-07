@@ -30,6 +30,9 @@ namespace CSGOTriggerbot
         [FieldOffset(0x134)]
         public Vector3 m_vecOrigin;
 
+        [FieldOffset(0x935)]
+        public bool m_bSpotted;
+
         [FieldOffset(0xA78)]
         public int m_pBoneMatrix;
 
