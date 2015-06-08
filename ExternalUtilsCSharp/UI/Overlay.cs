@@ -13,7 +13,7 @@ namespace ExternalUtilsCSharp.UI
     /// <typeparam name="TColor">Color-type</typeparam>
     /// <typeparam name="TVector2">Vector2-type</typeparam>
     /// <typeparam name="TFont">Font-type</typeparam>
-    public abstract class Overlay<TColor, TVector2, TFont> : Form
+    public abstract class Overlay<TRenderer, TColor, TVector2, TFont> : Form where TRenderer : Renderer<TColor, TVector2, TFont>
     {
         #region VARIABLES
         private Timer ctrlTimer;
@@ -21,7 +21,7 @@ namespace ExternalUtilsCSharp.UI
         #endregion
 
         #region PROPERTIES
-        public Renderer<TColor, TVector2, TFont> Renderer { get; protected set; }
+        public TRenderer Renderer { get; protected set; }
         /// <summary>
         /// Whether to perform drawing-operations when the target-window is in foreground only
         /// </summary>
@@ -31,7 +31,8 @@ namespace ExternalUtilsCSharp.UI
         /// </summary>
         public bool TrackTargetWindow { get; set; }
         public IntPtr hWnd { get; protected set; }
-        public List<Controls.Control<Renderer<TColor, TVector2, TFont>, TColor, TVector2, TFont>> ChildControls { get; set; }
+        public List<Controls.Control<TRenderer, TColor, TVector2, TFont>> ChildControls { get; set; }
+        public System.Drawing.Point CursorPosition { get { return this.PointToClient(System.Windows.Forms.Cursor.Position); } }
         #endregion
 
         #region EVENTS
@@ -46,8 +47,8 @@ namespace ExternalUtilsCSharp.UI
         }
         public class OverlayEventArgs : EventArgs
         {
-            public Overlay<TColor, TVector2, TFont> Overlay { get; private set; }
-            public OverlayEventArgs(Overlay<TColor, TVector2, TFont> overlay)
+            public Overlay<TRenderer, TColor, TVector2, TFont> Overlay { get; private set; }
+            public OverlayEventArgs(Overlay<TRenderer, TColor, TVector2, TFont> overlay)
                 : base()
             {
                 this.Overlay = overlay;
@@ -56,7 +57,7 @@ namespace ExternalUtilsCSharp.UI
         public class DeltaEventArgs : OverlayEventArgs
         {
             public double SecondsElapsed { get; private set; }
-            public DeltaEventArgs(double secondsElapsed, Overlay<TColor, TVector2, TFont> overlay)
+            public DeltaEventArgs(double secondsElapsed, Overlay<TRenderer, TColor, TVector2, TFont> overlay)
                 : base(overlay)
             {
                 this.SecondsElapsed = secondsElapsed;
@@ -105,7 +106,7 @@ namespace ExternalUtilsCSharp.UI
             //Overlay-properties
             this.DrawOnlyWhenInForeground = true;
             this.TrackTargetWindow = true;
-            this.ChildControls = new List<Controls.Control<Renderer<TColor, TVector2, TFont>, TColor, TVector2, TFont>>();
+            this.ChildControls = new List<Controls.Control<TRenderer, TColor, TVector2, TFont>>();
         }
 
         void Overlay_Paint(object sender, PaintEventArgs e)
@@ -121,7 +122,7 @@ namespace ExternalUtilsCSharp.UI
             this.Renderer.Clear(this.Renderer.GetRendererBackColor());
             this.OnBeforeDrawingEvent(new OverlayEventArgs(this));
 
-            foreach (Controls.Control<Renderer<TColor, TVector2, TFont>, TColor, TVector2, TFont> control in ChildControls)
+            foreach (Controls.Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
                 control.Draw(this.Renderer);
 
             this.OnBeforeDrawingEvent(new OverlayEventArgs(this));
@@ -200,6 +201,12 @@ namespace ExternalUtilsCSharp.UI
         /// </summary>
         /// <param name="size"></param>
         public abstract void OnResize();
+        /// <summary>
+        /// Call this method to update all controls on this form
+        /// </summary>
+        /// <param name="secondsElapsed"></param>
+        /// <param name="keys"></param>
+        public abstract void UpdateControls(double secondsElapsed, KeyUtils keys);
         #endregion
     }
 }

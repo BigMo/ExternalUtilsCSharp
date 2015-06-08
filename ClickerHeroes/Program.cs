@@ -22,7 +22,8 @@ namespace ClickerHeroes
                 drawing = true,
                 randomize = false,
                 firstRun = true,
-                castSpells = true;
+                castSpells = false,
+                advanceLevels = true;
             Random random = new Random();
             Point[] trail = new Point[16];
 
@@ -60,6 +61,8 @@ namespace ClickerHeroes
                         randomize = !randomize;
                     if (keys.KeyWentUp(WinAPI.VirtualKeyShort.F4))
                         castSpells = !castSpells;
+                    if (keys.KeyWentUp(WinAPI.VirtualKeyShort.F3))
+                        advanceLevels = !advanceLevels;
 
                     if (keys.KeyWentUp(WinAPI.VirtualKeyShort.NUMPAD8))
                         config.SetValue("offsetY", config.GetValue<int>("offsetY") + 1);
@@ -113,6 +116,16 @@ namespace ClickerHeroes
                         random = new Random(random.Next(0, (int)Environment.TickCount));
                         click_x += random.Next(0, randomD) * (random.Next(0, 2) == 1 ? 1 : -1);
                         click_y += random.Next(0, randomD) * (random.Next(0, 2) == 1 ? 1 : -1);
+                    }
+
+                    if (advanceLevels && clicker)
+                    {
+                        int x = (int)(width * 0.81);
+                        int y = (int)(height * 0.06);
+                        int lParam = MakeLParam(x, y);
+                        int wParam = 0;
+                        WinAPI.SendMessage(proc.Process.MainWindowHandle, (uint)WinAPI.WindowMessage.WM_LBUTTONDOWN, wParam, lParam);
+                        WinAPI.SendMessage(proc.Process.MainWindowHandle, (uint)WinAPI.WindowMessage.WM_LBUTTONUP, wParam, lParam);
                     }
 
                     if (clicker)
@@ -179,6 +192,9 @@ namespace ClickerHeroes
                                     }
                                 }
                                 g.FillEllipse(Brushes.Red, click_x - 8, click_y - 8, 16, 16);
+                                int x = (int)(width * 0.81);
+                                int y = (int)(height * 0.06);
+                                g.FillEllipse(Brushes.Red, x - 8, y - 8, 16, 16);
                             }
                         }
                         catch (Exception ex)
