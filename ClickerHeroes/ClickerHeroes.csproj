@@ -35,7 +35,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>ClickerHeroes.WithOverlay</StartupObject>
+    <StartupObject>ClickerHeroes.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SharpDX, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -60,6 +60,7 @@
     <Compile Include="CHConfig.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\CHCheckBox.cs" />
     <Compile Include="WithOverlay.cs" />
   </ItemGroup>
   <ItemGroup>

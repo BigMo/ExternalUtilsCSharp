@@ -29,7 +29,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
                 throw new Win32Exception(Marshal.GetLastWin32Error());
 
             this.hWnd = hWnd;
-            this.Renderer.InitializeDevice(hWnd, new Vector2(info.rcClient.Right - info.rcClient.Left, info.rcClient.Bottom - info.rcClient.Top));
+            this.Renderer.InitializeDevice(this.Handle, new Vector2(info.rcClient.Right - info.rcClient.Left, info.rcClient.Bottom - info.rcClient.Top));
             base.Attach(hWnd);
         }
 

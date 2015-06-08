@@ -61,6 +61,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MathObjects\Vector2.cs" />
     <Compile Include="MathObjects\Vector3.cs" />
+    <Compile Include="UI\Controls\CheckBox.cs" />
     <Compile Include="UI\Overlay.cs">
       <SubType>Form</SubType>
     </Compile>

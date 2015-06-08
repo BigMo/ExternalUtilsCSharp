@@ -31,10 +31,13 @@ namespace ExternalUtilsCSharp.UI
         /// </summary>
         public bool TrackTargetWindow { get; set; }
         public IntPtr hWnd { get; protected set; }
+        public List<Controls.Control<Renderer<TColor, TVector2, TFont>, TColor, TVector2, TFont>> ChildControls { get; set; }
         #endregion
 
         #region EVENTS
         public event EventHandler<DeltaEventArgs> TickEvent;
+        public event EventHandler<OverlayEventArgs> BeforeDrawingEvent;
+        public event EventHandler<OverlayEventArgs> AfterDrawingEvent;
 
         public virtual void OnTickEvent(DeltaEventArgs e)
         {
@@ -59,12 +62,17 @@ namespace ExternalUtilsCSharp.UI
                 this.SecondsElapsed = secondsElapsed;
             }
         }
-        public event EventHandler<OverlayEventArgs> DrawEvent;
 
-        public virtual void OnDrawEvent(OverlayEventArgs e)
+        public virtual void OnBeforeDrawingEvent(OverlayEventArgs e)
         {
-            if (DrawEvent != null)
-                DrawEvent(this, e);
+            if (BeforeDrawingEvent != null)
+                BeforeDrawingEvent(this, e);
+        }
+
+        public virtual void OnAfterDrawingEvent(OverlayEventArgs e)
+        {
+            if (AfterDrawingEvent != null)
+                AfterDrawingEvent(this, e);
         }
         #endregion
 
@@ -79,17 +87,17 @@ namespace ExternalUtilsCSharp.UI
             this.Text = "";
             this.Name = "";
             this.TopMost = true;
-            this.DoubleBuffered = true;
             this.Paint += Overlay_Paint;
 
             //Make form transparent and fully topmost
-            int initialStyle = WinAPI.GetWindowLong(this.Handle, -20);
-            WinAPI.SetWindowLong(this.Handle, -20, initialStyle | 0x80000 | 0x20);
+            int initialStyle = WinAPI.GetWindowLong(this.Handle, (int)WinAPI.GetWindowLongFlags.GWL_EXSTYLE);
+            WinAPI.SetWindowLong(this.Handle, (int)WinAPI.GetWindowLongFlags.GWL_EXSTYLE, initialStyle | (int)WinAPI.ExtendedWindowStyles.WS_EX_LAYERED | (int)WinAPI.ExtendedWindowStyles.WS_EX_TRANSPARENT);
             WinAPI.SetWindowPos(this.Handle, (IntPtr)WinAPI.SetWindpwPosHWNDFlags.TopMost, 0, 0, 0, 0, (uint)(WinAPI.SetWindowPosFlags.NOMOVE | WinAPI.SetWindowPosFlags.NOSIZE));
-        
+            WinAPI.SetLayeredWindowAttributes(this.Handle, 0, 255, (uint)WinAPI.LayeredWindowAttributesFlags.LWA_ALPHA);
+
             //Controls
             ctrlTimer = new Timer();
-            ctrlTimer.Interval = 1000 / 60;
+            ctrlTimer.Interval = 1000 / 20;
             ctrlTimer.Tick += this.ctrlTimer_Tick;
             lastTimerTick = Environment.TickCount;
             lastDrawTick = Environment.TickCount;
@@ -97,21 +105,36 @@ namespace ExternalUtilsCSharp.UI
             //Overlay-properties
             this.DrawOnlyWhenInForeground = true;
             this.TrackTargetWindow = true;
+            this.ChildControls = new List<Controls.Control<Renderer<TColor, TVector2, TFont>, TColor, TVector2, TFont>>();
         }
 
         void Overlay_Paint(object sender, PaintEventArgs e)
         {
-            this.OnDrawEvent(new OverlayEventArgs(this));
+            WinAPI.MARGINS margins = new WinAPI.MARGINS();
+            margins.topHeight = 0; //this.Top;
+            margins.bottomHeight = 0; // this.Bottom;
+            margins.leftWidth = this.Left;
+            margins.rightWidth = this.Right;
+            WinAPI.DwmExtendFrameIntoClientArea(this.Handle, ref margins);
+
+            this.Renderer.BeginDraw();
+            this.Renderer.Clear(this.Renderer.GetRendererBackColor());
+            this.OnBeforeDrawingEvent(new OverlayEventArgs(this));
+
+            foreach (Controls.Control<Renderer<TColor, TVector2, TFont>, TColor, TVector2, TFont> control in ChildControls)
+                control.Draw(this.Renderer);
+
+            this.OnBeforeDrawingEvent(new OverlayEventArgs(this));
+            this.Renderer.EndDraw();
         }
 
         protected void ctrlTimer_Tick(object sender, EventArgs e)
         {
-            TimeSpan deltaDraw = new TimeSpan(Environment.TickCount - lastDrawTick);
             TimeSpan deltaTimer = new TimeSpan(Environment.TickCount - lastTimerTick);
-
             lastTimerTick = Environment.TickCount;
             this.OnTick(deltaTimer.TotalSeconds);
 
+            TimeSpan deltaDraw = new TimeSpan(Environment.TickCount - lastDrawTick);
             lastDrawTick = Environment.TickCount;
             this.OnDraw(deltaDraw.TotalSeconds);
         }
@@ -143,7 +166,7 @@ namespace ExternalUtilsCSharp.UI
                 if(WinAPI.GetWindowInfo(this.hWnd, ref info))
                 {
                     if(this.Location.X != info.rcClient.Left ||
-                        this.Location.X != info.rcClient.Top)
+                        this.Location.Y != info.rcClient.Top)
                     {
                         this.Location = new System.Drawing.Point(info.rcClient.Left, info.rcClient.Top);
                     }
@@ -164,7 +187,6 @@ namespace ExternalUtilsCSharp.UI
         public virtual void Attach(IntPtr hWnd)
         {
             ctrlTimer.Enabled = true;
-            ctrlTimer.Start();
         }
         /// <summary>
         /// Detach from the window-handle which was earler attached to (and destroy your device here)

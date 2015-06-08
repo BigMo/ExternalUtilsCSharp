@@ -168,6 +168,11 @@ namespace ExternalUtilsCSharp.UI
         /// </summary>
         /// <param name="size"></param>
         public abstract void Resize(TVector2 size);
+        /// <summary>
+        /// Returns the renderer's backcolor
+        /// </summary>
+        /// <returns></returns>
+        public abstract TColor GetRendererBackColor();
         #endregion
     }
 }
