@@ -56,7 +56,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
         public override void UpdateControls(double secondsElapsed, KeyUtils keys)
         {
             Vector2 cursor = new Vector2(this.CursorPosition.X, this.CursorPosition.Y);
-            foreach (ExternalUtilsCSharp.UI.Controls.Control<SharpDXRenderer, Color, Vector2, TextFormat> control in this.ChildControls)
+            foreach (ExternalUtilsCSharp.UI.Control<SharpDXRenderer, Color, Vector2, TextFormat> control in this.ChildControls)
                 control.Update(secondsElapsed, keys, cursor);
         }
     }

@@ -31,7 +31,7 @@ namespace ExternalUtilsCSharp.UI
         /// </summary>
         public bool TrackTargetWindow { get; set; }
         public IntPtr hWnd { get; protected set; }
-        public List<Controls.Control<TRenderer, TColor, TVector2, TFont>> ChildControls { get; set; }
+        public List<UI.Control<TRenderer, TColor, TVector2, TFont>> ChildControls { get; set; }
         public System.Drawing.Point CursorPosition { get { return this.PointToClient(System.Windows.Forms.Cursor.Position); } }
         #endregion
 
@@ -106,11 +106,17 @@ namespace ExternalUtilsCSharp.UI
             //Overlay-properties
             this.DrawOnlyWhenInForeground = true;
             this.TrackTargetWindow = true;
-            this.ChildControls = new List<Controls.Control<TRenderer, TColor, TVector2, TFont>>();
+            this.ChildControls = new List<UI.Control<TRenderer, TColor, TVector2, TFont>>();
         }
 
         void Overlay_Paint(object sender, PaintEventArgs e)
         {
+            if (this.DrawOnlyWhenInForeground)
+            {
+                if (WinAPI.GetForegroundWindow() != this.hWnd)
+                    return;
+            }
+
             WinAPI.MARGINS margins = new WinAPI.MARGINS();
             margins.topHeight = 0; //this.Top;
             margins.bottomHeight = 0; // this.Bottom;
@@ -122,8 +128,9 @@ namespace ExternalUtilsCSharp.UI
             this.Renderer.Clear(this.Renderer.GetRendererBackColor());
             this.OnBeforeDrawingEvent(new OverlayEventArgs(this));
 
-            foreach (Controls.Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
-                control.Draw(this.Renderer);
+            foreach (UI.Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
+                if(control.Visible)
+                    control.Draw(this.Renderer);
 
             this.OnBeforeDrawingEvent(new OverlayEventArgs(this));
             this.Renderer.EndDraw();

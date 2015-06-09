@@ -1,5 +1,5 @@
 ﻿using ExternalUtilsCSharp.SharpDXRenderer;
-using ExternalUtilsCSharp.UI.Controls;
+using ExternalUtilsCSharp.UI;
 using SharpDX;
 using SharpDX.DirectWrite;
 using System;

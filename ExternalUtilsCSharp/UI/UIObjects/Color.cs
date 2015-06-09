@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace ExternalUtilsCSharp.UI.UIObjects
 {
-    public class Color
+    public struct Color
     {
         #region PROPERTIES
-        public byte A { get; private set; }
-        public byte R { get; private set; }
-        public byte G { get; private set; }
-        public byte B { get; private set; }
+        public byte A;
+        public byte R;
+        public byte G;
+        public byte B;
         #endregion
 
         #region CONSTRUCTOR
@@ -25,10 +25,10 @@ namespace ExternalUtilsCSharp.UI.UIObjects
         /// <param name="b">Value of the blue-channel (0-255)</param>
         public Color(byte a, byte r, byte g, byte b)
         {
-            this.A = a;
-            this.R = r;
-            this.G = g;
-            this.B = b;
+            A = a;
+            R = r;
+            G = g;
+            B = b;
         }
         /// <summary>
         /// Initializes a color-object using the given values for its channels
@@ -38,11 +38,6 @@ namespace ExternalUtilsCSharp.UI.UIObjects
         /// <param name="g">Value of the green-channel (0-1)</param>
         /// <param name="b">Value of the blue-channel (0-1)</param>
         public Color(float a, float r, float g, float b) : this((byte)(255f * a), (byte)(255f * r), (byte)(255f * g), (byte)(255f * b))
-        { }
-        /// <summary>
-        /// Initializes a black color-object
-        /// </summary>
-        public Color() : this(0,0,0,0)
         { }
         #endregion
 

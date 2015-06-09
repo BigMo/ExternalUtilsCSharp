@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace ExternalUtilsCSharp.UI.Controls
+namespace ExternalUtilsCSharp.UI
 {
     /// <summary>
     /// A very basic class to use as a base for more complex controls
@@ -17,7 +17,6 @@ namespace ExternalUtilsCSharp.UI.Controls
         #region VARIABLES
         private bool mouseOver;
         #endregion
-
         #region PROPERTIES
         public float X { get; set; }
         public float Y { get; set; }
@@ -48,12 +47,18 @@ namespace ExternalUtilsCSharp.UI.Controls
                 }
             }
         }
+        public float MarginTop { get; set; }
+        public float MarginBottom { get; set; }
+        public float MarginLeft { get; set; }
+        public float MarginRight { get; set; }
+        public bool Visible { get; set; }
+        public bool FillParent { get; set; }
         #endregion
-
         #region EVENTS
         protected struct MouseEvent
         {
             public bool Handled;
+            public int Depth;
         }
         public class MouseClickEventArgs : EventArgs
         {
@@ -92,7 +97,6 @@ namespace ExternalUtilsCSharp.UI.Controls
                 MouseClickEventUp(this, e);
         }
         #endregion
-
         #region CONSTRUCTOR
         public Control()
         {
@@ -103,9 +107,9 @@ namespace ExternalUtilsCSharp.UI.Controls
             this.Parent = null;
             this.ChildControls = new List<Control<TRenderer, TColor, TVector2, TFont>>();
             this.Text = "<Control>";
+            this.Visible = true;
         }
         #endregion
-
         #region METHODS
         /// <summary>
         /// Draws the control
@@ -114,7 +118,8 @@ namespace ExternalUtilsCSharp.UI.Controls
         public virtual void Draw(TRenderer renderer)
         {
             foreach (Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
-                control.Draw(renderer);
+                if(control.Visible)
+                    control.Draw(renderer);
         }
         /// <summary>
         /// Performs an update on this control and its chilcontrols
@@ -124,15 +129,13 @@ namespace ExternalUtilsCSharp.UI.Controls
         public virtual void Update(double secondsElapsed, KeyUtils keyUtils, TVector2 cursorPoint)
         {
             #region MOUSE
-            MouseEvent result = new MouseEvent() { Handled = false };
+            MouseEvent result = new MouseEvent() { Handled = false, Depth = 0 };
             CheckMouseEvents(cursorPoint, keyUtils, result);
             #endregion
-
             #region CHILDCONTROLS
             foreach (Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
                 control.Update(secondsElapsed, keyUtils, cursorPoint);
             #endregion
-
         }
         /// <summary>
         /// Checks whether the mouse left or entered this control (or one of its childcontrols)
@@ -143,11 +146,13 @@ namespace ExternalUtilsCSharp.UI.Controls
         {
             foreach(Control<TRenderer,TColor,TVector2,TFont> control in ChildControls)
             {
+                result.Depth++;
                 control.CheckMouseEvents(cursorPoint, keyUtils, result);
+                result.Depth--;
                 if (result.Handled)
                     break;
             }
-            if (!result.Handled)
+            if (!result.Handled && result.Depth == 0)
             {
                 this.MouseOver = this.CheckMouseOver(cursorPoint);
                 if (this.MouseOver)
@@ -158,8 +163,13 @@ namespace ExternalUtilsCSharp.UI.Controls
                         OnMouseClickEventDown(new MouseClickEventArgs() { RightButton = true });
                     if (keyUtils.KeyWentDown(WinAPI.VirtualKeyShort.MBUTTON))
                         OnMouseClickEventDown(new MouseClickEventArgs() { MiddleButton = true });
-                    if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.LBUTTON) || keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.RBUTTON) || keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.MBUTTON))
-                        OnMouseClickEventUp(new MouseClickEventArgs());
+
+                    if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.LBUTTON))
+                        OnMouseClickEventUp(new MouseClickEventArgs() { LeftButton = true });
+                    if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.RBUTTON))
+                        OnMouseClickEventUp(new MouseClickEventArgs() { RightButton = true });
+                    if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.MBUTTON))
+                        OnMouseClickEventUp(new MouseClickEventArgs() { MiddleButton = true });
                     result.Handled = true;
                 }
             }
@@ -170,21 +180,41 @@ namespace ExternalUtilsCSharp.UI.Controls
         /// <param name="point"></param>
         /// <returns></returns>
         public abstract bool CheckMouseOver(TVector2 cursorPoint);
+        /// <summary>
+        /// Adds a control to the childcontrols of this control
+        /// </summary>
+        /// <param name="control"></param>
         public virtual void AddChildControl(Control<TRenderer, TColor, TVector2, TFont> control)
         {
             this.ChildControls.Add(control);
             control.Parent = this;
         }
+        /// <summary>
+        /// Removes a control from this control's childcontrols
+        /// </summary>
+        /// <param name="control"></param>
         public virtual void RemoveChildControl(Control<TRenderer, TColor, TVector2, TFont> control)
         {
             this.ChildControls.Remove(control);
             control.Parent = null;
         }
+        /// <summary>
+        /// Removes a control at the given index from this control's list of childcontrols
+        /// </summary>
+        /// <param name="index"></param>
         public virtual void RemoveChildControlAt(int index)
         {
             this.RemoveChildControl(this.ChildControls[index]);
         }
+        /// <summary>
+        /// Returns the location of this control
+        /// </summary>
+        /// <returns></returns>
         public abstract TVector2 GetLocation();
+        /// <summary>
+        /// Returns the size of this control
+        /// </summary>
+        /// <returns></returns>
         public abstract TVector2 GetSize();
         #endregion
     }

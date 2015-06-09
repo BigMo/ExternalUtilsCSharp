@@ -60,7 +60,6 @@
     <Compile Include="CHConfig.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\CHCheckBox.cs" />
     <Compile Include="UI\Segments.cs" />
     <Compile Include="WithOverlay.cs" />
   </ItemGroup>
