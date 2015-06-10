@@ -17,7 +17,7 @@ namespace ClickerHeroes.UI
             return false;
         }
 
-        public override Vector2 GetLocation()
+        public override Vector2 GetAbsoluteLocation()
         {
             return Vector2.Zero;
         }
@@ -34,17 +34,17 @@ namespace ClickerHeroes.UI
         public override void Draw(SharpDXRenderer renderer)
         {
             base.Draw(renderer);
-            Vector2 rightHalf = new Vector2(this.Width / 2f, 0);
-            //Right half of the window
-            renderer.DrawRectangle(
-                this.ForeColor,
-                rightHalf,
-                new Vector2(this.Width /2f, this.Height));
-            //Levelbar
-            renderer.DrawRectangle(
-                this.ForeColor,
-                new Vector2(this.Width / 2f, 0),
-                new Vector2(this.Width / 2f, this.Width * 0.0675f));
+            //Vector2 rightHalf = new Vector2(this.Width / 2f, 0);
+            ////Right half of the window
+            //renderer.DrawRectangle(
+            //    this.ForeColor,
+            //    rightHalf,
+            //    new Vector2(this.Width /2f, this.Height));
+            ////Levelbar
+            //renderer.DrawRectangle(
+            //    this.ForeColor,
+            //    new Vector2(this.Width / 2f, 0),
+            //    new Vector2(this.Width / 2f, this.Width * 0.0675f));
             //Levelbar items
             Vector2 item = new Vector2(this.Width * 0.0375f);
             Vector2 itemWidth = new Vector2(this.Width * 0.0375f, 0);
@@ -66,13 +66,13 @@ namespace ClickerHeroes.UI
                 this.ForeColor,
                 new Vector2(this.Width * 0.75f - item.X / 2f, 0) + itemY + itemDistance + itemWidth,
                 item);
-            //Click-area
-            Vector2 areaSize = new Vector2(this.Width / 2f * 0.6f, this.Width * 0.15f);
-            Vector2 location = new Vector2(this.Width / 4f, this.Width / 2f * 0.7f);
-            renderer.DrawRectangle(
-                this.ForeColor,
-                rightHalf + location - areaSize / 2f,
-                areaSize);
+            ////Click-area
+            //Vector2 areaSize = new Vector2(this.Width / 2f * 0.6f, this.Width * 0.15f);
+            //Vector2 location = new Vector2(this.Width / 4f, this.Width / 2f * 0.7f);
+            //renderer.DrawRectangle(
+            //    this.ForeColor,
+            //    rightHalf + location - areaSize / 2f,
+            //    areaSize);
         }
     }
 }

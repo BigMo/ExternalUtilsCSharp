@@ -149,7 +149,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
             {
                 device.DrawEllipse(
                     new Ellipse(
-                       (centered ? position : new Vector2(position.X - size.X / 2f, position.Y - size.Y / 2f)),
+                       (centered ? position : new Vector2(position.X + size.X / 2f, position.Y + size.Y / 2f)),
                         size.X / 2f,
                         size.Y / 2f
                     ),
@@ -167,7 +167,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
             {
                 device.FillEllipse(
                     new Ellipse(
-                       (centered ? position : new Vector2(position.X - size.X / 2f, position.Y - size.Y / 2f)),
+                       (centered ? position : new Vector2(position.X + size.X / 2f, position.Y + size.Y / 2f)),
                         size.X / 2f,
                         size.Y / 2f
                     ),

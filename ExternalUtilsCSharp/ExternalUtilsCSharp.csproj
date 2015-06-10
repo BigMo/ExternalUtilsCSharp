@@ -68,6 +68,7 @@
     <Compile Include="UI\Control.cs" />
     <Compile Include="UI\UIObjects\Rectangle.cs" />
     <Compile Include="UI\Renderer.cs" />
+    <Compile Include="Updater.cs" />
     <Compile Include="WinAPI.cs" />
   </ItemGroup>
   <ItemGroup>

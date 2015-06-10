@@ -16,6 +16,8 @@ namespace ExternalUtilsCSharp.UI
     {
         #region VARIABLES
         private bool mouseOver;
+        private string text;
+        private TFont font;
         #endregion
         #region PROPERTIES
         public float X { get; set; }
@@ -24,11 +26,36 @@ namespace ExternalUtilsCSharp.UI
         public float Height { get; set; }
         public TColor BackColor { get; set; }
         public TColor ForeColor { get; set; }
-        public TFont Font { get; set; }
+        public TFont Font
+        {
+            get { return this.font; }
+            set
+            {
+                if (this.font == null || !this.font.Equals(value))
+                {
+                    this.font = value;
+                    OnFontChangedEvent(new EventArgs());
+                }
+            }
+        }
         public Rectangle Rectangle { get { return new Rectangle(this.X, this.Y, this.Width, this.Height); } }
         public Control<TRenderer, TColor, TVector2, TFont> Parent { get; set; }
         public List<Control<TRenderer, TColor, TVector2, TFont>> ChildControls { get; set; }
-        public string Text { get; set; }
+        public string Text 
+        {
+            get 
+            {
+                return text;
+            }
+            set
+            {
+                if(this.text != value)
+                {
+                    this.text = value;
+                    OnTextChangedEvent(new EventArgs());
+                }
+            }
+        }
         public bool MouseOver
         {
             get 
@@ -53,6 +80,7 @@ namespace ExternalUtilsCSharp.UI
         public float MarginRight { get; set; }
         public bool Visible { get; set; }
         public bool FillParent { get; set; }
+        public TVector2 LastMousePos { get; private set; }
         #endregion
         #region EVENTS
         protected struct MouseEvent
@@ -60,17 +88,31 @@ namespace ExternalUtilsCSharp.UI
             public bool Handled;
             public int Depth;
         }
-        public class MouseClickEventArgs : EventArgs
+        public class MouseEventArgs : EventArgs
         {
             public bool LeftButton;
             public bool RightButton;
             public bool MiddleButton;
+
+            public TVector2 Position;
         }
         public event EventHandler MouseEnteredEvent;
         public event EventHandler MouseLeftEvent;
-        public event EventHandler MouseMovedEvent;
-        public event EventHandler<MouseClickEventArgs> MouseClickEventDown;
-        public event EventHandler<MouseClickEventArgs> MouseClickEventUp;
+        public event EventHandler TextChangedEvent;
+        public event EventHandler FontChangedEvent;
+        public event EventHandler<MouseEventArgs> MouseMovedEvent;
+        public event EventHandler<MouseEventArgs> MouseClickEventDown;
+        public event EventHandler<MouseEventArgs> MouseClickEventUp;
+        protected virtual void OnTextChangedEvent(EventArgs e)
+        {
+            if (TextChangedEvent != null)
+                TextChangedEvent(this, e);
+        }
+        protected virtual void OnFontChangedEvent(EventArgs e)
+        {
+            if (FontChangedEvent != null)
+                FontChangedEvent(this, e);
+        }
         protected virtual void OnMouseEnteredEvent(EventArgs e)
         {
             if (MouseEnteredEvent != null)
@@ -81,17 +123,17 @@ namespace ExternalUtilsCSharp.UI
             if (MouseLeftEvent != null)
                 MouseLeftEvent(this, e);
         }
-        protected virtual void OnMouseMovedEvent(EventArgs e)
+        protected virtual void OnMouseMovedEvent(MouseEventArgs e)
         {
             if (MouseMovedEvent != null)
                 MouseMovedEvent(this, e);
         }
-        protected virtual void OnMouseClickEventDown(MouseClickEventArgs e)
+        protected virtual void OnMouseClickEventDown(MouseEventArgs e)
         {
             if (MouseClickEventDown != null)
                 MouseClickEventDown(this, e);
         }
-        protected virtual void OnMouseClickEventUp(MouseClickEventArgs e)
+        protected virtual void OnMouseClickEventUp(MouseEventArgs e)
         {
             if (MouseClickEventUp != null)
                 MouseClickEventUp(this, e);
@@ -129,8 +171,11 @@ namespace ExternalUtilsCSharp.UI
         public virtual void Update(double secondsElapsed, KeyUtils keyUtils, TVector2 cursorPoint)
         {
             #region MOUSE
-            MouseEvent result = new MouseEvent() { Handled = false, Depth = 0 };
-            CheckMouseEvents(cursorPoint, keyUtils, result);
+            if (Visible)
+            {
+                MouseEvent result = new MouseEvent() { Handled = false, Depth = 0 };
+                CheckMouseEvents(cursorPoint, keyUtils, result);
+            }
             #endregion
             #region CHILDCONTROLS
             foreach (Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
@@ -158,18 +203,24 @@ namespace ExternalUtilsCSharp.UI
                 if (this.MouseOver)
                 {
                     if (keyUtils.KeyWentDown(WinAPI.VirtualKeyShort.LBUTTON))
-                        OnMouseClickEventDown(new MouseClickEventArgs() { LeftButton = true });
+                        OnMouseClickEventDown(new MouseEventArgs() { LeftButton = true, Position = cursorPoint });
                     if (keyUtils.KeyWentDown(WinAPI.VirtualKeyShort.RBUTTON))
-                        OnMouseClickEventDown(new MouseClickEventArgs() { RightButton = true });
+                        OnMouseClickEventDown(new MouseEventArgs() { RightButton = true, Position = cursorPoint });
                     if (keyUtils.KeyWentDown(WinAPI.VirtualKeyShort.MBUTTON))
-                        OnMouseClickEventDown(new MouseClickEventArgs() { MiddleButton = true });
+                        OnMouseClickEventDown(new MouseEventArgs() { MiddleButton = true, Position = cursorPoint });
 
                     if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.LBUTTON))
-                        OnMouseClickEventUp(new MouseClickEventArgs() { LeftButton = true });
+                        OnMouseClickEventUp(new MouseEventArgs() { LeftButton = true, Position = cursorPoint });
                     if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.RBUTTON))
-                        OnMouseClickEventUp(new MouseClickEventArgs() { RightButton = true });
+                        OnMouseClickEventUp(new MouseEventArgs() { RightButton = true, Position = cursorPoint });
                     if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.MBUTTON))
-                        OnMouseClickEventUp(new MouseClickEventArgs() { MiddleButton = true });
+                        OnMouseClickEventUp(new MouseEventArgs() { MiddleButton = true, Position = cursorPoint });
+
+                    if(!LastMousePos.Equals(cursorPoint))
+                    {
+                        OnMouseMovedEvent(new MouseEventArgs() { Position = cursorPoint });
+                        LastMousePos = cursorPoint;
+                    }
                     result.Handled = true;
                 }
             }
@@ -186,8 +237,8 @@ namespace ExternalUtilsCSharp.UI
         /// <param name="control"></param>
         public virtual void AddChildControl(Control<TRenderer, TColor, TVector2, TFont> control)
         {
-            this.ChildControls.Add(control);
             control.Parent = this;
+            this.ChildControls.Add(control);
         }
         /// <summary>
         /// Removes a control from this control's childcontrols
@@ -210,7 +261,7 @@ namespace ExternalUtilsCSharp.UI
         /// Returns the location of this control
         /// </summary>
         /// <returns></returns>
-        public abstract TVector2 GetLocation();
+        public abstract TVector2 GetAbsoluteLocation();
         /// <summary>
         /// Returns the size of this control
         /// </summary>

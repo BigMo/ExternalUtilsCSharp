@@ -47,8 +47,8 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
                     Control<SharpDXRenderer, Color, Vector2, TextFormat> control = this.ChildControls[i];
                     if (i == 0)
                     {
-                        control.X = this.X + this.MarginLeft + control.MarginLeft;
-                        control.Y = this.Y + this.MarginTop + control.MarginTop;
+                        control.X = control.MarginLeft + this.MarginLeft;
+                        control.Y = control.MarginTop;
                     }
                     else
                     {
@@ -59,7 +59,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
 
                     if (this.DynamicHeight)
                         if (i == this.ChildControls.Count - 1)
-                            height = control.Y + control.Height + control.MarginBottom - this.Y;
+                            height = control.Y + control.Height + control.MarginBottom ;
                     if (this.DynamicWidth)
                         if (control.Width + control.MarginLeft + control.MarginRight > width)
                             width = control.Width + control.MarginLeft + control.MarginRight;
@@ -77,7 +77,8 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
 
         public override void Draw(SharpDXRenderer renderer)
         {
-            Vector2 boxLocation = new Vector2(this.X - this.MarginLeft, this.Y - this.MarginTop);
+            Vector2 location = this.GetAbsoluteLocation();
+            Vector2 boxLocation = new Vector2(location.X - this.MarginLeft, location.Y - this.MarginTop);
             Vector2 boxSize = new Vector2(this.Width + this.MarginLeft + this.MarginRight, this.Height + this.MarginBottom + this.MarginTop);
             renderer.FillRectangle(this.BackColor,
                 boxLocation,
