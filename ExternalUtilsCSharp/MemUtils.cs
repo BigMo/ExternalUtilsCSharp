@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -415,6 +416,10 @@ namespace ExternalUtilsCSharp
         public static int SizeOf<T>(this T obj)
         {
             return Marshal.SizeOf(typeof(T));
+        }
+        public static string GetMemberName<T, TValue>(Expression<Func<T, TValue>> memberAccess)
+        {
+            return ((MemberExpression)memberAccess.Body).Member.Name;
         }
     }
 }

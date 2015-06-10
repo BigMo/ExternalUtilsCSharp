@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ColorExtension.cs" />
     <Compile Include="SharpDXOverlay.cs">
       <SubType>Form</SubType>
     </Compile>
