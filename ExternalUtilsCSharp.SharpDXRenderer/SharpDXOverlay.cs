@@ -13,7 +13,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
     /// <summary>
     /// An implementation of the abstract Overlay-class utilizing SharpDX
     /// </summary>
-    public class SharpDXOverlay : ExternalUtilsCSharp.UI.Overlay<Color, Vector2, TextFormat>, IDisposable
+    public class SharpDXOverlay : ExternalUtilsCSharp.UI.Overlay<SharpDXRenderer, Color, Vector2, TextFormat>, IDisposable
     {
         #region CONSTRUCTORS
         public SharpDXOverlay() : base()
@@ -29,7 +29,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
                 throw new Win32Exception(Marshal.GetLastWin32Error());
 
             this.hWnd = hWnd;
-            this.Renderer.InitializeDevice(hWnd, new Vector2(info.rcClient.Right - info.rcClient.Left, info.rcClient.Bottom - info.rcClient.Top));
+            this.Renderer.InitializeDevice(this.Handle, new Vector2(info.rcClient.Right - info.rcClient.Left, info.rcClient.Bottom - info.rcClient.Top));
             base.Attach(hWnd);
         }
 
@@ -51,6 +51,13 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
         public override void OnResize()
         {
             this.Renderer.Resize(new Vector2(this.Width, this.Height));
+        }
+
+        public override void UpdateControls(double secondsElapsed, KeyUtils keys)
+        {
+            Vector2 cursor = new Vector2(this.CursorPosition.X, this.CursorPosition.Y);
+            foreach (ExternalUtilsCSharp.UI.Control<SharpDXRenderer, Color, Vector2, TextFormat> control in this.ChildControls)
+                control.Update(secondsElapsed, keys, cursor);
         }
     }
 }

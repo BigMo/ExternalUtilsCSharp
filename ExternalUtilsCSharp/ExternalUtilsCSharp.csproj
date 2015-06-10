@@ -65,7 +65,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\UIObjects\Color.cs" />
-    <Compile Include="UI\Controls\Control.cs" />
+    <Compile Include="UI\Control.cs" />
     <Compile Include="UI\UIObjects\Rectangle.cs" />
     <Compile Include="UI\Renderer.cs" />
     <Compile Include="WinAPI.cs" />
