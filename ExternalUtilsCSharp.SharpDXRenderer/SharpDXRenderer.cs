@@ -69,8 +69,8 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
                 PixelSize = new Size2((int)size.X, (int)size.Y),
                 PresentOptions = PresentOptions.None
             };
-            device = new WindowRenderTarget(factory, new RenderTargetProperties(new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied)), renderTargetProperties);
-            device.TextAntialiasMode = TextAntialiasMode.Cleartype;
+            device = new WindowRenderTarget(factory, new RenderTargetProperties(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied)), renderTargetProperties);
+            device.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Cleartype;
         }
         public override void DestroyDevice()
         {
@@ -149,10 +149,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
             {
                 device.DrawEllipse(
                     new Ellipse(
-                        new Vector2(
-                            (centered ? position.X : position.X - size.X / 2f),
-                            (centered ? position.Y : position.Y - size.Y / 2f)
-                        ),
+                       (centered ? position : new Vector2(position.X - size.X / 2f, position.Y - size.Y / 2f)),
                         size.X / 2f,
                         size.Y / 2f
                     ),
@@ -170,10 +167,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
             {
                 device.FillEllipse(
                     new Ellipse(
-                        new Vector2(
-                            (centered ? position.X : position.X - size.X / 2f),
-                            (centered ? position.Y : position.Y - size.Y / 2f)
-                        ),
+                       (centered ? position : new Vector2(position.X - size.X / 2f, position.Y - size.Y / 2f)),
                         size.X / 2f,
                         size.Y / 2f
                     ),
@@ -236,6 +230,11 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
         {
             if (this.device != null)
                 this.DestroyDevice();
+        }
+
+        public override Color GetRendererBackColor()
+        {
+            return Color.Transparent;
         }
     }
 }

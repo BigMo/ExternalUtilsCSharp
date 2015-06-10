@@ -54,6 +54,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\SharpDXButton.cs" />
+    <Compile Include="Controls\SharpDXCheckBox.cs" />
+    <Compile Include="Controls\SharpDXControl.cs" />
+    <Compile Include="Controls\SharpDXLabel.cs" />
+    <Compile Include="Controls\SharpDXPanel.cs" />
+    <Compile Include="Controls\SharpDXSpacer.cs" />
     <Compile Include="ColorExtension.cs" />
     <Compile Include="SharpDXOverlay.cs">
       <SubType>Form</SubType>
