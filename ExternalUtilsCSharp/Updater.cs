@@ -13,8 +13,8 @@ namespace ExternalUtilsCSharp
         private Thread thread;
         private bool work;
         private long lastTick;
-
         private long fpsTick;
+        private long begin;
         #endregion
 
         #region PROPERTIES
@@ -56,7 +56,8 @@ namespace ExternalUtilsCSharp
         {
             if (thread != null)
                 StopUpdater();
-            work = true; 
+            work = true;
+            begin = DateTime.Now.Ticks;
             this.thread = new Thread(new ThreadStart(Loop));
             thread.IsBackground = true;
             thread.Priority = ThreadPriority.Highest;
@@ -95,6 +96,14 @@ namespace ExternalUtilsCSharp
                 fpsTick = DateTime.Now.Ticks;
             }
             FrameRate++;
+        }
+        public TimeSpan GetRuntime()
+        {
+            return new TimeSpan(DateTime.Now.Ticks - begin);
+        }
+        public int GetAverageFPS()
+        {
+            return (int)(this.TickCount / this.GetRuntime().TotalSeconds);
         }
     }
 }

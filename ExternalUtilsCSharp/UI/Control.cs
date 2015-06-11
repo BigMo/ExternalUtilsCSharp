@@ -191,17 +191,18 @@ namespace ExternalUtilsCSharp.UI
         {
             foreach(Control<TRenderer,TColor,TVector2,TFont> control in ChildControls)
             {
+                if (result.Handled)
+                    return;
                 result.Depth++;
                 control.CheckMouseEvents(cursorPoint, keyUtils, result);
                 result.Depth--;
-                if (result.Handled)
-                    break;
             }
             if (!result.Handled && result.Depth == 0)
             {
                 this.MouseOver = this.CheckMouseOver(cursorPoint);
                 if (this.MouseOver)
                 {
+                    result.Handled = true;
                     if (keyUtils.KeyWentDown(WinAPI.VirtualKeyShort.LBUTTON))
                         OnMouseClickEventDown(new MouseEventArgs() { LeftButton = true, Position = cursorPoint });
                     if (keyUtils.KeyWentDown(WinAPI.VirtualKeyShort.RBUTTON))
@@ -221,7 +222,6 @@ namespace ExternalUtilsCSharp.UI
                         OnMouseMovedEvent(new MouseEventArgs() { Position = cursorPoint });
                         LastMousePos = cursorPoint;
                     }
-                    result.Handled = true;
                 }
             }
         }

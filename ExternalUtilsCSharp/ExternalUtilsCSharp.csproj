@@ -57,6 +57,7 @@
     <Compile Include="MemObjects\PE\PEOptHeader.cs" />
     <Compile Include="MemObjects\ScanResult.cs" />
     <Compile Include="MemUtils.cs" />
+    <Compile Include="MiscUtils.cs" />
     <Compile Include="ProcUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MathObjects\Vector2.cs" />
