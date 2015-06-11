@@ -24,14 +24,18 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         #region METHODS
         public override bool CheckMouseOver(Vector2 cursorPoint)
         {
+            Vector2 location = this.GetAbsoluteLocation();
             return
-                cursorPoint.X >= this.X && cursorPoint.X <= this.X + this.Width &&
-                cursorPoint.Y >= this.Y && cursorPoint.Y <= this.Y + this.Height;
+                cursorPoint.X >= location.X && cursorPoint.X <= location.X + this.Width &&
+                cursorPoint.Y >= location.Y && cursorPoint.Y <= location.Y + this.Height;
         }
 
-        public override Vector2 GetLocation()
+        public override Vector2 GetAbsoluteLocation()
         {
-            return new Vector2(this.X, this.Y);
+            if (this.Parent == null)
+                return new Vector2(this.X, this.Y);
+            else
+                return this.Parent.GetAbsoluteLocation() + new Vector2(this.X, this.Y);
         }
 
         public override void Update(double secondsElapsed, KeyUtils keyUtils, Vector2 cursorPoint)

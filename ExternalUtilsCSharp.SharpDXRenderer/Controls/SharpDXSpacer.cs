@@ -20,7 +20,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         {
             renderer.FillRectangle(
                 this.ForeColor,
-                this.GetLocation(),
+                this.GetAbsoluteLocation(),
                 this.GetSize());
             base.Draw(renderer);
         }

@@ -16,7 +16,7 @@ namespace ExternalUtilsCSharp.UI
     public abstract class Overlay<TRenderer, TColor, TVector2, TFont> : Form where TRenderer : Renderer<TColor, TVector2, TFont>
     {
         #region VARIABLES
-        private Timer ctrlTimer;
+        private Updater updLogic, updDraw;
         private long lastTimerTick, lastDrawTick;
         #endregion
 
@@ -33,6 +33,8 @@ namespace ExternalUtilsCSharp.UI
         public IntPtr hWnd { get; protected set; }
         public List<UI.Control<TRenderer, TColor, TVector2, TFont>> ChildControls { get; set; }
         public System.Drawing.Point CursorPosition { get { return this.PointToClient(System.Windows.Forms.Cursor.Position); } }
+        public Updater DrawUpdater { get { return updDraw; } }
+        public Updater LogicUpdater { get { return updLogic; } }
         #endregion
 
         #region EVENTS
@@ -88,7 +90,6 @@ namespace ExternalUtilsCSharp.UI
             this.Text = "";
             this.Name = "";
             this.TopMost = true;
-            this.Paint += Overlay_Paint;
 
             //Make form transparent and fully topmost
             int initialStyle = WinAPI.GetWindowLong(this.Handle, (int)WinAPI.GetWindowLongFlags.GWL_EXSTYLE);
@@ -97,9 +98,10 @@ namespace ExternalUtilsCSharp.UI
             WinAPI.SetLayeredWindowAttributes(this.Handle, 0, 255, (uint)WinAPI.LayeredWindowAttributesFlags.LWA_ALPHA);
 
             //Controls
-            ctrlTimer = new Timer();
-            ctrlTimer.Interval = 1000 / 20;
-            ctrlTimer.Tick += this.ctrlTimer_Tick;
+            updLogic = new Updater(60);
+            updLogic.TickEvent += updLogic_TickEvent;
+            updDraw = new Updater(60);
+            updDraw.TickEvent += updDraw_TickEvent;
             lastTimerTick = Environment.TickCount;
             lastDrawTick = Environment.TickCount;
 
@@ -109,42 +111,18 @@ namespace ExternalUtilsCSharp.UI
             this.ChildControls = new List<UI.Control<TRenderer, TColor, TVector2, TFont>>();
         }
 
-        void Overlay_Paint(object sender, PaintEventArgs e)
+        void updDraw_TickEvent(object sender, Updater.DeltaEventArgs e)
         {
-            if (this.DrawOnlyWhenInForeground)
-            {
-                if (WinAPI.GetForegroundWindow() != this.hWnd)
-                    return;
-            }
-
-            WinAPI.MARGINS margins = new WinAPI.MARGINS();
-            margins.topHeight = 0; //this.Top;
-            margins.bottomHeight = 0; // this.Bottom;
-            margins.leftWidth = this.Left;
-            margins.rightWidth = this.Right;
-            WinAPI.DwmExtendFrameIntoClientArea(this.Handle, ref margins);
-
-            this.Renderer.BeginDraw();
-            this.Renderer.Clear(this.Renderer.GetRendererBackColor());
-            this.OnBeforeDrawingEvent(new OverlayEventArgs(this));
-
-            foreach (UI.Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
-                if(control.Visible)
-                    control.Draw(this.Renderer);
-
-            this.OnBeforeDrawingEvent(new OverlayEventArgs(this));
-            this.Renderer.EndDraw();
+            TimeSpan deltaDraw = new TimeSpan(Environment.TickCount - lastDrawTick);
+            lastDrawTick = Environment.TickCount;
+            this.Invoke((MethodInvoker)(() => { this.OnDraw(deltaDraw.TotalSeconds); }));
         }
 
-        protected void ctrlTimer_Tick(object sender, EventArgs e)
+        void updLogic_TickEvent(object sender, Updater.DeltaEventArgs e)
         {
             TimeSpan deltaTimer = new TimeSpan(Environment.TickCount - lastTimerTick);
             lastTimerTick = Environment.TickCount;
-            this.OnTick(deltaTimer.TotalSeconds);
-
-            TimeSpan deltaDraw = new TimeSpan(Environment.TickCount - lastDrawTick);
-            lastDrawTick = Environment.TickCount;
-            this.OnDraw(deltaDraw.TotalSeconds);
+            this.Invoke((MethodInvoker)(() => { this.OnTick(deltaTimer.TotalSeconds); }));
         }
         #endregion
 
@@ -160,7 +138,25 @@ namespace ExternalUtilsCSharp.UI
                 if (WinAPI.GetForegroundWindow() != this.hWnd)
                     return;
             }
-            this.Invalidate();
+            //this.Invalidate();
+
+            WinAPI.MARGINS margins = new WinAPI.MARGINS();
+            margins.topHeight = 0; //this.Top;
+            margins.bottomHeight = 0; // this.Bottom;
+            margins.leftWidth = this.Left;
+            margins.rightWidth = this.Right;
+            this.Invoke((MethodInvoker)(() => { WinAPI.DwmExtendFrameIntoClientArea(this.Handle, ref margins); }));            
+
+            this.Renderer.BeginDraw();
+            this.Renderer.Clear(this.Renderer.GetRendererBackColor());
+            this.OnBeforeDrawingEvent(new OverlayEventArgs(this));
+
+            foreach (UI.Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
+                if(control.Visible)
+                    control.Draw(this.Renderer);
+
+            this.OnAfterDrawingEvent(new OverlayEventArgs(this));
+            this.Renderer.EndDraw();
         }
         /// <summary>
         /// Perform your logic-operations here
@@ -181,8 +177,8 @@ namespace ExternalUtilsCSharp.UI
                     if(this.Width != info.rcClient.Right - info.rcClient.Left ||
                         this.Height != info.rcClient.Bottom - info.rcClient.Top)
                     {
-                        this.Size = new System.Drawing.Size(info.rcClient.Right - info.rcClient.Left, info.rcClient.Bottom - info.rcClient.Top);
-                        this.OnResize();
+                            this.Size = new System.Drawing.Size(info.rcClient.Right - info.rcClient.Left, info.rcClient.Bottom - info.rcClient.Top);
+                            this.OnResize();
                     }
                 }
             }
@@ -194,14 +190,16 @@ namespace ExternalUtilsCSharp.UI
         /// <param name="hWnd">Handle to the window to attach to</param>
         public virtual void Attach(IntPtr hWnd)
         {
-            ctrlTimer.Enabled = true;
+            updDraw.StartUpdater();
+            updLogic.StartUpdater();
         }
         /// <summary>
         /// Detach from the window-handle which was earler attached to (and destroy your device here)
         /// </summary>
         public virtual void Detach()
         {
-            ctrlTimer.Enabled = false;
+            updDraw.StopUpdater();
+            updLogic.StopUpdater();
         }
         /// <summary>
         /// Is called whenever this form is resized, resize your renderer here

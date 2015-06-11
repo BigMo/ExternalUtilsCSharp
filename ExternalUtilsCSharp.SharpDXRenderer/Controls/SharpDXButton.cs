@@ -15,7 +15,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         }
         public override void Draw(SharpDXRenderer renderer)
         {
-            Vector2 location = this.GetLocation();
+            Vector2 location = this.GetAbsoluteLocation();
             if(this.MouseOver)
                 renderer.FillRectangle(this.BackColor,
                     new Vector2(location.X - MarginLeft, location.Y - MarginTop),

@@ -1421,5 +1421,10 @@ namespace ExternalUtilsCSharp
         [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
         static extern bool FreeConsole();
         #endregion
+
+        public static int MakeLParam(int LoWord, int HiWord)
+        {
+            return ((HiWord << 16) | (LoWord & 0xffff));
+        }
     }
 }

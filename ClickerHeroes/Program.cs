@@ -122,7 +122,7 @@ namespace ClickerHeroes
                     {
                         int x = (int)(width * 0.81);
                         int y = (int)(height * 0.06);
-                        int lParam = MakeLParam(x, y);
+                        int lParam = WinAPI.MakeLParam(x, y);
                         int wParam = 0;
                         WinAPI.SendMessage(proc.Process.MainWindowHandle, (uint)WinAPI.WindowMessage.WM_LBUTTONDOWN, wParam, lParam);
                         WinAPI.SendMessage(proc.Process.MainWindowHandle, (uint)WinAPI.WindowMessage.WM_LBUTTONUP, wParam, lParam);
@@ -131,7 +131,7 @@ namespace ClickerHeroes
                     if (clicker)
                     {
 
-                        int lParam = MakeLParam(click_x, click_y);
+                        int lParam = WinAPI.MakeLParam(click_x, click_y);
                         int wParam = 0;
                         WinAPI.SendMessage(proc.Process.MainWindowHandle, (uint)WinAPI.WindowMessage.WM_LBUTTONDOWN, wParam, lParam);
                         WinAPI.SendMessage(proc.Process.MainWindowHandle, (uint)WinAPI.WindowMessage.WM_LBUTTONUP, wParam, lParam);
@@ -204,10 +204,6 @@ namespace ClickerHeroes
                     }
                 }
             }
-        }
-        public static int MakeLParam(int LoWord, int HiWord)
-        {
-            return ((HiWord << 16) | (LoWord & 0xffff));
         }
     }
 }

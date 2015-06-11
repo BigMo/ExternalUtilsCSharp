@@ -12,12 +12,22 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
     /// </summary>
     public class SharpDXLabel : SharpDXControl
     {
+        #region ENUMS
+        public enum TextAlignment { Left, Center, Right };
+        #endregion
 
+        #region PROPERTIES
+        public bool FixedWidth { get; set; }
+        public TextAlignment TextAlign { get; set; }
+        #endregion
+        
         #region CONSTRUCTOR
         public SharpDXLabel()
             : base()
         {
             this.Text = "<SharpDXLabel>";
+            this.FixedWidth = false;
+            this.TextAlign = SharpDXLabel.TextAlignment.Left;
         }
         #endregion
 
@@ -27,10 +37,19 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             base.Draw(renderer);
             float fontSize = (float)Math.Ceiling(this.Font.FontSize);
             Vector2 size = renderer.MeasureString(this.Text, this.Font);
-            if (!this.FillParent)
+            if (!this.FillParent && !this.FixedWidth)
                 this.Width = size.X;
             this.Height = size.Y;
-            Vector2 location = this.GetLocation();
+            Vector2 location = this.GetAbsoluteLocation();
+            switch (this.TextAlign) 
+            { 
+                case TextAlignment.Center:
+                    location.X += this.Width / 2f - size.X / 2f;
+                    break;
+                case TextAlignment.Right:
+                    location.X += this.Width - size.X;
+                    break;
+            }
             renderer.DrawText(this.Text,
                 this.ForeColor,
                 this.Font,
