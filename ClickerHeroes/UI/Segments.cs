@@ -1,4 +1,5 @@
 ﻿using ExternalUtilsCSharp.SharpDXRenderer;
+using ExternalUtilsCSharp.SharpDXRenderer.Controls;
 using ExternalUtilsCSharp.UI;
 using SharpDX;
 using SharpDX.DirectWrite;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ClickerHeroes.UI
 {
-    class Segments : Control<SharpDXRenderer, Color, Vector2, TextFormat>
+    class Segments : SharpDXControl
     {
         public override bool CheckMouseOver(Vector2 cursorPoint)
         {

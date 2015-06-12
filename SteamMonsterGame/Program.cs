@@ -1,18 +1,16 @@
-﻿using ClickerHeroes.UI;
-using ExternalUtilsCSharp;
+﻿using ExternalUtilsCSharp;
 using ExternalUtilsCSharp.SharpDXRenderer;
 using ExternalUtilsCSharp.SharpDXRenderer.Controls;
+using SharpDX;
+using SharpDX.DirectWrite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using ExternalUtilsCSharp.UI;
-using SharpDX;
-using SharpDX.DirectWrite;
 
-namespace ClickerHeroes
+namespace SteamMonsterGame
 {
     class WithOverlay
     {
@@ -29,12 +27,11 @@ namespace ClickerHeroes
         private static SharpDXWindow wndWindow;
         private static SharpDXLabel lblAutomation;
         private static SharpDXCheckBox chbAutoClicker;
-        private static SharpDXCheckBox chbAutoSpells;
+        private static SharpDXCheckBox chbMoveMouse;
         private static SharpDXRadioButton rdbUseSend;
         private static SharpDXRadioButton rdbUsePost;
         private static SharpDXLabel lblVisuals;
         private static SharpDXCheckBox chbVisDrawClicker;
-        private static SharpDXCheckBox chbVisDrawLevels;
         private static SharpDXLabel lblPerformance;
         private static SharpDXLabel lblFpsLogic;
         private static SharpDXProgressBar pgbFpsLogic;
@@ -42,34 +39,51 @@ namespace ClickerHeroes
         private static SharpDXLabel lblFpsDraw;
         private static SharpDXProgressBar pgbFpsDraw;
         private static SharpDXLabel lblFpsDrawAverage;
-        private static Segments segments;
+
+        private static ClickerWindow clkWindow;
 
         [STAThread]
         public static void Main(string[] args)
         {
             System.Windows.Forms.Application.EnableVisualStyles();
             System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
-            
-            while (!ProcUtils.ProcessIsRunning("Clicker Heroes"))
+            Console.Title = "SteamMonsterGame";
+
+            Console.WriteLine("> Waiting for steam to start up...");
+            while (!ProcUtils.ProcessIsRunning("Steam"))
                 Thread.Sleep(250);
 
-            InitializeComponent();
+            proc = new ProcUtils("Steam", WinAPI.ProcessAccessFlags.QueryLimitedInformation);
+            IntPtr window = IntPtr.Zero;
 
-            proc = new ProcUtils("Clicker Heroes", WinAPI.ProcessAccessFlags.QueryLimitedInformation);
+            Console.WriteLine("> Waiting for steam-window to start up...");
+            do
+                window = WinAPI.FindWindowByCaption(window, "Steam");
+            while (window == IntPtr.Zero);
+
+            Console.WriteLine("> Initializing utils");
             keys = new KeyUtils();
             lastClickerPos = new Vector2();
+
+            Console.WriteLine("> Initializing overlay");
             using (overlay = new SharpDXOverlay())
             {
                 overlay.ChildControls.Clear();
-                overlay.Attach(proc.Process.MainWindowHandle);
+                Console.WriteLine("> Attaching overlay");
+                overlay.Attach(window);
                 overlay.TickEvent += overlay_TickEvent;
                 overlay.DrawOnlyWhenInForeground = false;
                 overlay.BeforeDrawingEvent += overlay_BeforeDrawingEvent;
 
+                Console.WriteLine("> Setting up fonts");
                 SharpDXRenderer renderer = overlay.Renderer;
                 renderer.CreateFont("smallFont", "Century Gothic", 12f);
                 renderer.CreateFont("tallFont", "Century Gothic", 16f);
 
+                Console.WriteLine("> Initializing controls");
+                InitializeComponent();
+
+                Console.WriteLine("> Setting up controls");
                 lblCaption.Font = renderer.GetFont("tallFont");
                 lblDescription.Font = renderer.GetFont("smallFont");
                 btnToggleMenu.Font = renderer.GetFont("smallFont");
@@ -77,20 +91,16 @@ namespace ClickerHeroes
                 wndWindow.Font = renderer.GetFont("tallFont");
                 lblAutomation.Font = renderer.GetFont("smallFont");
                 chbAutoClicker.Font = renderer.GetFont("smallFont");
-                chbAutoSpells.Font = renderer.GetFont("smallFont");
+                chbMoveMouse.Font = renderer.GetFont("smallFont");
                 rdbUsePost.Font = renderer.GetFont("smallFont");
                 rdbUseSend.Font = renderer.GetFont("smallFont");
                 lblVisuals.Font = renderer.GetFont("smallFont");
                 chbVisDrawClicker.Font = renderer.GetFont("smallFont");
-                chbVisDrawLevels.Font = renderer.GetFont("smallFont");
                 lblPerformance.Font = renderer.GetFont("smallFont");
                 lblFpsLogic.Font = renderer.GetFont("smallFont");
                 lblFpsLogicAverage.Font = renderer.GetFont("smallFont");
                 lblFpsDraw.Font = renderer.GetFont("smallFont");
                 lblFpsDrawAverage.Font = renderer.GetFont("smallFont");
-
-                segments.Width = overlay.Width;
-                segments.Height = overlay.Height;
 
                 pnlPanel.ChildControls.Clear();
                 pnlPanel.AddChildControl(lblCaption);
@@ -101,7 +111,7 @@ namespace ClickerHeroes
                 wndWindow.Panel.AddChildControl(lblAutomation);
                 wndWindow.Panel.InsertSpacer();
                 wndWindow.Panel.AddChildControl(chbAutoClicker);
-                wndWindow.Panel.AddChildControl(chbAutoSpells);
+                wndWindow.Panel.AddChildControl(chbMoveMouse);
                 wndWindow.Panel.AddChildControl(rdbUsePost);
                 wndWindow.Panel.AddChildControl(rdbUseSend);
 
@@ -109,7 +119,6 @@ namespace ClickerHeroes
                 wndWindow.Panel.AddChildControl(lblVisuals);
                 wndWindow.Panel.InsertSpacer();
                 wndWindow.Panel.AddChildControl(chbVisDrawClicker);
-                wndWindow.Panel.AddChildControl(chbVisDrawLevels);
 
                 wndWindow.Panel.InsertSpacer();
                 wndWindow.Panel.AddChildControl(lblPerformance);
@@ -122,8 +131,10 @@ namespace ClickerHeroes
                 wndWindow.Panel.AddChildControl(lblFpsDrawAverage);
 
                 overlay.ChildControls.Add(pnlPanel);
-                overlay.ChildControls.Add(segments);
                 overlay.ChildControls.Add(wndWindow);
+                overlay.ChildControls.Add(clkWindow);
+
+                Console.WriteLine("> Running overlay (close this console to terminate!)");
                 System.Windows.Forms.Application.Run(overlay);
             }
         }
@@ -134,7 +145,7 @@ namespace ClickerHeroes
             pnlPanel.Y = 2;
 
             lblCaption = new SharpDXLabel();
-            lblCaption.Text = "ClickerHeroes";
+            lblCaption.Text = "SteamMonsterGame";
             lblDescription = new SharpDXLabel();
             lblDescription.Text = "A sample of ExternalUtilsCSharp";
 
@@ -146,7 +157,8 @@ namespace ClickerHeroes
             wndWindow.Text = "Configuration";
             wndWindow.Width = 400;
             wndWindow.Height = 200;
-            wndWindow.X = 400;
+            wndWindow.X = 500;
+            wndWindow.Y = 500;
             wndWindow.Visible = false;
 
             lblAutomation = new SharpDXLabel();
@@ -155,9 +167,9 @@ namespace ClickerHeroes
             lblAutomation.Width = 150;
             lblAutomation.TextAlign = SharpDXLabel.TextAlignment.Center;
             chbAutoClicker = new SharpDXCheckBox();
-            chbAutoClicker.Text = "Auto clicker";
-            chbAutoSpells = new SharpDXCheckBox();
-            chbAutoSpells.Text = "Auto spell-casting";
+            chbAutoClicker.Text = "[INS] Auto clicker";
+            chbMoveMouse = new SharpDXCheckBox();
+            chbMoveMouse.Text = "[DEL] Move mouse";
             rdbUsePost = new SharpDXRadioButton();
             rdbUsePost.Text = "[Use PostMessage]";
             rdbUsePost.Checked = true;
@@ -172,9 +184,6 @@ namespace ClickerHeroes
             lblVisuals.TextAlign = SharpDXLabel.TextAlignment.Center;
             chbVisDrawClicker = new SharpDXCheckBox();
             chbVisDrawClicker.Text = "Draw auto-clicker";
-            chbVisDrawLevels = new SharpDXCheckBox();
-            chbVisDrawLevels.Text = "Draw levels";
-            chbVisDrawLevels.CheckedChangedEvent += chbVisDrawLevels_CheckedChangedEvent;
             lblPerformance = new SharpDXLabel();
             lblPerformance.Text = "~ Performance ~";
             lblPerformance.FixedWidth = true;
@@ -193,12 +202,12 @@ namespace ClickerHeroes
             lblFpsDrawAverage = new SharpDXLabel();
             lblFpsDrawAverage.Text = "Average FPS: 0 (0 ticks total)";
 
-            segments = new Segments();
-            segments.Visible = false;
-        }
-        private static void chbVisDrawLevels_CheckedChangedEvent(object sender, EventArgs e)
-        {
-            segments.Visible = !segments.Visible;
+            clkWindow = new ClickerWindow();
+            clkWindow.X = 500;
+            clkWindow.Y = 500;
+            clkWindow.Width = 500;
+            clkWindow.Height = 500;
+
         }
         private static void overlay_BeforeDrawingEvent(object sender, SharpDXOverlay.OverlayEventArgs e)
         {
@@ -215,43 +224,38 @@ namespace ClickerHeroes
         private static void overlay_TickEvent(object sender, SharpDXOverlay.DeltaEventArgs e)
         {
             keys.Update();
+            pnlPanel.Y = overlay.Location.Y + overlay.Height / 2f - pnlPanel.Height;
+
+            if (keys.KeyWentUp(WinAPI.VirtualKeyShort.INSERT))
+                chbAutoClicker.Checked = !chbAutoClicker.Checked;
+            if (keys.KeyWentUp(WinAPI.VirtualKeyShort.DELETE))
+                chbMoveMouse.Checked = !chbMoveMouse.Checked;
 
             overlay.UpdateControls(e.SecondsElapsed, keys);
-            segments.Width = overlay.Width;
-            segments.Height = overlay.Height;
 
-            if (keys.KeyIsDown(WinAPI.VirtualKeyShort.INSERT))
+            if (keys.KeyIsDown(WinAPI.VirtualKeyShort.END))
                 e.Overlay.Close();
 
             #region AutoClicker
             if (chbAutoClicker.Checked)
             {
                 //Click-area
-                ExternalUtilsCSharp.MathObjects.Vector2 areaSize = new ExternalUtilsCSharp.MathObjects.Vector2(overlay.Width / 2f * 0.6f, overlay.Width * 0.15f);
-                ExternalUtilsCSharp.MathObjects.Vector2 location = new ExternalUtilsCSharp.MathObjects.Vector2(overlay.Width / 2f + overlay.Width / 4f, overlay.Width / 2f * 0.7f);
+                ExternalUtilsCSharp.MathObjects.Vector2 areaSize = new ExternalUtilsCSharp.MathObjects.Vector2(clkWindow.GetSize().X, clkWindow.GetSize().Y);
+                ExternalUtilsCSharp.MathObjects.Vector2 location = new ExternalUtilsCSharp.MathObjects.Vector2(clkWindow.GetAbsoluteLocation().X, clkWindow.GetAbsoluteLocation().Y);
                 ExternalUtilsCSharp.MathObjects.Vector2 areaCenter = location + areaSize * 0.5f;
                 bool sec = DateTime.Now.Second % 2 == 0;
                 ExternalUtilsCSharp.MathObjects.Vector2 areaTop = new ExternalUtilsCSharp.MathObjects.Vector2(areaCenter.X, areaCenter.Y - areaSize.Y / (sec ? 2f : 4f));
-                ExternalUtilsCSharp.MathObjects.Vector2 clickPoint = MathUtils.RotatePoint(areaTop, areaCenter, DateTime.Now.Millisecond % 360) - areaSize * 0.5f;
+                ExternalUtilsCSharp.MathObjects.Vector2 clickPoint = areaCenter;
+                if (chbMoveMouse.Checked)
+                {
+                    clickPoint = MathUtils.RotatePoint(areaTop, areaCenter, DateTime.Now.Millisecond % 360);
+                    WinAPI.SetCursorPos((int)(overlay.Location.X + clickPoint.X), (int)(overlay.Location.Y + clickPoint.Y));
+                }
                 int lParam = WinAPI.MakeLParam((int)clickPoint.X, (int)clickPoint.Y);
                 lastClickerPos.X = clickPoint.X;
                 lastClickerPos.Y = clickPoint.Y;
                 Message(proc.Process.MainWindowHandle, (uint)WinAPI.WindowMessage.WM_LBUTTONDOWN, 0, lParam);
                 Message(proc.Process.MainWindowHandle, (uint)WinAPI.WindowMessage.WM_LBUTTONUP, 0, lParam);
-            }
-            #endregion
-            #region Cast spells
-            if (chbAutoSpells.Checked && overlay.LogicUpdater.TickCount % 10 == 0)
-            {
-                for (uint i = 0; i < 10; i++)
-                {
-                    uint key = (uint)WinAPI.VirtualKeyShort.KEY_0 + i;
-                    uint scanCode = WinAPI.MapVirtualKey(key, 0);
-                    uint lParam = lParam = (0x00000001 | (scanCode << 16));
-
-                    Message(proc.Process.MainWindowHandle, (uint)WinAPI.WindowMessage.WM_KEYDOWN, (int)key, (int)lParam);
-                    Message(proc.Process.MainWindowHandle, (uint)WinAPI.WindowMessage.WM_KEYUP, (int)key, (int)lParam);
-                }
             }
             #endregion
             lblFpsLogic.Text = string.Format("FPS logic: {0}", overlay.LogicUpdater.LastFrameRate.ToString());
