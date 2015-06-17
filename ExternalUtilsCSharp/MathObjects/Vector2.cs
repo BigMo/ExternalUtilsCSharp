@@ -76,6 +76,11 @@ namespace ExternalUtilsCSharp.MathObjects
         {
             return this.X.GetHashCode() ^ this.Y.GetHashCode();
         }
+
+        public override string ToString()
+        {
+            return string.Format("[X={0}, Y={1}]", this.X.ToString(), this.Y.ToString());
+        }
         #endregion
 
         #region OPERATORS

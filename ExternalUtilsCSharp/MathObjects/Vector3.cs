@@ -57,7 +57,7 @@ namespace ExternalUtilsCSharp.MathObjects
         /// <returns></returns>
         public float Length()
         {
-            return (float)System.Math.Sqrt(System.Math.Pow(X, 2) + System.Math.Pow(Y, 2) + System.Math.Pow(Z, 2));
+            return (float)System.Math.Abs(System.Math.Sqrt(System.Math.Pow(X, 2) + System.Math.Pow(Y, 2) + System.Math.Pow(Z, 2)));
         }
         /// <summary>
         /// Returns the distance from this Vector3 to the given Vector3
@@ -66,7 +66,7 @@ namespace ExternalUtilsCSharp.MathObjects
         /// <returns></returns>
         public float DistanceTo(Vector3 other)
         {
-            return (this + other).Length();
+            return (this - other).Length();
         }
 
         public override bool Equals(object obj)
@@ -78,6 +78,11 @@ namespace ExternalUtilsCSharp.MathObjects
         public override int GetHashCode()
         {
             return this.X.GetHashCode() ^ this.Y.GetHashCode() ^ this.Z.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return string.Format("[X={0}, Y={1}, Z={2}]", this.X.ToString(), this.Y.ToString(), this.Z.ToString());
         }
         #endregion
 

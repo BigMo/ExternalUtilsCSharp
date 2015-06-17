@@ -31,6 +31,8 @@ namespace ExternalUtilsCSharp
         /// https://github.com/Aevitas/bluerain/blob/master/src/BlueRain/ExternalProcessMemory.cs
         /// </summary>
         public bool UseUnsafeReadWrite { get; set; }
+        public long BytesRead { get; private set; }
+        public long BytesWritten { get; private set; }
         #endregion
         #region METHODS
         #region PRIMITIVE WRAPPERS
@@ -45,6 +47,7 @@ namespace ExternalUtilsCSharp
             IntPtr numBytes = IntPtr.Zero;
             data = new byte[length];
             bool result = WinAPI.ReadProcessMemory(Handle, address, data, length, out numBytes);
+            BytesRead += numBytes.ToInt32();
             if (!result)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
@@ -57,6 +60,7 @@ namespace ExternalUtilsCSharp
         {
             IntPtr numBytes = IntPtr.Zero;
             bool result = WinAPI.WriteProcessMemory(Handle, address, data, data.Length, out numBytes);
+            BytesWritten += numBytes.ToInt32();
             if (!result)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
@@ -88,7 +92,11 @@ namespace ExternalUtilsCSharp
         {
             byte[] data;
             Read(address, out data, length);
-            return encoding.GetString(data);
+            string text = encoding.GetString(data);
+            if (text.Contains("\0"))
+                text = text.Substring(0, text.IndexOf('\0'));
+            return text;
+            //return encoding.GetString(data);
         }
         /// <summary>
         /// Generic function to read data from memory using the given type

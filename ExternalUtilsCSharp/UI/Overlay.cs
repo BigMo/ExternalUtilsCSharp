@@ -102,8 +102,8 @@ namespace ExternalUtilsCSharp.UI
             updLogic.TickEvent += updLogic_TickEvent;
             updDraw = new Updater(60);
             updDraw.TickEvent += updDraw_TickEvent;
-            lastTimerTick = Environment.TickCount;
-            lastDrawTick = Environment.TickCount;
+            lastTimerTick = DateTime.Now.Ticks;
+            lastDrawTick = DateTime.Now.Ticks;
 
             //Overlay-properties
             this.DrawOnlyWhenInForeground = true;
@@ -113,15 +113,15 @@ namespace ExternalUtilsCSharp.UI
 
         void updDraw_TickEvent(object sender, Updater.DeltaEventArgs e)
         {
-            TimeSpan deltaDraw = new TimeSpan(Environment.TickCount - lastDrawTick);
-            lastDrawTick = Environment.TickCount;
+            TimeSpan deltaDraw = new TimeSpan(DateTime.Now.Ticks - lastDrawTick);
+            lastDrawTick = DateTime.Now.Ticks;
             this.Invoke((MethodInvoker)(() => { this.OnDraw(deltaDraw.TotalSeconds); }));
         }
 
         void updLogic_TickEvent(object sender, Updater.DeltaEventArgs e)
         {
-            TimeSpan deltaTimer = new TimeSpan(Environment.TickCount - lastTimerTick);
-            lastTimerTick = Environment.TickCount;
+            TimeSpan deltaTimer = new TimeSpan(DateTime.Now.Ticks - lastTimerTick);
+            lastTimerTick = DateTime.Now.Ticks;
             this.Invoke((MethodInvoker)(() => { this.OnTick(deltaTimer.TotalSeconds); }));
         }
         #endregion
