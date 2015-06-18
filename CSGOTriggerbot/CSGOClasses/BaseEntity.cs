@@ -50,6 +50,10 @@ namespace CSGOTriggerbot.CSGOClasses
         #endregion
 
         #region FIELDS
+        public int m_iHealth
+        {
+            get { return this.ReadFieldProxy<int>("CSPlayer.m_iHealth"); }
+        }
         public int m_iVirtualTable
         {
             get { return ReadFieldProxy<int>("Entity.m_iVirtualTable"); }
@@ -62,9 +66,9 @@ namespace CSGOTriggerbot.CSGOClasses
         {
             get { return ReadFieldProxy<byte>("Entity.m_iDormant"); }
         }
-        public int m_hOwner
+        public int m_hOwnerEntity
         {
-            get { return ReadFieldProxy<int>("Entity.m_hOwner"); }
+            get { return ReadFieldProxy<int>("Entity.m_hOwnerEntity"); }
         }
         public int m_iTeamNum
         {
@@ -95,16 +99,6 @@ namespace CSGOTriggerbot.CSGOClasses
             this.iClassID = 0;
             this.iClientClass = 0;
             this.szClassName = "<none>";
-
-            this.AddField<int>("Entity.m_iVirtualTable", 0x08);
-            this.AddField<int>("Entity.m_iID", CSGOOffsets.NetVars.Entity.m_iID);
-            this.AddField<byte>("Entity.m_iDormant", CSGOOffsets.NetVars.Entity.m_bDormant);
-            this.AddField<int>("Entity.m_hOwner", CSGOOffsets.NetVars.Entity.m_hOwner);
-            this.AddField<int>("Entity.m_iTeamNum", CSGOOffsets.NetVars.Entity.m_iTeamNum);
-            this.AddField<int>("Entity.m_bSpotted", CSGOOffsets.NetVars.Entity.m_bSpotted);
-            this.AddField<long>("Entity.m_bSpottedByMask", CSGOOffsets.NetVars.Entity.m_bSpottedByMask);
-            this.AddField<Vector3>("Entity.m_vecOrigin", CSGOOffsets.NetVars.Entity.m_vecOrigin);
-            this.AddField<Vector3>("Entity.m_angRotation", CSGOOffsets.NetVars.Entity.m_angRotation);
         }
         public BaseEntity(BaseEntity copyFrom)
             : base(copyFrom.Address)
@@ -115,25 +109,23 @@ namespace CSGOTriggerbot.CSGOClasses
             this.iClientClass = copyFrom.m_iClientClass;
             this.szClassName = copyFrom.m_szClassName;
         }
-        //public BaseEntity() : base()
-        //{
-        //    this.iClassID = 0;
-        //    this.iClientClass = 0;
-        //    this.szClassName = "<none>";
-
-        //    this.AddField<int>("Entity.m_iVirtualTable", 0x08);
-        //    this.AddField<int>("Entity.m_iID", CSGOOffsets.NetVars.Entity.m_iID);
-        //    this.AddField<int>("Entity.m_iDormant", CSGOOffsets.NetVars.Entity.m_bDormant);
-        //    this.AddField<int>("Entity.m_hOwner", CSGOOffsets.NetVars.Entity.m_hOwner);
-        //    this.AddField<int>("Entity.m_iTeamNum", CSGOOffsets.NetVars.Entity.m_iTeamNum);
-        //    this.AddField<int>("Entity.m_bSpotted", CSGOOffsets.NetVars.Entity.m_bSpotted);
-        //    this.AddField<long>("Entity.m_bSpottedByMask", CSGOOffsets.NetVars.Entity.m_bSpottedByMask);
-        //    this.AddField<int>("Entity.m_vecOrigin", CSGOOffsets.NetVars.Entity.m_vecOrigin);
-        //    this.AddField<int>("Entity.m_angRotation", CSGOOffsets.NetVars.Entity.m_angRotation);
-        //}
         #endregion
 
         #region METHODS
+        protected override void SetupFields()
+        {
+            base.SetupFields();
+            this.AddField<int>("CSPlayer.m_iHealth", CSGOOffsets.NetVars.C_BaseEntity.m_iHealth);
+            this.AddField<int>("Entity.m_iVirtualTable", 0x08);
+            this.AddField<int>("Entity.m_iID", CSGOOffsets.NetVars.C_BaseEntity.m_iID);
+            this.AddField<byte>("Entity.m_iDormant", CSGOOffsets.NetVars.C_BaseEntity.m_bDormant);
+            this.AddField<int>("Entity.m_hOwnerEntity", CSGOOffsets.NetVars.C_BaseEntity.m_hOwnerEntity);
+            this.AddField<int>("Entity.m_iTeamNum", CSGOOffsets.NetVars.C_BaseEntity.m_iTeamNum);
+            this.AddField<int>("Entity.m_bSpotted", CSGOOffsets.NetVars.C_BaseEntity.m_bSpotted);
+            this.AddField<long>("Entity.m_bSpottedByMask", CSGOOffsets.NetVars.C_BaseEntity.m_bSpottedByMask);
+            this.AddField<Vector3>("Entity.m_vecOrigin", CSGOOffsets.NetVars.C_BaseEntity.m_vecOrigin);
+            this.AddField<Vector3>("Entity.m_angRotation", CSGOOffsets.NetVars.C_BaseEntity.m_angRotation);
+        }
         public override string ToString()
         {
             return string.Format("[BaseEntity m_iID={0}, m_iClassID={3}, m_szClassName={4}, m_vecOrigin={1}]\n{2}", this.m_iID, this.m_vecOrigin, base.ToString(), this.m_iClassID, this.m_szClassName);

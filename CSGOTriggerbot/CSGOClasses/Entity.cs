@@ -25,6 +25,7 @@ namespace CSGOTriggerbot.CSGOClasses
         {
             this.Address = address;
             this.Fields = new Hashtable();
+            this.SetupFields();
         }
         public Entity() : this(0)
         { }
@@ -67,6 +68,9 @@ namespace CSGOTriggerbot.CSGOClasses
             foreach (string key in other.Fields.Keys)
                 this.Fields[key] = other.Fields[key];
         }
+
+        protected virtual void SetupFields()
+        { }
         #endregion
     }
 }

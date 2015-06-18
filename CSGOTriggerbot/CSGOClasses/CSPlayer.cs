@@ -15,10 +15,6 @@ namespace CSGOTriggerbot.CSGOClasses
         #endregion
 
         #region FIELDS
-        public int m_iHealth
-        {
-            get { return this.ReadFieldProxy<int>("CSPlayer.m_iHealth"); }
-        }
         public int m_hBoneMatrix
         {
             get { return this.ReadFieldProxy<int>("CSPlayer.m_hBoneMatrix"); }
@@ -53,22 +49,12 @@ namespace CSGOTriggerbot.CSGOClasses
         #region CONSTRUCTORS
         public CSPlayer(int address) : base(address)
         {
-            this.AddField<int>("CSPlayer.m_iHealth", CSGOOffsets.NetVars.Player.m_iHealth);
-            this.AddField<int>("CSPlayer.m_hBoneMatrix", CSGOOffsets.NetVars.Player.m_hBoneMatrix);
-            this.AddField<uint>("CSPlayer.m_hActiveWeapon", CSGOOffsets.NetVars.Player.m_hActiveWeapon);
-            this.AddField<int>("CSPlayer.m_iFlags", CSGOOffsets.NetVars.Player.m_iFlags);
-            this.AddField<Vector3>("CSPlayer.m_vecVelocity", CSGOOffsets.NetVars.Player.m_vecVelocity);
             iWeaponIndex = 0;
             this.Bones = new Skeleton(this.m_hBoneMatrix);
         }
         public CSPlayer(BaseEntity baseEntity)
             : base(baseEntity)
         {
-            this.AddField<int>("CSPlayer.m_iHealth", CSGOOffsets.NetVars.Player.m_iHealth);
-            this.AddField<int>("CSPlayer.m_hBoneMatrix", CSGOOffsets.NetVars.Player.m_hBoneMatrix);
-            this.AddField<uint>("CSPlayer.m_hActiveWeapon", CSGOOffsets.NetVars.Player.m_hActiveWeapon);
-            this.AddField<int>("CSPlayer.m_iFlags", CSGOOffsets.NetVars.Player.m_iFlags);
-            this.AddField<Vector3>("CSPlayer.m_vecVelocity", CSGOOffsets.NetVars.Player.m_vecVelocity);
             iWeaponIndex = 0;
             this.Bones = new Skeleton(this.m_hBoneMatrix);
         }
@@ -81,6 +67,14 @@ namespace CSGOTriggerbot.CSGOClasses
         #endregion
 
         #region METHODS
+        protected override void SetupFields()
+        {
+            base.SetupFields();
+            this.AddField<int>("CSPlayer.m_hBoneMatrix", CSGOOffsets.NetVars.C_CSPlayer.m_hBoneMatrix);
+            this.AddField<uint>("CSPlayer.m_hActiveWeapon", CSGOOffsets.NetVars.C_CSPlayer.m_hActiveWeapon);
+            this.AddField<int>("CSPlayer.m_iFlags", CSGOOffsets.NetVars.C_CSPlayer.m_iFlags);
+            this.AddField<Vector3>("CSPlayer.m_vecVelocity", CSGOOffsets.NetVars.C_CSPlayer.m_vecVelocity);
+        }
         public override bool IsValid()
         {
             return base.IsValid() && (this.m_iTeamNum == 2 ||this.m_iTeamNum == 3);

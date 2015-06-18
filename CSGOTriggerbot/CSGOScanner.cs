@@ -146,7 +146,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 byte tmp = memUtils.Read<byte>((IntPtr)(scan.Address.ToInt32() + 8));
-                CSGOOffsets.NetVars.Entity.m_iID = tmp;
+                CSGOOffsets.NetVars.C_BaseEntity.m_iID = tmp;
             }
         }
         static void EntityHealth(MemUtils memUtils)
@@ -157,7 +157,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 23));
-                CSGOOffsets.NetVars.Player.m_iHealth = tmp;
+                CSGOOffsets.NetVars.C_BaseEntity.m_iHealth = tmp;
             }
         }
         static void EntityVecOrigin(MemUtils memUtils)
@@ -168,7 +168,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 13));
-                CSGOOffsets.NetVars.Entity.m_vecOrigin = tmp;
+                CSGOOffsets.NetVars.C_BaseEntity.m_vecOrigin = tmp;
             }
         }
         #endregion
@@ -181,7 +181,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 5));
-                CSGOOffsets.NetVars.Entity.m_iTeamNum = tmp;
+                CSGOOffsets.NetVars.C_BaseEntity.m_iTeamNum = tmp;
             }
         }
         static void PlayerBoneMatrix(MemUtils memUtils)
@@ -192,7 +192,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 8));
-                CSGOOffsets.NetVars.Player.m_hBoneMatrix = tmp;
+                CSGOOffsets.NetVars.C_CSPlayer.m_hBoneMatrix = tmp;
             }
         }
         static void PlayerWeaponHandle(MemUtils memUtils)
@@ -203,7 +203,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 6));
-                CSGOOffsets.NetVars.Player.m_hActiveWeapon = tmp;
+                CSGOOffsets.NetVars.C_CSPlayer.m_hActiveWeapon = tmp;
             }
         }
         #endregion

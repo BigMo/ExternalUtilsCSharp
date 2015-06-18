@@ -215,7 +215,16 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
         {
             if (device == null)
                 throw new SharpDXException("The device was not initialized yet");
-            device.EndDraw();
+            try
+            {
+                device.EndDraw();
+            }
+            catch
+            {
+                device.Dispose();
+                device = new WindowRenderTarget(factory, new RenderTargetProperties(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied)), renderTargetProperties);
+                device.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Cleartype;
+            }
         }
 
         public override void Resize(Vector2 size)

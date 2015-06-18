@@ -6,13 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ExternalUtilsCSharp
+namespace ExternalUtilsCSharp.JSONConfigUtils
 {
     /// <summary>
     /// JSON configurations helper classes
     /// Basicaly lets you to write any kind of object to file
     /// </summary>
-  
+
     #region JsonConfigs
     public static class JSONConfigHelper
     {
@@ -36,7 +36,7 @@ namespace ExternalUtilsCSharp
         /// <summary>
         /// Rewrites configuration
         /// </summary>
-        public static void RewriteConfiguration<T>( string configFileName,T configs)
+        public static void RewriteConfiguration<T>(string configFileName, T configs)
         {
             JSONConfigManager.WriteFile(configs, configFileName);
         }
@@ -82,7 +82,7 @@ namespace ExternalUtilsCSharp
         /// Reads settings from file and stores it into Settings Object
         /// </summary>
         /// <param name="configName">Path of file</param>
-        public override void ReadSettingsFromFile(string configName) 
+        public override void ReadSettingsFromFile(string configName)
         {
             lastConfigName = configName;
             Settings = JSONConfigManager.ReadFile<T>(configName);
@@ -118,7 +118,7 @@ namespace ExternalUtilsCSharp
             }
             catch (Exception e)
             {
-                throw new Exception("Could not read settings\n",e);
+                throw new Exception("Could not read settings\n", e);
                 //data = null;
                 //return new T();
             }

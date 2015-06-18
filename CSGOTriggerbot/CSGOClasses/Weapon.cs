@@ -82,6 +82,10 @@ namespace CSGOTriggerbot.CSGOClasses
         {
             return base.IsValid() && this.m_iWeaponID > 0 && this.m_iItemDefinitionIndex > 0;
         }
+        public bool IsCarried()
+        {
+            return this.m_hOwnerEntity != 0;
+        }
         #endregion
     }
 }

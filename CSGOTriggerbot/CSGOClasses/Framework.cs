@@ -50,6 +50,8 @@ namespace CSGOTriggerbot.CSGOClasses
                 if (address != 0)
                 {
                     BaseEntity ent = new BaseEntity(address);
+                    if (!ent.IsValid())
+                        continue;
                     if (ent.IsPlayer())
                         players.Add(new Tuple<int, CSPlayer>(i, new CSPlayer(ent)));
                     else if (ent.IsWeapon())
