@@ -49,7 +49,7 @@ namespace ExternalUtilsCSharp.UI
             }
             set
             {
-                if(this.text != value)
+                if (this.text != value)
                 {
                     this.text = value;
                     OnTextChangedEvent(new EventArgs());
@@ -81,6 +81,7 @@ namespace ExternalUtilsCSharp.UI
         public bool Visible { get; set; }
         public bool FillParent { get; set; }
         public TVector2 LastMousePos { get; private set; }
+        public object Tag { get; set; }
         #endregion
         #region EVENTS
         protected struct MouseEvent

@@ -38,6 +38,13 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             this.DynamicHeight = true;
             this.BackColor = new Color(0.9f, 0.9f, 0.9f, 1f);
             this.ContentLayout = LinearLayout.Instance;
+            this.FontChangedEvent += SharpDXPanel_FontChangedEvent;
+        }
+
+        void SharpDXPanel_FontChangedEvent(object sender, EventArgs e)
+        {
+            foreach (SharpDXControl control in this.ChildControls)
+                control.Font = this.Font;
         }
         #endregion
 

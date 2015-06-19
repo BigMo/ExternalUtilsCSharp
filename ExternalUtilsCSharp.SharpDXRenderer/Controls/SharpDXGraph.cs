@@ -12,6 +12,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         #region VARIABLES
         private long minimum, maximum, numberofvalues;
         #endregion
+
         #region PROPERTIES
         public long NumberOfValues 
         {
@@ -97,7 +98,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             long max = DynamicMaximum ? this.Values.Max() : this.Maximum;
             for (int i = 0; i < points.Length; i++)
             {
-                points[i] = location + new Vector2(this.Width / (points.Length - 1) * i, this.Height + this.MarginTop - (this.Height - this.MarginTop - this.MarginBottom) / max * this.Values[i]);
+                points[i] = location + new Vector2(this.Width / (points.Length - 1) * i, this.Height - (this.Height - this.MarginTop - this.MarginBottom) / max * this.Values[i]);
             }
             renderer.DrawLines(this.ForeColor, points);
 
@@ -105,7 +106,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             Vector2 maxSize = renderer.MeasureString(maxString, this.Font);
             Vector2 maxLocation = location + new Vector2(this.Width - maxSize.X, 0);
             renderer.DrawText(maxString, this.ForeColor, this.Font, maxLocation);
-
+            renderer.DrawText(this.Text, this.ForeColor, this.Font, location);
             base.Draw(renderer);
         }
         #endregion

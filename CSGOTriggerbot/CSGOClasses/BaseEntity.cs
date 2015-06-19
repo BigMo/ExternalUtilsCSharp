@@ -132,7 +132,7 @@ namespace CSGOTriggerbot.CSGOClasses
         }
         public virtual bool IsValid()
         {
-            return this.m_iDormant != 1 && this.m_iID > 0 && this.m_iClassID > 0;
+            return this.Address != 0 && this.m_iDormant != 1 && this.m_iID > 0 && this.m_iClassID > 0;
         }
         public bool SeenBy(int entityIndex)
         {

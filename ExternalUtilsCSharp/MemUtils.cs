@@ -114,6 +114,25 @@ namespace ExternalUtilsCSharp
             return BytesToT<T>(data, defVal);
         }
         /// <summary>
+        /// Generic function to read an array of data from memory using the given type
+        /// </summary>
+        /// <typeparam name="T">The type of the value</typeparam>
+        /// <param name="address">The address to read data at</param>
+        /// <param name="length">The number of elements to read</param>
+        /// <returns></returns>
+        public T[] ReadArray<T>(IntPtr address, int length) where T: struct
+        {
+            byte[] data;
+            int size = Marshal.SizeOf(typeof(T));
+
+            Read(address, out data, size * length);
+            T[] result = new T[length];
+            for (int i = 0; i < length; i++)
+                result[i] = BytesToT<T>(data, i * size);
+
+            return result;
+        }
+        /// <summary>
         /// Generic function to read data from memory using the given type
         /// Applies the given offsets to read multilevel-pointers
         /// </summary>
@@ -231,6 +250,22 @@ namespace ExternalUtilsCSharp
                 gcHandle.Free();
             }
             return structure;
+        }
+        /// <summary>
+        /// Converts the given array of bytes to the specified type.
+        /// Uses either marshalling or unsafe code, depending on UseUnsafeReadWrite
+        /// </summary>
+        /// <typeparam name="T">The type of the value</typeparam>
+        /// <param name="data">Array of bytes</param>
+        /// <param name="index">Index of the data to convert</param>
+        /// <param name="defVal">The default value of this operation (which is returned in case the Read-operation fails)</param>
+        /// <returns></returns>
+        public unsafe T BytesToT<T>(byte[] data, int index, T defVal = default(T)) where T : struct
+        {
+            int size = Marshal.SizeOf(typeof(T));
+            byte[] tmp = new byte[size];
+            Array.Copy(data, index, tmp, 0, size);
+            return BytesToT<T>(tmp, defVal);
         }
         /// <summary>
         /// Converts the given struct to a byte-array

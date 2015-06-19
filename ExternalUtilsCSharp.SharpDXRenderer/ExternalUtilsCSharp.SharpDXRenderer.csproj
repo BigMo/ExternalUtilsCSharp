@@ -65,6 +65,7 @@
     <Compile Include="Controls\SharpDXGraph.cs" />
     <Compile Include="Controls\SharpDXPanel.cs" />
     <Compile Include="Controls\SharpDXProgressBar.cs" />
+    <Compile Include="Controls\SharpDXRadar.cs" />
     <Compile Include="Controls\SharpDXRadioButton.cs" />
     <Compile Include="Controls\SharpDXSpacer.cs" />
     <Compile Include="Controls\SharpDXWindow.cs" />

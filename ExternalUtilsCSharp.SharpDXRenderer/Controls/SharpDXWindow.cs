@@ -36,12 +36,6 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             this.MouseLeftEvent += SharpDXWindow_MouseLeftEvent;
             this.MouseMovedEvent += SharpDXWindow_MouseMovedEvent;
             this.TextChangedEvent += SharpDXWindow_TextChangedEvent;
-            this.FontChangedEvent += SharpDXWindow_FontChangedEvent;
-        }
-
-        void SharpDXWindow_FontChangedEvent(object sender, EventArgs e)
-        {
-            this.Caption.Font = this.Font;
         }
 
         void SharpDXWindow_TextChangedEvent(object sender, EventArgs e)

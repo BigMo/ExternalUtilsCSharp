@@ -39,11 +39,11 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
         /// <param name="fontFamilyName">Name of the used font-family</param>
         /// <param name="fontSize">Size of the font</param>
         /// <returns>New font</returns>
-        public TextFormat CreateFont(string fontName, string fontFamilyName, float fontSize)
+        public TextFormat CreateFont(string fontName, string fontFamilyName, float fontSize, FontStyle fontStyle = FontStyle.Normal, FontWeight fontWeight = FontWeight.Normal)
         {
             if (device == null)
                 throw new SharpDXException("The device was not initialized yet");
-            TextFormat font = new TextFormat(fontFactory, fontFamilyName, fontSize);
+            TextFormat font = new TextFormat(fontFactory, fontFamilyName, fontWeight, fontStyle, fontSize);
             fonts.Add(fontName, font);
             return font;
         }

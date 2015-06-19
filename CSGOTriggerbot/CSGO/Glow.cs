@@ -15,12 +15,12 @@ namespace CSGOTriggerbot.CSGO
             {
                 case ClassID.CSPlayer:
                     {
-                        if (entity.m_iTeam == Program.localPlayer.m_iTeam)
-                            clr = Color.Blue;
-                        else if (entity.m_bSpotted && (entity.m_iTeam == 3 || entity.m_iTeam == 3))
-                            clr = Color.Green;
-                        else
-                            clr = Color.Red;
+                        //if (entity.m_iTeam == Program.localPlayer.m_iTeam)
+                        //    clr = Color.Blue;
+                        //else if (entity.m_bSpotted && (entity.m_iTeam == 3 || entity.m_iTeam == 3))
+                        //    clr = Color.Green;
+                        //else
+                        //    clr = Color.Red;
                         break;
                     }
                 case ClassID.AK47:

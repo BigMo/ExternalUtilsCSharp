@@ -98,9 +98,9 @@ namespace ExternalUtilsCSharp.UI
             WinAPI.SetLayeredWindowAttributes(this.Handle, 0, 255, (uint)WinAPI.LayeredWindowAttributesFlags.LWA_ALPHA);
 
             //Controls
-            updLogic = new Updater(60);
+            updLogic = new Updater(256);
             updLogic.TickEvent += updLogic_TickEvent;
-            updDraw = new Updater(60);
+            updDraw = new Updater(256);
             updDraw.TickEvent += updDraw_TickEvent;
             lastTimerTick = DateTime.Now.Ticks;
             lastDrawTick = DateTime.Now.Ticks;

@@ -80,10 +80,11 @@ namespace ExternalUtilsCSharp
             while (work)
             {
                 CalculateFPS();
-                this.OnTickEvent(new DeltaEventArgs(new TimeSpan(DateTime.Now.Ticks - lastTick).TotalSeconds));
-                this.TickCount++;
+                double elapsedSeconds = new TimeSpan(DateTime.Now.Ticks - lastTick).TotalSeconds;
+                this.OnTickEvent(new DeltaEventArgs(elapsedSeconds));
+                this.TickCount++;                
                 lastTick = DateTime.Now.Ticks;
-                Thread.Sleep(Interval);
+                Thread.Sleep(this.Interval);
             }
         }
         #endregion
