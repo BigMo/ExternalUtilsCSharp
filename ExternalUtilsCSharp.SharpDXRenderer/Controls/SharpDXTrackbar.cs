@@ -10,7 +10,8 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
     public class SharpDXTrackbar : SharpDXControl
     {
         #region VARIABLES
-        private float minimum, maximum, value;
+        private float value;
+        private Vector2 trackbarLocation;
         #endregion
 
         #region PROPERTIES
@@ -22,10 +23,10 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             {
                 if (this.value != value)
                 {
-                    if (value < minimum)
-                        value = minimum;
-                    if (value > maximum)
-                        value = maximum;
+                    if (value < Minimum)
+                        value = Minimum;
+                    if (value > Maximum)
+                        value = Maximum;
                     this.value = value;
                     OnValueChangedEvent(new EventArgs());
                 }
@@ -33,7 +34,13 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         }
         public int NumberOfDecimals { get; set; }
         public float TrackbarHeight { get; set; }
-        public float StepSize { get; set; }
+        public float Percent
+        {
+            get
+            {
+                return 1f / Math.Abs(this.Minimum - this.Maximum) * this.value;
+            }
+        }
         #endregion
 
         #region EVENTS
@@ -48,17 +55,35 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         #region CONSTRUCTOR
         public SharpDXTrackbar() : base()
         {
-            this.minimum = 0;
-            this.maximum = 100;
+            this.Minimum = 0;
+            this.Maximum = 100;
             this.value = 50;
-            this.StepSize = 5f;
             this.NumberOfDecimals = 2;
             this.TrackbarHeight = 16f;
             this.FillParent = true;
+            this.MouseMovedEvent += SharpDXTrackbar_MouseMovedEvent;
         }
 
-        void SharpDXTrackbar_FontChangedEvent(object sender, EventArgs e)
+        void SharpDXTrackbar_MouseMovedEvent(object sender, UI.Control<SharpDXRenderer, Color, Vector2, SharpDX.DirectWrite.TextFormat>.MouseEventArgs e)
         {
+            if (!e.LeftButton)
+                return;
+
+            Vector2 size = this.GetSize();
+
+            Vector2 trackbarSize = new Vector2(size.X - TrackbarHeight, 0);
+            Vector2 cursorPos = e.Position - trackbarLocation;
+
+            if (cursorPos.X >= 0 && cursorPos.X <= trackbarSize.X)
+            {
+                if (cursorPos.Y >= -TrackbarHeight && cursorPos.Y <= TrackbarHeight)
+                {
+                    float percent = 1f / trackbarSize.X * cursorPos.X;
+                    float range = Math.Abs(this.Minimum - this.Maximum);
+                    float val = range * percent;
+                    this.Value = this.Minimum + val;
+                }
+            }
         }
         #endregion
 
@@ -78,14 +103,12 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
 
             renderer.DrawText(text, this.ForeColor, this.Font, location);
 
-            float range = Math.Abs(this.minimum - this.maximum);
-            float percent = 1f / range * this.value;
-            Vector2 trackbarLocation = location + Vector2.UnitY * textSize.Y;
+            trackbarLocation = location + Vector2.UnitY * textSize.Y;
             Vector2 trackBarHandleSize = new Vector2(TrackbarHeight, TrackbarHeight);
 
             trackbarLocation = location + Vector2.UnitY * (textSize.Y + MarginTop + TrackbarHeight / 2f) + Vector2.UnitX * TrackbarHeight / 2f;
             Vector2 trackbarSize = new Vector2(size.X - TrackbarHeight, 0);
-            Vector2 trackbarMarkerLocation = new Vector2(trackbarLocation.X + trackbarSize.X * percent, trackbarLocation.Y);
+            Vector2 trackbarMarkerLocation = new Vector2(trackbarLocation.X + trackbarSize.X * Percent, trackbarLocation.Y);
             Vector2 trackbarMarkerSize = new Vector2(TrackbarHeight / 2f, TrackbarHeight);
 
             renderer.DrawLine(this.ForeColor, trackbarLocation, trackbarLocation + trackbarSize, TrackbarHeight / 2f + 2f);

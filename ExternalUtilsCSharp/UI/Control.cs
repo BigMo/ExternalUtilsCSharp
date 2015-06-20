@@ -220,7 +220,13 @@ namespace ExternalUtilsCSharp.UI
 
                     if(!LastMousePos.Equals(cursorPoint))
                     {
-                        OnMouseMovedEvent(new MouseEventArgs() { Position = cursorPoint });
+                        OnMouseMovedEvent(new MouseEventArgs() 
+                        {
+                            Position = cursorPoint,
+                            LeftButton = keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.LBUTTON),
+                            RightButton = keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.RBUTTON),
+                            MiddleButton = keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.MBUTTON)
+                        });
                         LastMousePos = cursorPoint;
                     }
                 }

@@ -34,6 +34,8 @@ namespace CSGOTriggerbot
         //Menu-window
         private static SharpDXWindow windowMenu;
         private static SharpDXLabel labelBoxESPCaption;
+        private static SharpDXButton buttonESPToggle;
+        private static SharpDXPanel panelESPContent;
         private static SharpDXCheckBox checkBoxESPEnabled;
         private static SharpDXCheckBox checkBoxESPBox;
         private static SharpDXCheckBox checkBoxESPSkeleton;
@@ -41,11 +43,14 @@ namespace CSGOTriggerbot
         private static SharpDXCheckBox checkBoxESPHealth;
 
         private static SharpDXLabel labelBoxAimCaption;
+        private static SharpDXButton buttonAimToggle;
+        private static SharpDXPanel panelAimContent;
         private static SharpDXCheckBox checkBoxAimEnabled;
         private static SharpDXRadioButton radioAimToggle;
         private static SharpDXRadioButton radioAimHold;
         private static SharpDXTrackbar trackBarAimFov;
-        private static SharpDXCheckBox checkBoxAimSmooth;
+        private static SharpDXCheckBox checkBoxAimSmoothEnaled;
+        private static SharpDXTrackbar trackBarAimSmoothValue;
         private static SharpDXCheckBox checkBoxAimBone;
 
         //Performance-window
@@ -77,8 +82,9 @@ namespace CSGOTriggerbot
             ConfigUtils.SetValue("aimEnabled", true);
             ConfigUtils.SetValue("aimToggle", true);
             ConfigUtils.SetValue("aimHold", true);
-            ConfigUtils.SetValue("aimFov", 1);
-            ConfigUtils.SetValue("aimSmooth", 1);
+            ConfigUtils.SetValue("aimFov", 1f);
+            ConfigUtils.SetValue("aimSmoothEnabled", true);
+            ConfigUtils.SetValue("aimSmoothValue", 1f);
             ConfigUtils.SetValue("aimBone", 10);
             ConfigUtils.ReadSettingsFromFile("euc_csgo.cfg");
 
@@ -121,7 +127,6 @@ namespace CSGOTriggerbot
                 windowMenu.Caption.Font = largeFont;
                 windowGraphs.Font = smallFont;
                 windowGraphs.Caption.Font = largeFont;
-                trackBarAimFov.Font = smallFont;
 
                 graphMemRead.Font = smallFont;
                 graphMemWrite.Font = smallFont;
@@ -202,22 +207,48 @@ namespace CSGOTriggerbot
             windowMenu = new SharpDXWindow();
             windowMenu.Caption.Text = "[CSGO] Multihack";
             windowMenu.X = 500;
-            InitLabel(ref labelBoxESPCaption,       "~~~ ESP ~~~", true, 150, SharpDXLabel.TextAlignment.Center);
+            windowMenu.Panel.DynamicWidth = false;
+            windowMenu.Panel.Width = 200;
+
+            InitLabel(ref labelBoxESPCaption, "~~~ ESP ~~~", true, 150, SharpDXLabel.TextAlignment.Center);
+            InitPanel(ref panelESPContent, false, true, true, true);
+            InitToggleButton(ref buttonESPToggle, "[Toggle ESP-menu]", panelESPContent);
             InitCheckBox(ref checkBoxESPEnabled, "Enabled", "espEnabled", true);
-            InitCheckBox(ref checkBoxESPBox, "Draw box", "espBox", true);
+            InitCheckBox(ref checkBoxESPBox, "Draw box", "espBox", false);
             InitCheckBox(ref checkBoxESPSkeleton, "Draw skeleton", "espSkeleton", true);
-            InitCheckBox(ref checkBoxESPName, "Draw name", "espName", true);
+            InitCheckBox(ref checkBoxESPName, "Draw name", "espName", false);
             InitCheckBox(ref checkBoxESPHealth, "Draw health", "espHealth", true);
+
             InitLabel(ref labelBoxAimCaption, "~~~ Aim ~~~", true, 150, SharpDXLabel.TextAlignment.Center);
-            InitTrackBar(ref trackBarAimFov, "Aimbot FOV", "aimFov", 1, 40, 3, 1);
-            windowMenu.Panel.AddChildControl(labelBoxESPCaption);
-            windowMenu.Panel.AddChildControl(checkBoxESPEnabled);
-            windowMenu.Panel.AddChildControl(checkBoxESPBox);
-            windowMenu.Panel.AddChildControl(checkBoxESPSkeleton);
-            windowMenu.Panel.AddChildControl(checkBoxESPName);
-            windowMenu.Panel.AddChildControl(checkBoxESPHealth);
-            windowMenu.Panel.AddChildControl(labelBoxAimCaption);
-            windowMenu.Panel.AddChildControl(trackBarAimFov);
+            InitPanel(ref panelAimContent, false, true, true, true);
+            InitToggleButton(ref buttonAimToggle, "[Toggle aim-menu]", panelAimContent);
+            InitCheckBox(ref checkBoxAimEnabled, "Enabled", "aimEnabled", true);
+            InitTrackBar(ref trackBarAimFov, "Aimbot FOV", "aimFov", 1, 180, 20, 0);
+            InitRadioButton(ref radioAimHold, "Mode: Hold key", "aimHold", true);
+            InitRadioButton(ref radioAimToggle, "Mode: Toggle", "aimToggle", false);
+            InitCheckBox(ref checkBoxAimSmoothEnaled, "Smoothing", "aimSmoothEnabled", true);
+            InitTrackBar(ref trackBarAimSmoothValue, "Smooth-factor", "aimSmoothValue", 0, 1, 0.2f, 4);
+
+            windowMenu.Panel.AddChildControl(buttonESPToggle);
+            windowMenu.Panel.AddChildControl(panelESPContent);
+            windowMenu.Panel.AddChildControl(buttonAimToggle);
+            windowMenu.Panel.AddChildControl(panelAimContent);
+
+            panelESPContent.AddChildControl(labelBoxESPCaption);
+            panelESPContent.AddChildControl(checkBoxESPEnabled);
+            panelESPContent.AddChildControl(checkBoxESPBox);
+            panelESPContent.AddChildControl(checkBoxESPSkeleton);
+            panelESPContent.AddChildControl(checkBoxESPName);
+            panelESPContent.AddChildControl(checkBoxESPHealth);
+
+            panelAimContent.AddChildControl(labelBoxAimCaption);
+            panelAimContent.AddChildControl(checkBoxAimEnabled);
+            panelAimContent.AddChildControl(trackBarAimFov);
+            panelAimContent.AddChildControl(radioAimHold);
+            panelAimContent.AddChildControl(radioAimToggle);
+            panelAimContent.AddChildControl(checkBoxAimSmoothEnaled);
+            panelAimContent.AddChildControl(trackBarAimSmoothValue);
+
             ctrlRadar = new PlayerRadar();
             ctrlRadar.Width = 128;
             ctrlRadar.Height = 128;
@@ -251,10 +282,32 @@ namespace CSGOTriggerbot
             SharpDXTrackbar control = (SharpDXTrackbar)sender;
             ConfigUtils.SetValue(control.Tag.ToString(), control.Value);
         }
+        static void button_MouseClickEventUp(object sender, ExternalUtilsCSharp.UI.Control<SharpDXRenderer, SharpDX.Color, SharpDX.Vector2, TextFormat>.MouseEventArgs e)
+        {
+            if (!e.LeftButton)
+                return;
+            SharpDXPanel panel = (SharpDXPanel)((SharpDXButton)sender).Tag;
+            panel.Visible = !panel.Visible;
+        }
         #endregion
 
         #region HELPERS
-        private static void InitTrackBar(ref SharpDXTrackbar control, string text, object tag, float min =0, float max = 100, float value = 50, float stepSize = 1)
+        private static void InitPanel(ref SharpDXPanel control, bool dynamicWidth = true, bool dynamicHeight = true, bool fillParent = true, bool visible = true)
+        {
+            control = new SharpDXPanel();
+            control.DynamicHeight = dynamicHeight;
+            control.DynamicWidth = dynamicWidth;
+            control.FillParent = fillParent;
+            control.Visible = visible;
+        }
+        private static void InitToggleButton(ref SharpDXButton control, string text, SharpDXPanel tag)
+        {
+            control = new SharpDXButton();
+            control.Text = text;
+            control.Tag = tag;
+            control.MouseClickEventUp += button_MouseClickEventUp;
+        }
+        private static void InitTrackBar(ref SharpDXTrackbar control, string text, object tag, float min =0, float max = 100, float value = 50, int numberofdecimals = 2)
         {
             control = new SharpDXTrackbar();
             control.Text = text;
@@ -262,7 +315,7 @@ namespace CSGOTriggerbot
             control.Minimum = min;
             control.Maximum = max;
             control.Value = value;
-            control.StepSize = stepSize;
+            control.NumberOfDecimals = numberofdecimals;
             control.ValueChangedEvent += trackBar_ValueChangedEvent;
         }
 

@@ -178,12 +178,12 @@ namespace CSGOTriggerbot.CSGOClasses
             foreach(Tuple<int, CSPlayer> tpl in valid)
             {
                 CSPlayer plr = tpl.Item2;
-                // float tps = 1f / WithOverlay.SHDXOverlay.LogicUpdater.FrameRate;
+                //float tps = 1f / WithOverlay.SHDXOverlay.LogicUpdater.FrameRate;
                 //Vector3 newAngles = MathUtils.CalcAngle(LocalPlayer.m_vecOrigin + LocalPlayer.m_vecViewOffset + LocalPlayer.m_vecVelocity * tps, plr.Bones.Spine3 + plr.m_vecVelocity * tps) - viewAngles;
                 Vector3 newAngles = MathUtils.CalcAngle(LocalPlayer.m_vecOrigin + LocalPlayer.m_vecViewOffset, plr.Bones.Neck) - viewAngles;
                 newAngles = MathUtils.ClampAngle(newAngles);
                 float fov = newAngles.Length() % 360f;
-                if (fov < closestFov && fov < 1)
+                if (fov < closestFov && fov < WithOverlay.ConfigUtils.GetValue<float>("aimFov"))
                 {
                     closestFov = fov;
                     closest = newAngles;
@@ -191,8 +191,10 @@ namespace CSGOTriggerbot.CSGOClasses
             }
             if (closest != Vector3.Zero)
             {
-                //viewAngles = MathUtils.SmoothAngle(viewAngles, viewAngles + closest, 0.2f);
-                viewAngles += closest;
+                if (WithOverlay.ConfigUtils.GetValue<bool>("aimSmoothEnabled"))
+                    viewAngles = MathUtils.SmoothAngle(viewAngles, viewAngles + closest, WithOverlay.ConfigUtils.GetValue<float>("aimSmoothValue"));
+                else
+                    viewAngles += closest;
                 SetViewAngles(viewAngles);
             }
         }
