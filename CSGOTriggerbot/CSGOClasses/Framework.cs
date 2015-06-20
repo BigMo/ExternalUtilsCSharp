@@ -20,6 +20,7 @@ namespace CSGOTriggerbot.CSGOClasses
             clientDllBase, 
             engineDllBase,
             dwIGameResources;
+        private bool mouseEnabled;
         #endregion
         #region PROPERTIES
         public CSLocalPlayer LocalPlayer { get; private set; }
@@ -37,6 +38,19 @@ namespace CSGOTriggerbot.CSGOClasses
         public string[] Clantags { get; private set; }
         public string[] Names { get; private set; }
         public SignOnState State { get; set; }
+        public bool MouseEnabled
+        { 
+            get { return mouseEnabled; }
+            set
+            {
+                if(value != mouseEnabled)
+                {
+                    mouseEnabled = value;
+                    WinAPI.SetCursorPos(WithOverlay.SHDXOverlay.Location.X + WithOverlay.SHDXOverlay.Width / 2, WithOverlay.SHDXOverlay.Location.Y + WithOverlay.SHDXOverlay.Height / 2);
+                    WithOverlay.MemUtils.Write<byte>((IntPtr)(clientDllBase + CSGOOffsets.Misc.MouseEnable), value ? (byte)1 : (byte)0);
+                }
+            }
+        }
         #endregion
 
         #region CONSTRUCTOR
@@ -48,6 +62,7 @@ namespace CSGOTriggerbot.CSGOClasses
             dwEntityList = clientDllBase + CSGOOffsets.Misc.EntityList;
             dwViewMatrix = clientDllBase + CSGOOffsets.Misc.ViewMatrix;
             dwClientState = WithOverlay.MemUtils.Read<int>((IntPtr)(engineDllBase + CSGOOffsets.ClientState.Base));
+            mouseEnabled = true;
         }
         #endregion
 
@@ -168,7 +183,7 @@ namespace CSGOTriggerbot.CSGOClasses
                 Vector3 newAngles = MathUtils.CalcAngle(LocalPlayer.m_vecOrigin + LocalPlayer.m_vecViewOffset, plr.Bones.Neck) - viewAngles;
                 newAngles = MathUtils.ClampAngle(newAngles);
                 float fov = newAngles.Length() % 360f;
-                if (fov < closestFov)// && fov < 90)
+                if (fov < closestFov && fov < 1)
                 {
                     closestFov = fov;
                     closest = newAngles;

@@ -57,7 +57,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
         {
             Vector2 cursor = new Vector2(this.CursorPosition.X, this.CursorPosition.Y);
             foreach (ExternalUtilsCSharp.UI.Control<SharpDXRenderer, Color, Vector2, TextFormat> control in this.ChildControls)
-                control.Update(secondsElapsed, keys, cursor);
+                control.Update(secondsElapsed, keys, cursor, true);
         }
     }
 }

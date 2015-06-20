@@ -96,9 +96,9 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
                 mouseDown = false;
         }
 
-        public override void Update(double secondsElapsed, KeyUtils keyUtils, Vector2 cursorPoint)
+        public override void Update(double secondsElapsed, KeyUtils keyUtils, Vector2 cursorPoint, bool checkMouse = false)
         {
-            base.Update(secondsElapsed, keyUtils, cursorPoint);
+            base.Update(secondsElapsed, keyUtils, cursorPoint, checkMouse);
         }
         #endregion
     }

@@ -13,9 +13,9 @@ namespace CSGOTriggerbot.UI
 {
     public class PlayerRadar : SharpDXRadar
     {
-        public override void Update(double secondsElapsed, ExternalUtilsCSharp.KeyUtils keyUtils, SharpDX.Vector2 cursorPoint)
+        public override void Update(double secondsElapsed, ExternalUtilsCSharp.KeyUtils keyUtils, SharpDX.Vector2 cursorPoint, bool checkMouse = false)
         {
-            base.Update(secondsElapsed, keyUtils, cursorPoint);
+            base.Update(secondsElapsed, keyUtils, cursorPoint, checkMouse);
             Framework fw = WithOverlay.Framework;
             if (fw.LocalPlayer == null)
                 return;

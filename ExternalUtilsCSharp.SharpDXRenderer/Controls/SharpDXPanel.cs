@@ -49,9 +49,9 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         #endregion
 
         #region METHODS
-        public override void Update(double secondsElapsed, KeyUtils keyUtils, SharpDX.Vector2 cursorPoint)
+        public override void Update(double secondsElapsed, KeyUtils keyUtils, SharpDX.Vector2 cursorPoint, bool checkMouse = false)
         {
-            base.Update(secondsElapsed, keyUtils, cursorPoint);
+            base.Update(secondsElapsed, keyUtils, cursorPoint, checkMouse);
             if (this.Visible)
             {
                 //this.ContentLayout.ApplyLayout(this);

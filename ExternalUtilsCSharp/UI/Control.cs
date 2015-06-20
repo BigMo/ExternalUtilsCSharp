@@ -169,18 +169,18 @@ namespace ExternalUtilsCSharp.UI
         /// </summary>
         /// <param name="secondsElapsed"></param>
         /// <param name="cursorPoint"></param>
-        public virtual void Update(double secondsElapsed, KeyUtils keyUtils, TVector2 cursorPoint)
+        public virtual void Update(double secondsElapsed, KeyUtils keyUtils, TVector2 cursorPoint, bool checkMouse = false)
         {
             #region MOUSE
-            if (Visible)
+            if (Visible && checkMouse)
             {
                 MouseEvent result = new MouseEvent() { Handled = false, Depth = 0 };
-                CheckMouseEvents(cursorPoint, keyUtils, result);
+                CheckMouseEvents(cursorPoint, keyUtils, ref result);
             }
             #endregion
             #region CHILDCONTROLS
             foreach (Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
-                control.Update(secondsElapsed, keyUtils, cursorPoint);
+                control.Update(secondsElapsed, keyUtils, cursorPoint, false);
             #endregion
         }
         /// <summary>
@@ -188,17 +188,17 @@ namespace ExternalUtilsCSharp.UI
         /// </summary>
         /// <param name="cursorPoint"></param>
         /// <param name="result"></param>
-        protected void CheckMouseEvents(TVector2 cursorPoint, KeyUtils keyUtils, MouseEvent result)
+        protected void CheckMouseEvents(TVector2 cursorPoint, KeyUtils keyUtils, ref MouseEvent result)
         {
             foreach(Control<TRenderer,TColor,TVector2,TFont> control in ChildControls)
             {
                 if (result.Handled)
                     return;
                 result.Depth++;
-                control.CheckMouseEvents(cursorPoint, keyUtils, result);
+                control.CheckMouseEvents(cursorPoint, keyUtils, ref result);
                 result.Depth--;
             }
-            if (!result.Handled && result.Depth == 0)
+            if (!result.Handled)
             {
                 this.MouseOver = this.CheckMouseOver(cursorPoint);
                 if (this.MouseOver)
