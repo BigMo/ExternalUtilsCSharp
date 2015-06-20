@@ -467,6 +467,9 @@ namespace ExternalUtilsCSharp
 
         [DllImport("user32.dll")]
         public static extern bool SetCursorPos(int X, int Y);
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool GetCursorPos(out POINT lpPoint);
 
         [DllImport("user32.dll")]
         static extern UInt32 SendInput(UInt32 nInputs, [MarshalAs(UnmanagedType.LPArray, SizeConst = 1)] INPUT[] pInputs, Int32 cbSize);

@@ -17,6 +17,7 @@ namespace SteamMonsterGame
         private static ProcUtils proc;
         private static KeyUtils keys;
         private static Vector2 lastClickerPos;
+        private static IntPtr hWnd;
 
         private static SharpDXOverlay overlay;
         private static SharpDXPanel pnlPanel;
@@ -54,12 +55,12 @@ namespace SteamMonsterGame
                 Thread.Sleep(250);
 
             proc = new ProcUtils("Steam", WinAPI.ProcessAccessFlags.QueryLimitedInformation);
-            IntPtr window = IntPtr.Zero;
+            hWnd = IntPtr.Zero;
 
             Console.WriteLine("> Waiting for steam-window to start up...");
             do
-                window = WinAPI.FindWindowByCaption(window, "Steam");
-            while (window == IntPtr.Zero);
+                hWnd = WinAPI.FindWindowByCaption(hWnd, "Steam");
+            while (hWnd == IntPtr.Zero);
 
             Console.WriteLine("> Initializing utils");
             keys = new KeyUtils();
@@ -70,7 +71,7 @@ namespace SteamMonsterGame
             {
                 overlay.ChildControls.Clear();
                 Console.WriteLine("> Attaching overlay");
-                overlay.Attach(window);
+                overlay.Attach(hWnd);
                 overlay.TickEvent += overlay_TickEvent;
                 overlay.DrawOnlyWhenInForeground = false;
                 overlay.BeforeDrawingEvent += overlay_BeforeDrawingEvent;
@@ -254,8 +255,8 @@ namespace SteamMonsterGame
                 int lParam = WinAPI.MakeLParam((int)clickPoint.X, (int)clickPoint.Y);
                 lastClickerPos.X = clickPoint.X;
                 lastClickerPos.Y = clickPoint.Y;
-                Message(proc.Process.MainWindowHandle, (uint)WinAPI.WindowMessage.WM_LBUTTONDOWN, 0, lParam);
-                Message(proc.Process.MainWindowHandle, (uint)WinAPI.WindowMessage.WM_LBUTTONUP, 0, lParam);
+                Message(hWnd, (uint)WinAPI.WindowMessage.WM_LBUTTONDOWN, 0, lParam);
+                Message(hWnd, (uint)WinAPI.WindowMessage.WM_LBUTTONUP, 0, lParam);
             }
             #endregion
             lblFpsLogic.Text = string.Format("FPS logic: {0}", overlay.LogicUpdater.LastFrameRate.ToString());

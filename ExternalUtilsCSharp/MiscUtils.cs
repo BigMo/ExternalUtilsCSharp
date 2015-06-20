@@ -60,6 +60,28 @@ namespace ExternalUtilsCSharp
         {
             return GetUnit(value, DIVIDER_SIZES, useAbbreviation ? NAMES_SIZESABBREVIATIONS : NAMES_SIZES, format);
         }
+        /// <summary>
+        /// Merges the given arrays to one single array (preserves the order of all elements)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="arrays">Arrays to merge</param>
+        /// <returns>A single array containing all elements of the given arrays</returns>
+        public static T[] MergeArrays<T>(params T[][] arrays)
+        {
+            int totalLength = 0;
+            for (int i = 0; i < arrays.GetLength(0); i++)
+                totalLength += arrays[i].Length;
+
+            T[] result = new T[totalLength];
+            int idx = 0;
+            foreach (T[] array in arrays)
+            {
+                Array.Copy(array, 0, result, idx, array.Length);
+                idx += array.Length;
+            }
+
+            return result;
+        }
         #endregion
     }
 }

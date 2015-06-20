@@ -35,7 +35,6 @@ namespace CSGOTriggerbot
             EntityHealth(memUtils);
             EntityVecOrigin(memUtils);
             PlayerTeamNum(memUtils);
-            PlayerTeamNum(memUtils);
             PlayerBoneMatrix(memUtils);
             PlayerWeaponHandle(memUtils);
             vMatrix(memUtils);
@@ -58,7 +57,7 @@ namespace CSGOTriggerbot
                 int address = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + +0x4EE));
                 address -= clientDllBase;
                 address += 0x80;
-                Program.offsetvMatrix = address;
+                CSGOOffsets.Misc.ViewMatrix = address;
             }
         }
         static void EntityOff(MemUtils memUtils)
@@ -68,7 +67,7 @@ namespace CSGOTriggerbot
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 1));
                 byte tmp2 = memUtils.Read<byte>((IntPtr)(scan.Address.ToInt32() + 7));
-                Program.offsetMiscEntityList = tmp + tmp2 - clientDllBase;
+                CSGOOffsets.Misc.EntityList = tmp + tmp2 - clientDllBase;
             }
         }
         static void LocalPlayer(MemUtils memUtils)
@@ -78,7 +77,7 @@ namespace CSGOTriggerbot
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 3));
                 byte tmp2 = memUtils.Read<byte>((IntPtr)(scan.Address.ToInt32() + 18));
-                Program.offsetMiscLocalPlayer = tmp + tmp2 - clientDllBase;
+                CSGOOffsets.Misc.LocalPlayer = tmp + tmp2 - clientDllBase;
             }
         }
         static void Jump(MemUtils memUtils)
@@ -87,7 +86,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 2));
-                Program.offsetMiscJump = tmp - clientDllBase;
+                CSGOOffsets.Misc.Jump = tmp - clientDllBase;
             }
         }
         static void ClientState(MemUtils memUtils)
@@ -96,7 +95,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 7));
-                Program.offsetMiscClientState = tmp - engineDllBase;
+                CSGOOffsets.ClientState.Base = tmp - engineDllBase;
             }
         }
         static void SetViewAngles(MemUtils memUtils)
@@ -105,7 +104,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 11));
-                Program.offsetMiscSetViewAngles = tmp;
+                CSGOOffsets.ClientState.SetViewAngles = tmp;
             }
         }
         static void SignOnState(MemUtils memUtils)
@@ -116,7 +115,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 11));
-                Program.offsetMiscSignOnState = tmp;
+                CSGOOffsets.Misc.SignOnState = tmp;
             }
         }
         static void GlowManager(MemUtils memUtils)
@@ -125,7 +124,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 7));
-                Program.offsetMiscGlowManager = tmp - clientDllBase;
+                CSGOOffsets.Misc.GlowManager = tmp - clientDllBase;
             }
         }
         static void WeaponTable(MemUtils memUtils)
@@ -134,7 +133,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 1));
-                Program.offsetMiscWeaponTable = tmp - clientDllBase;
+                CSGOOffsets.Misc.WeaponTable = tmp - clientDllBase;
             }
         }
         #endregion
@@ -147,7 +146,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 byte tmp = memUtils.Read<byte>((IntPtr)(scan.Address.ToInt32() + 8));
-                Program.offsetEntityID = tmp;
+                CSGOOffsets.NetVars.C_BaseEntity.m_iID = tmp;
             }
         }
         static void EntityHealth(MemUtils memUtils)
@@ -158,7 +157,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 23));
-                Program.offsetEntityHealth = tmp;
+                CSGOOffsets.NetVars.C_BaseEntity.m_iHealth = tmp;
             }
         }
         static void EntityVecOrigin(MemUtils memUtils)
@@ -169,7 +168,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 13));
-                Program.offsetEntityVecOrigin = tmp;
+                CSGOOffsets.NetVars.C_BaseEntity.m_vecOrigin = tmp;
             }
         }
         #endregion
@@ -182,7 +181,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 5));
-                Program.offsetPlayerTeamNum = tmp;
+                CSGOOffsets.NetVars.C_BaseEntity.m_iTeamNum = tmp;
             }
         }
         static void PlayerBoneMatrix(MemUtils memUtils)
@@ -193,7 +192,7 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 8));
-                Program.offsetPlayerBoneMatrix = tmp;
+                CSGOOffsets.NetVars.C_CSPlayer.m_hBoneMatrix = tmp;
             }
         }
         static void PlayerWeaponHandle(MemUtils memUtils)
@@ -204,11 +203,10 @@ namespace CSGOTriggerbot
             if (scan.Success)
             {
                 int tmp = memUtils.Read<int>((IntPtr)(scan.Address.ToInt32() + 6));
-                Program.offsetPlayerWeaponHandle = tmp;
+                CSGOOffsets.NetVars.C_CSPlayer.m_hActiveWeapon = tmp;
             }
         }
         #endregion
-
     }
 
 }

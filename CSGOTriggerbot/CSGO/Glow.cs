@@ -15,12 +15,12 @@ namespace CSGOTriggerbot.CSGO
             {
                 case ClassID.CSPlayer:
                     {
-                        if (entity.m_iTeam == Program.localPlayer.m_iTeam)
-                            clr = Color.Blue;
-                        else if (entity.m_bSpotted && (entity.m_iTeam == 3 || entity.m_iTeam == 3))
-                            clr = Color.Green;
-                        else
-                            clr = Color.Red;
+                        //if (entity.m_iTeam == Program.localPlayer.m_iTeam)
+                        //    clr = Color.Blue;
+                        //else if (entity.m_bSpotted && (entity.m_iTeam == 3 || entity.m_iTeam == 3))
+                        //    clr = Color.Green;
+                        //else
+                        //    clr = Color.Red;
                         break;
                     }
                 case ClassID.AK47:
@@ -53,7 +53,6 @@ namespace CSGOTriggerbot.CSGO
                 case ClassID.WeaponTec9x:
                 case ClassID.WeaponUMP45:
                 case ClassID.WeaponXM1014:
-                case ClassID.Weapon:
                 case ClassID.WeaponNova:
                 case ClassID.WeaponM4:
                 case ClassID.WeaponUMP45x:
@@ -94,39 +93,6 @@ namespace CSGOTriggerbot.CSGO
                         clr = Color.DarkViolet;
                         break;
                     }
-                //case ClassID.DynamicProp:
-                //case ClassID.Inferno:
-                //case ClassID.BaseAnimating:
-                //case ClassID.BaseDoor:
-                //case ClassID.BaseEntity:
-                //case ClassID.BaseTrigger:
-                //case ClassID.CSGameRulesProxy:
-                //case ClassID.CSPlayerResource:
-                //case ClassID.CSRagdoll:
-                //case ClassID.CascadeLight:
-                //case ClassID.ColorCorrection:
-                //case ClassID.EnvDetailController:
-                //case ClassID.EnvTonemapController:
-                //case ClassID.EnvWind:
-                //case ClassID.FogController:
-                //case ClassID.FuncBrush:
-                //case ClassID.FuncOccluder:
-                //case ClassID.FuncRotating:
-                //case ClassID.Func_Dust:
-                //case ClassID.LightGlow:
-                //case ClassID.ParticleSystem:
-                //case ClassID.PhysicsProp:
-                //case ClassID.PhysicsPropMultiplayer:
-                //case ClassID.PostProcessController:
-                //case ClassID.PredictedViewModel:
-                //case ClassID.PropDoorRotating:
-                //case ClassID.RopeKeyframe:
-                //case ClassID.ShadowControl:
-                //case ClassID.Sprite:
-                //case ClassID.Sun:
-                //case ClassID.VGuiScreen:
-                //case ClassID.VoteController:
-                //case ClassID.Knife:
                 default:
                     break;
             }

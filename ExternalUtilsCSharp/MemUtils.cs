@@ -32,6 +32,8 @@ namespace ExternalUtilsCSharp
         /// https://github.com/Aevitas/bluerain/blob/master/src/BlueRain/ExternalProcessMemory.cs
         /// </summary>
         public bool UseUnsafeReadWrite { get; set; }
+        public long BytesRead { get; private set; }
+        public long BytesWritten { get; private set; }
         #endregion
         #region METHODS
         #region PRIMITIVE WRAPPERS
@@ -46,6 +48,7 @@ namespace ExternalUtilsCSharp
             IntPtr numBytes = IntPtr.Zero;
             data = new byte[length];
             bool result = WinAPI.ReadProcessMemory(Handle, address, data, length, out numBytes);
+            BytesRead += numBytes.ToInt32();
             if (!result)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
@@ -58,6 +61,7 @@ namespace ExternalUtilsCSharp
         {
             IntPtr numBytes = IntPtr.Zero;
             bool result = WinAPI.WriteProcessMemory(Handle, address, data, data.Length, out numBytes);
+            BytesWritten += numBytes.ToInt32();
             if (!result)
                 throw new Win32Exception(Marshal.GetLastWin32Error());
         }
@@ -89,7 +93,11 @@ namespace ExternalUtilsCSharp
         {
             byte[] data;
             Read(address, out data, length);
-            return encoding.GetString(data);
+            string text = encoding.GetString(data);
+            if (text.Contains("\0"))
+                text = text.Substring(0, text.IndexOf('\0'));
+            return text;
+            //return encoding.GetString(data);
         }
         /// <summary>
         /// Generic function to read data from memory using the given type
@@ -105,6 +113,25 @@ namespace ExternalUtilsCSharp
 
             Read(address, out data, size);
             return BytesToT<T>(data, defVal);
+        }
+        /// <summary>
+        /// Generic function to read an array of data from memory using the given type
+        /// </summary>
+        /// <typeparam name="T">The type of the value</typeparam>
+        /// <param name="address">The address to read data at</param>
+        /// <param name="length">The number of elements to read</param>
+        /// <returns></returns>
+        public T[] ReadArray<T>(IntPtr address, int length) where T: struct
+        {
+            byte[] data;
+            int size = Marshal.SizeOf(typeof(T));
+
+            Read(address, out data, size * length);
+            T[] result = new T[length];
+            for (int i = 0; i < length; i++)
+                result[i] = BytesToT<T>(data, i * size);
+
+            return result;
         }
         /// <summary>
         /// Generic function to read data from memory using the given type
@@ -224,6 +251,22 @@ namespace ExternalUtilsCSharp
                 gcHandle.Free();
             }
             return structure;
+        }
+        /// <summary>
+        /// Converts the given array of bytes to the specified type.
+        /// Uses either marshalling or unsafe code, depending on UseUnsafeReadWrite
+        /// </summary>
+        /// <typeparam name="T">The type of the value</typeparam>
+        /// <param name="data">Array of bytes</param>
+        /// <param name="index">Index of the data to convert</param>
+        /// <param name="defVal">The default value of this operation (which is returned in case the Read-operation fails)</param>
+        /// <returns></returns>
+        public unsafe T BytesToT<T>(byte[] data, int index, T defVal = default(T)) where T : struct
+        {
+            int size = Marshal.SizeOf(typeof(T));
+            byte[] tmp = new byte[size];
+            Array.Copy(data, index, tmp, 0, size);
+            return BytesToT<T>(tmp, defVal);
         }
         /// <summary>
         /// Converts the given struct to a byte-array

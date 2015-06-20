@@ -167,6 +167,17 @@ namespace ExternalUtilsCSharp
             return ret;
         }
         /// <summary>
+        /// Smooths an angle from src to dest
+        /// </summary>
+        /// <param name="src">Original angle</param>
+        /// <param name="dest">Destination angle</param>
+        /// <param name="smoothAmount">Value between 0 and 1 to apply as smooting where 0 is no modification and 1 is no smoothing</param>
+        /// <returns></returns>
+        public static Vector3 SmoothAngle(this Vector3 src, Vector3 dest, float smoothAmount)
+        {
+            return src + (dest - src) * smoothAmount;
+        }
+        /// <summary>
         /// Converts the given angle in degrees to radians
         /// </summary>
         /// <param name="deg">Angle in degrees</param>

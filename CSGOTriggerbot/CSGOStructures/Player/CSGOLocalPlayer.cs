@@ -55,7 +55,7 @@ namespace CSGOTriggerbot
                 return new CSGOWeapon() { m_iItemDefinitionIndex = 0, m_iWeaponID = 0 };
 
             uint handle = this.m_hActiveWeapon & 0xFFF;
-            int weapAddress = Program.entityAddresses[handle - 1];
+            int weapAddress = 0;// Program.entityAddresses[handle - 1];
             return memUtils.Read<CSGOWeapon>((IntPtr)weapAddress);
         }
     }

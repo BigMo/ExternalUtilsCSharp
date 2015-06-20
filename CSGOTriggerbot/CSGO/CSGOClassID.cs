@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSGOTriggerbot
+namespace CSGOTriggerbot.CSGO
 {
     public enum ClassID
     {
@@ -87,8 +87,6 @@ namespace CSGOTriggerbot
         WeaponNova = 218,
         WeaponMAG = 213,
         ParticleSmokeGrenade = 237,
-        Weapon = 0xBEEF,
-        Unknown = 0xDEAD,
         ParticleDecoy = 40,
         ParticleFlash = 9,
         ParticleIncendiaryGrenade = 93,
