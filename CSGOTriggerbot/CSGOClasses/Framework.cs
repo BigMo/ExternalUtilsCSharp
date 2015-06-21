@@ -30,6 +30,7 @@ namespace CSGOTriggerbot.CSGOClasses
         public Tuple<int, Weapon>[] Weapons { get; private set; }
         public Matrix ViewMatrix { get; private set; }
         public Vector3 ViewAngles { get; private set; }
+        public Vector3 NewViewAngles { get; private set; }
         public int[] Kills { get; private set; }
         public int[] Deaths { get; private set; }
         public int[] Assists { get; private set; }
@@ -51,6 +52,8 @@ namespace CSGOTriggerbot.CSGOClasses
                 }
             }
         }
+        public bool AimbotActive { get; set; }
+        public bool RCSHandled { get; set; }
         #endregion
 
         #region CONSTRUCTOR
@@ -63,6 +66,7 @@ namespace CSGOTriggerbot.CSGOClasses
             dwViewMatrix = clientDllBase + CSGOOffsets.Misc.ViewMatrix;
             dwClientState = WithOverlay.MemUtils.Read<int>((IntPtr)(engineDllBase + CSGOOffsets.ClientState.Base));
             mouseEnabled = true;
+            AimbotActive = false;
         }
         #endregion
 
@@ -73,7 +77,6 @@ namespace CSGOTriggerbot.CSGOClasses
             List<Tuple<int, BaseEntity>> entities = new List<Tuple<int, BaseEntity>>();
             List<Tuple<int, Weapon>> weapons = new List<Tuple<int, Weapon>>();
 
-
             dwLocalPlayer = WithOverlay.MemUtils.Read<int>((IntPtr)(clientDllBase + CSGOOffsets.Misc.LocalPlayer));
             dwIGameResources = WithOverlay.MemUtils.Read<int>((IntPtr)(clientDllBase + CSGOOffsets.GameResources.Base));
             
@@ -83,6 +86,8 @@ namespace CSGOTriggerbot.CSGOClasses
 
             ViewMatrix = WithOverlay.MemUtils.ReadMatrix((IntPtr)dwViewMatrix, 4, 4);
             ViewAngles = WithOverlay.MemUtils.Read<Vector3>((IntPtr)(dwClientState + CSGOOffsets.ClientState.SetViewAngles));
+            NewViewAngles = ViewAngles;
+            RCSHandled = false;
 
             #region Read entities
             byte[] data = new byte[16 * 8192];
@@ -150,12 +155,43 @@ namespace CSGOTriggerbot.CSGOClasses
             Players = players.ToArray();
             Entities = entities.ToArray();
             Weapons = weapons.ToArray();
+
+            #region Aimbot
+            if (WithOverlay.ConfigUtils.GetValue<bool>("aimEnabled"))
+            {
+                if (WithOverlay.ConfigUtils.GetValue<bool>("aimToggle"))
+                {
+                    if (WithOverlay.KeyUtils.KeyWentUp(WithOverlay.ConfigUtils.GetValue<WinAPI.VirtualKeyShort>("aimKey")))
+                        AimbotActive = !AimbotActive;
+                }
+                else if (WithOverlay.ConfigUtils.GetValue<bool>("aimHold"))
+                {
+                    AimbotActive = WithOverlay.KeyUtils.KeyIsDown(WithOverlay.ConfigUtils.GetValue<WinAPI.VirtualKeyShort>("aimKey"));
+                }
+                if (AimbotActive)
+                    DoAimbot();
+            }
+            #endregion
+
+            #region RCS
+            if (WithOverlay.ConfigUtils.GetValue<bool>("rcsEnabled"))
+            {
+                if (!RCSHandled && LocalPlayer.m_iShotsFired > 0)
+                {
+                    NewViewAngles -= LocalPlayer.m_vecPunch * (2f / 100f * WithOverlay.ConfigUtils.GetValue<float>("rcsForce"));
+                    RCSHandled = true;
+                }
+            }
+            #endregion
+
+            #region Set view angles
+            if (NewViewAngles != ViewAngles)
+                SetViewAngles(NewViewAngles);
+            #endregion
         }
 
-        public void SetViewAngles(Vector3 viewAngles, bool clamp = true, bool rcs = true)
+        public void SetViewAngles(Vector3 viewAngles, bool clamp = true)
         {
-            if (rcs && LocalPlayer.m_iShotsFired > 0)
-                viewAngles -= LocalPlayer.m_vecPunch * 2f;
             if (clamp)
                 viewAngles = MathUtils.ClampAngle(viewAngles);
             WithOverlay.MemUtils.Write<Vector3>((IntPtr)(dwClientState + CSGOOffsets.ClientState.SetViewAngles), viewAngles);
@@ -166,11 +202,20 @@ namespace CSGOTriggerbot.CSGOClasses
             return State == SignOnState.SIGNONSTATE_FULL;
         }
 
-        public void Aimbot()
+        public void DoAimbot()
         {
             if (LocalPlayer == null)
                 return;
-            var valid = Players.Where(x => x.Item2.IsValid() && x.Item2.m_iTeamNum != LocalPlayer.m_iTeamNum && x.Item2.m_iHealth != 0);// && x.Item2.SeenBy(LocalPlayer));
+            var valid = Players.Where(x => x.Item2.IsValid() && x.Item2.m_iHealth != 0);
+            if (WithOverlay.ConfigUtils.GetValue<bool>("aimFilterSpotted"))
+                valid = valid.Where(x => x.Item2.SeenBy(LocalPlayer));
+            if (WithOverlay.ConfigUtils.GetValue<bool>("aimFilterSpottedBy"))
+                valid = valid.Where(x => LocalPlayer.SeenBy(x.Item2));
+            if (WithOverlay.ConfigUtils.GetValue<bool>("aimFilterEnemies"))
+                valid = valid.Where(x => x.Item2.m_iTeamNum != LocalPlayer.m_iTeamNum);
+            if (WithOverlay.ConfigUtils.GetValue<bool>("aimFilterAllies"))
+                valid = valid.Where(x => x.Item2.m_iTeamNum == LocalPlayer.m_iTeamNum);
+
             valid = valid.OrderBy(x => (x.Item2.m_vecOrigin - LocalPlayer.m_vecOrigin).Length());
             Vector3 viewAngles = ViewAngles;
             Vector3 closest = Vector3.Zero;
@@ -191,11 +236,19 @@ namespace CSGOTriggerbot.CSGOClasses
             }
             if (closest != Vector3.Zero)
             {
+                if (WithOverlay.ConfigUtils.GetValue<bool>("rcsEnabled"))
+                {
+                    if (!RCSHandled && LocalPlayer.m_iShotsFired > 0)
+                    {
+                        closest -= LocalPlayer.m_vecPunch * (2f / 100f * WithOverlay.ConfigUtils.GetValue<float>("rcsForce"));
+                        RCSHandled = true;
+                    }
+                }
                 if (WithOverlay.ConfigUtils.GetValue<bool>("aimSmoothEnabled"))
                     viewAngles = MathUtils.SmoothAngle(viewAngles, viewAngles + closest, WithOverlay.ConfigUtils.GetValue<float>("aimSmoothValue"));
                 else
                     viewAngles += closest;
-                SetViewAngles(viewAngles);
+                NewViewAngles = viewAngles;
             }
         }
         #endregion

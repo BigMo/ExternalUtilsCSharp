@@ -39,6 +39,13 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             this.BackColor = new Color(0.9f, 0.9f, 0.9f, 1f);
             this.ContentLayout = LinearLayout.Instance;
             this.FontChangedEvent += SharpDXPanel_FontChangedEvent;
+            this.VisibleChangedEvent+=SharpDXPanel_VisibleChangedEvent;
+        }
+
+        void SharpDXPanel_VisibleChangedEvent(object sender, EventArgs e)
+        {
+            foreach (SharpDXControl control in this.ChildControls)
+                control.Visible = this.Visible;
         }
 
         void SharpDXPanel_FontChangedEvent(object sender, EventArgs e)
@@ -110,6 +117,13 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         public void InsertSpacer()
         {
             this.AddChildControl(new SharpDXSpacer());
+        }
+
+        public override void ApplySettings(ConfigUtils config)
+        {
+            base.ApplySettings(config);
+            foreach (SharpDXControl control in ChildControls)
+                control.ApplySettings(config);
         }
         #endregion
     }

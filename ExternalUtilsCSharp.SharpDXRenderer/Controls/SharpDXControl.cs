@@ -49,6 +49,9 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         {
             return new Vector2(this.Width, this.Height);
         }
+
+        public virtual void ApplySettings(ConfigUtils config)
+        { }
         #endregion
     }
 }

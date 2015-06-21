@@ -95,8 +95,8 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             Vector2 marginLocation = location - Vector2.UnitX * this.MarginLeft - Vector2.UnitY * this.MarginTop;
             Vector2 marginSize = size + Vector2.UnitX * this.MarginLeft + Vector2.UnitX * this.MarginRight + Vector2.UnitY * this.MarginTop + Vector2.UnitY * this.MarginBottom;
 
-            renderer.FillRectangle(this.BackColor, marginLocation, marginSize);
-            renderer.DrawRectangle(this.ForeColor, marginLocation, marginSize);
+            //renderer.FillRectangle(this.BackColor, marginLocation, marginSize);
+            //renderer.DrawRectangle(this.ForeColor, marginLocation, marginSize);
 
             string text = string.Format("{0} {1}", this.Text, Math.Round(this.value, this.NumberOfDecimals));
             Vector2 textSize = renderer.MeasureString(text, this.Font);
@@ -109,10 +109,10 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             trackbarLocation = location + Vector2.UnitY * (textSize.Y + MarginTop + TrackbarHeight / 2f) + Vector2.UnitX * TrackbarHeight / 2f;
             Vector2 trackbarSize = new Vector2(size.X - TrackbarHeight, 0);
             Vector2 trackbarMarkerLocation = new Vector2(trackbarLocation.X + trackbarSize.X * Percent, trackbarLocation.Y);
-            Vector2 trackbarMarkerSize = new Vector2(TrackbarHeight / 2f, TrackbarHeight);
+            Vector2 trackbarMarkerSize = new Vector2(TrackbarHeight / 4f, TrackbarHeight);
 
-            renderer.DrawLine(this.ForeColor, trackbarLocation, trackbarLocation + trackbarSize, TrackbarHeight / 2f + 2f);
-            renderer.DrawLine(this.BackColor, trackbarLocation, trackbarLocation + trackbarSize, TrackbarHeight / 2f);
+            renderer.DrawLine(this.ForeColor, trackbarLocation, trackbarLocation + trackbarSize, TrackbarHeight / 4f + 2f);
+            renderer.DrawLine(this.BackColor, trackbarLocation, trackbarLocation + trackbarSize, TrackbarHeight / 4f);
 
             renderer.FillRectangle(this.ForeColor, trackbarMarkerLocation - (trackbarMarkerSize + 2f) / 2f, trackbarMarkerSize + 2f);
             renderer.FillRectangle(this.BackColor, trackbarMarkerLocation - trackbarMarkerSize / 2f, trackbarMarkerSize);
@@ -120,6 +120,13 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             this.Height = textSize.Y + TrackbarHeight + MarginTop + MarginBottom;
 
             base.Draw(renderer);
+        }
+
+        public override void ApplySettings(ConfigUtils config)
+        {
+            if (this.Tag != null)
+                if (config.HasKey(this.Tag.ToString()))
+                    this.Value = config.GetValue<float>(this.Tag.ToString());
         }
         #endregion
     }

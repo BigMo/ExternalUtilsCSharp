@@ -1,4 +1,5 @@
-﻿using CSGOTriggerbot.CSGOClasses;
+﻿using CSGOTriggerbot.CSGO.Enums;
+using CSGOTriggerbot.CSGOClasses;
 using CSGOTriggerbot.UI;
 using ExternalUtilsCSharp;
 using ExternalUtilsCSharp.MathObjects;
@@ -12,13 +13,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace CSGOTriggerbot
 {
     public class WithOverlay
     {
         #region VARIABLES
-        private static KeyUtils keys;
+        public static KeyUtils KeyUtils;
         private static IntPtr hWnd;
         private static double seconds = 0;
         public static Framework Framework;
@@ -33,6 +35,7 @@ namespace CSGOTriggerbot
         private static SharpDXCursor cursor;
         //Menu-window
         private static SharpDXWindow windowMenu;
+        private static SharpDXLabel labelHotkeys;
         private static SharpDXLabel labelBoxESPCaption;
         private static SharpDXButton buttonESPToggle;
         private static SharpDXPanel panelESPContent;
@@ -46,17 +49,31 @@ namespace CSGOTriggerbot
         private static SharpDXButton buttonAimToggle;
         private static SharpDXPanel panelAimContent;
         private static SharpDXCheckBox checkBoxAimEnabled;
+        private static SharpDXCheckBox checkBoxAimFilterSpotted;
+        private static SharpDXCheckBox checkBoxAimFilterSpottedBy;
+        private static SharpDXCheckBox checkBoxAimFilterEnemies;
+        private static SharpDXCheckBox checkBoxAimFilterAllies;
         private static SharpDXRadioButton radioAimToggle;
         private static SharpDXRadioButton radioAimHold;
         private static SharpDXTrackbar trackBarAimFov;
         private static SharpDXCheckBox checkBoxAimSmoothEnaled;
         private static SharpDXTrackbar trackBarAimSmoothValue;
-        private static SharpDXCheckBox checkBoxAimBone;
+        private static SharpDXButtonKey keyAimKey;
+
+        private static SharpDXLabel labelBoxRCSCaption;
+        private static SharpDXButton buttonRCSToggle;
+        private static SharpDXPanel panelRCSContent;
+        private static SharpDXCheckBox checkBoxRCSEnabled;
+        private static SharpDXTrackbar trackBarRCSForce;
 
         //Performance-window
         private static SharpDXWindow windowGraphs;
         private static SharpDXGraph graphMemRead;
         private static SharpDXGraph graphMemWrite;
+
+        //Spectators-window
+        private static SharpDXWindow windowSpectators;
+        private static SharpDXLabel labelSpectators;
 
         //Others
         private static PlayerRadar ctrlRadar;
@@ -70,22 +87,30 @@ namespace CSGOTriggerbot
             System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
 
             PrintSuccess("[>]=-- Zat's CSGO-ESP");
-            keys = new KeyUtils();
+            KeyUtils = new KeyUtils();
             ConfigUtils = new CSGOConfigUtils();
 
             ConfigUtils.SetValue("espEnabled", true);
-            ConfigUtils.SetValue("espBox", true);
+            ConfigUtils.SetValue("espBox", false);
             ConfigUtils.SetValue("espSkeleton", true);
-            ConfigUtils.SetValue("espName", true);
+            ConfigUtils.SetValue("espName", false);
             ConfigUtils.SetValue("espHealth", true);
 
             ConfigUtils.SetValue("aimEnabled", true);
-            ConfigUtils.SetValue("aimToggle", true);
+            ConfigUtils.SetValue("aimKey", WinAPI.VirtualKeyShort.XBUTTON1);
+            ConfigUtils.SetValue("aimToggle", false);
             ConfigUtils.SetValue("aimHold", true);
-            ConfigUtils.SetValue("aimFov", 1f);
+            ConfigUtils.SetValue("aimFov", 30f);
             ConfigUtils.SetValue("aimSmoothEnabled", true);
-            ConfigUtils.SetValue("aimSmoothValue", 1f);
-            ConfigUtils.SetValue("aimBone", 10);
+            ConfigUtils.SetValue("aimSmoothValue", 0.2f);
+            ConfigUtils.SetValue("aimFilterSpotted", false);
+            ConfigUtils.SetValue("aimFilterSpottedBy", false);
+            ConfigUtils.SetValue("aimFilterEnemies", true);
+            ConfigUtils.SetValue("aimFilterAllies", false);
+
+            ConfigUtils.SetValue("rcsEnabled", true);
+            ConfigUtils.SetValue("rcsForce", 100f);
+
             ConfigUtils.ReadSettingsFromFile("euc_csgo.cfg");
 
             PrintInfo("> Waiting for CSGO to start up...");
@@ -115,7 +140,6 @@ namespace CSGOTriggerbot
             {
                 SHDXOverlay.Attach(hWnd);
                 SHDXOverlay.TickEvent += overlay_TickEvent;
-                SHDXOverlay.DrawOnlyWhenInForeground = false;
 
                 InitializeComponents();
                 SharpDXRenderer renderer = SHDXOverlay.Renderer;
@@ -127,7 +151,8 @@ namespace CSGOTriggerbot
                 windowMenu.Caption.Font = largeFont;
                 windowGraphs.Font = smallFont;
                 windowGraphs.Caption.Font = largeFont;
-
+                windowSpectators.Font = smallFont;
+                windowSpectators.Caption.Font = largeFont;
                 graphMemRead.Font = smallFont;
                 graphMemWrite.Font = smallFont;
                 for (int i = 0; i < ctrlPlayerESP.Length; i++)
@@ -137,9 +162,12 @@ namespace CSGOTriggerbot
                 }
                 ctrlRadar.Font = smallFont;
 
+                windowMenu.ApplySettings(ConfigUtils);
+
                 SHDXOverlay.ChildControls.Add(ctrlRadar);
                 SHDXOverlay.ChildControls.Add(windowMenu);
                 SHDXOverlay.ChildControls.Add(windowGraphs);
+                SHDXOverlay.ChildControls.Add(windowSpectators);
                 SHDXOverlay.ChildControls.Add(cursor);
                 PrintInfo("> Running overlay");
                 System.Windows.Forms.Application.Run(SHDXOverlay);
@@ -150,17 +178,16 @@ namespace CSGOTriggerbot
         private static void overlay_TickEvent(object sender, SharpDXOverlay.DeltaEventArgs e)
         {
             seconds += e.SecondsElapsed;
-            keys.Update();
+            KeyUtils.Update();
             Framework.Update();
-            if(keys.KeyIsDown(WinAPI.VirtualKeyShort.XBUTTON1))
-                Framework.Aimbot();
-            SHDXOverlay.UpdateControls(e.SecondsElapsed, keys);
-
-            if (keys.KeyWentUp(WinAPI.VirtualKeyShort.UP))
+            SHDXOverlay.UpdateControls(e.SecondsElapsed, KeyUtils);
+            if (KeyUtils.KeyWentUp(WinAPI.VirtualKeyShort.DELETE))
+                SHDXOverlay.Kill();
+            if (KeyUtils.KeyWentUp(WinAPI.VirtualKeyShort.UP))
                 ctrlRadar.Scaling -= 0.005f;
-            if (keys.KeyWentUp(WinAPI.VirtualKeyShort.DOWN))
+            if (KeyUtils.KeyWentUp(WinAPI.VirtualKeyShort.DOWN))
                 ctrlRadar.Scaling += 0.005f;
-            if (keys.KeyWentUp(WinAPI.VirtualKeyShort.INSERT))
+            if (KeyUtils.KeyWentUp(WinAPI.VirtualKeyShort.INSERT))
                 Framework.MouseEnabled = !Framework.MouseEnabled;
             cursor.Visible = !Framework.MouseEnabled;
             if (seconds >= 1)
@@ -182,6 +209,28 @@ namespace CSGOTriggerbot
                     ctrlPlayerESP[i].Visible = true;
                     ctrlPlayerESP[i].Player = Framework.Players[i].Item2;
                 }
+                if (Framework.LocalPlayer != null)
+                {
+                    var spectators = Framework.Players.Where(x => x.Item2.m_hObserverTarget == Framework.LocalPlayer.m_iID);
+                    StringBuilder builder = new StringBuilder();
+                    foreach (Tuple<int, CSPlayer> spec in spectators)
+                    {
+                        CSPlayer player = spec.Item2;
+                        builder.AppendFormat("{0} [{1}]{2}", Framework.Names[player.m_iID], (SpectatorView)player.m_iObserverMode, builder.Length > 0 ? "\n" : "");
+                    }
+                    if (builder.Length > 0)
+                        labelSpectators.Text = builder.ToString();
+                    else
+                        labelSpectators.Text = "<none>";
+                }
+                else
+                {
+                    labelSpectators.Text = "<none>";
+                }
+            }
+            else
+            {
+                labelSpectators.Text = "<none>";
             }
         }
 
@@ -193,6 +242,7 @@ namespace CSGOTriggerbot
 
             windowGraphs = new SharpDXWindow();
             windowGraphs.Caption.Text = "Performance";
+
             graphMemRead = new SharpDXGraph();
             graphMemRead.DynamicMaximum = true;
             graphMemRead.Width = 256;
@@ -204,11 +254,16 @@ namespace CSGOTriggerbot
             graphMemWrite.Height = 48;
             graphMemWrite.Text = "WPM data/s";
 
+            windowGraphs.Panel.AddChildControl(graphMemRead);
+            windowGraphs.Panel.AddChildControl(graphMemWrite);  
+
             windowMenu = new SharpDXWindow();
             windowMenu.Caption.Text = "[CSGO] Multihack";
             windowMenu.X = 500;
             windowMenu.Panel.DynamicWidth = false;
             windowMenu.Panel.Width = 200;
+
+            InitLabel(ref labelHotkeys, "[INS] Toggle mouse\n[DEL] Terminate hack", false, 150, SharpDXLabel.TextAlignment.Center);
 
             InitLabel(ref labelBoxESPCaption, "~~~ ESP ~~~", true, 150, SharpDXLabel.TextAlignment.Center);
             InitPanel(ref panelESPContent, false, true, true, true);
@@ -223,16 +278,31 @@ namespace CSGOTriggerbot
             InitPanel(ref panelAimContent, false, true, true, true);
             InitToggleButton(ref buttonAimToggle, "[Toggle aim-menu]", panelAimContent);
             InitCheckBox(ref checkBoxAimEnabled, "Enabled", "aimEnabled", true);
+            InitButtonKey(ref keyAimKey, "Key", "aimKey");
             InitTrackBar(ref trackBarAimFov, "Aimbot FOV", "aimFov", 1, 180, 20, 0);
             InitRadioButton(ref radioAimHold, "Mode: Hold key", "aimHold", true);
             InitRadioButton(ref radioAimToggle, "Mode: Toggle", "aimToggle", false);
             InitCheckBox(ref checkBoxAimSmoothEnaled, "Smoothing", "aimSmoothEnabled", true);
             InitTrackBar(ref trackBarAimSmoothValue, "Smooth-factor", "aimSmoothValue", 0, 1, 0.2f, 4);
+            InitCheckBox(ref checkBoxAimFilterSpotted, "Filter: Spotted by me", "aimFilterSpotted", false);
+            InitCheckBox(ref checkBoxAimFilterSpottedBy, "Filter: Spotted me", "aimFilterSpottedBy", false);
+            InitCheckBox(ref checkBoxAimFilterEnemies, "Filter: Enemies", "aimFilterEnemies", true);
+            InitCheckBox(ref checkBoxAimFilterAllies, "Filter: Allies", "aimFilterAllies", false);
 
+            InitLabel(ref labelBoxRCSCaption, "~~~ RCS ~~~", true, 150, SharpDXLabel.TextAlignment.Center);
+            InitPanel(ref panelRCSContent, false, true, true, true);
+            InitToggleButton(ref buttonRCSToggle, "[Toggle RCS-menu]", panelRCSContent);
+            InitCheckBox(ref checkBoxRCSEnabled, "Enabled", "rcsEnabled", true);
+            InitTrackBar(ref trackBarRCSForce, "Force (%)", "rcsForce", 1, 100, 100, 2);
+
+
+            windowMenu.Panel.AddChildControl(labelHotkeys);
             windowMenu.Panel.AddChildControl(buttonESPToggle);
             windowMenu.Panel.AddChildControl(panelESPContent);
             windowMenu.Panel.AddChildControl(buttonAimToggle);
             windowMenu.Panel.AddChildControl(panelAimContent);
+            windowMenu.Panel.AddChildControl(buttonRCSToggle);
+            windowMenu.Panel.AddChildControl(panelRCSContent);
 
             panelESPContent.AddChildControl(labelBoxESPCaption);
             panelESPContent.AddChildControl(checkBoxESPEnabled);
@@ -243,11 +313,26 @@ namespace CSGOTriggerbot
 
             panelAimContent.AddChildControl(labelBoxAimCaption);
             panelAimContent.AddChildControl(checkBoxAimEnabled);
+            panelAimContent.AddChildControl(keyAimKey);
             panelAimContent.AddChildControl(trackBarAimFov);
             panelAimContent.AddChildControl(radioAimHold);
             panelAimContent.AddChildControl(radioAimToggle);
             panelAimContent.AddChildControl(checkBoxAimSmoothEnaled);
             panelAimContent.AddChildControl(trackBarAimSmoothValue);
+            panelAimContent.AddChildControl(checkBoxAimFilterSpotted);
+            panelAimContent.AddChildControl(checkBoxAimFilterSpottedBy);
+            panelAimContent.AddChildControl(checkBoxAimFilterEnemies);
+            panelAimContent.AddChildControl(checkBoxAimFilterAllies);
+
+            panelRCSContent.AddChildControl(labelBoxRCSCaption);
+            panelRCSContent.AddChildControl(checkBoxRCSEnabled);
+            panelRCSContent.AddChildControl(trackBarRCSForce);
+
+            windowSpectators = new SharpDXWindow();
+            windowSpectators.Caption.Text = "Spectators";
+            windowSpectators.Y = 500;
+            InitLabel(ref labelSpectators, "<none>", false, 200f, SharpDXLabel.TextAlignment.Left);
+            windowSpectators.Panel.AddChildControl(labelSpectators);
 
             ctrlRadar = new PlayerRadar();
             ctrlRadar.Width = 128;
@@ -261,10 +346,7 @@ namespace CSGOTriggerbot
             {
                 ctrlPlayerESP[i] = new PlayerESP();
                 ctrlPlayerESP[i].Visible = false;
-            }
-
-            windowGraphs.Panel.AddChildControl(graphMemRead);
-            windowGraphs.Panel.AddChildControl(graphMemWrite);          
+            }      
         }
 
         static void checkBox_CheckedChanged(object sender, EventArgs e)
@@ -282,6 +364,11 @@ namespace CSGOTriggerbot
             SharpDXTrackbar control = (SharpDXTrackbar)sender;
             ConfigUtils.SetValue(control.Tag.ToString(), control.Value);
         }
+        static void buttonKey_KeyChangedEvent(object sender, EventArgs e)
+        {
+            SharpDXButtonKey control = (SharpDXButtonKey)sender;
+            ConfigUtils.SetValue(control.Tag.ToString(), control.Key);
+        }
         static void button_MouseClickEventUp(object sender, ExternalUtilsCSharp.UI.Control<SharpDXRenderer, SharpDX.Color, SharpDX.Vector2, TextFormat>.MouseEventArgs e)
         {
             if (!e.LeftButton)
@@ -292,6 +379,13 @@ namespace CSGOTriggerbot
         #endregion
 
         #region HELPERS
+        private static void InitButtonKey(ref SharpDXButtonKey control, string text, object tag)
+        {
+            control = new SharpDXButtonKey();
+            control.Text = text;
+            control.Tag = tag;
+            control.KeyChangedEvent += buttonKey_KeyChangedEvent;
+        }
         private static void InitPanel(ref SharpDXPanel control, bool dynamicWidth = true, bool dynamicHeight = true, bool fillParent = true, bool visible = true)
         {
             control = new SharpDXPanel();

@@ -15,7 +15,7 @@ namespace ExternalUtilsCSharp.UI
     public abstract class Control<TRenderer, TColor, TVector2, TFont> where TRenderer : Renderer<TColor, TVector2, TFont>
     {
         #region VARIABLES
-        private bool mouseOver;
+        private bool mouseOver, visible;
         private string text;
         private TFont font;
         #endregion
@@ -78,7 +78,18 @@ namespace ExternalUtilsCSharp.UI
         public float MarginBottom { get; set; }
         public float MarginLeft { get; set; }
         public float MarginRight { get; set; }
-        public bool Visible { get; set; }
+        public bool Visible
+        { 
+            get { return this.visible; }
+            set
+            {
+                if(this.visible != value)
+                {
+                    this.visible = value;
+                    OnVisibleChangedEvent(new EventArgs());
+                }
+            }
+        }
         public bool FillParent { get; set; }
         public TVector2 LastMousePos { get; private set; }
         public object Tag { get; set; }
@@ -101,6 +112,7 @@ namespace ExternalUtilsCSharp.UI
         public event EventHandler MouseLeftEvent;
         public event EventHandler TextChangedEvent;
         public event EventHandler FontChangedEvent;
+        public event EventHandler VisibleChangedEvent;
         public event EventHandler<MouseEventArgs> MouseMovedEvent;
         public event EventHandler<MouseEventArgs> MouseClickEventDown;
         public event EventHandler<MouseEventArgs> MouseClickEventUp;
@@ -108,6 +120,11 @@ namespace ExternalUtilsCSharp.UI
         {
             if (TextChangedEvent != null)
                 TextChangedEvent(this, e);
+        }
+        protected virtual void OnVisibleChangedEvent(EventArgs e)
+        {
+            if (VisibleChangedEvent != null)
+                VisibleChangedEvent(this, e);
         }
         protected virtual void OnFontChangedEvent(EventArgs e)
         {
@@ -194,6 +211,8 @@ namespace ExternalUtilsCSharp.UI
             {
                 if (result.Handled)
                     return;
+                if (!control.Visible)
+                    continue;
                 result.Depth++;
                 control.CheckMouseEvents(cursorPoint, keyUtils, ref result);
                 result.Depth--;
