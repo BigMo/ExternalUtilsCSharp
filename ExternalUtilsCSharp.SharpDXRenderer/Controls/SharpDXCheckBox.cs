@@ -54,6 +54,13 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
                 this.Font,
                 new Vector2(location.X + box.X + MarginLeft, location.Y));
         }
+
+        public override void ApplySettings(ConfigUtils config)
+        {
+            if (this.Tag != null)
+                if (config.HasKey(this.Tag.ToString()))
+                    this.Checked = config.GetValue<bool>(this.Tag.ToString());
+        }
         #endregion
     }
 }

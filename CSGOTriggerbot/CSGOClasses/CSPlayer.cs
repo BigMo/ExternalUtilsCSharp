@@ -31,6 +31,14 @@ namespace CSGOTriggerbot.CSGOClasses
         {
             get { return this.ReadFieldProxy<Vector3>("CSPlayer.m_vecVelocity"); }
         }
+        public int m_hObserverTarget
+        {
+            get { return this.ReadFieldProxy<int>("CSPlayer.m_hObserverTarget") & 0xFFF; }
+        }
+        public int m_iObserverMode
+        {
+            get { return this.ReadFieldProxy<int>("CSPlayer.m_iObserverMode"); }
+        }
         public uint m_iWeaponIndex
         {
             get
@@ -73,6 +81,8 @@ namespace CSGOTriggerbot.CSGOClasses
             this.AddField<int>("CSPlayer.m_hBoneMatrix", CSGOOffsets.NetVars.C_CSPlayer.m_hBoneMatrix);
             this.AddField<uint>("CSPlayer.m_hActiveWeapon", CSGOOffsets.NetVars.C_CSPlayer.m_hActiveWeapon);
             this.AddField<int>("CSPlayer.m_iFlags", CSGOOffsets.NetVars.C_CSPlayer.m_iFlags);
+            this.AddField<int>("CSPlayer.m_hObserverTarget", CSGOOffsets.NetVars.C_CSPlayer.m_hObserverTarget);
+            this.AddField<int>("CSPlayer.m_iObserverMode", CSGOOffsets.NetVars.C_CSPlayer.m_iObserverMode);
             this.AddField<Vector3>("CSPlayer.m_vecVelocity", CSGOOffsets.NetVars.C_CSPlayer.m_vecVelocity);
         }
         public override bool IsValid()

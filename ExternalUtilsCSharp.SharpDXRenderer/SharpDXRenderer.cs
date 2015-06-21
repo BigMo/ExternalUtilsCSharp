@@ -24,13 +24,23 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
         private FontFactory fontFactory;
         private Factory factory;
         private Hashtable fonts;
+        private bool disposing;
         #endregion
+
+        #region CONSTRUCTOR
+        public SharpDXRenderer() : base()
+        {
+            disposing = false;
+        }
+        #endregion
+
         #region DESTRUCTOR
         ~SharpDXRenderer()
         {
             this.Dispose();
         }
         #endregion
+
         #region METHODS
         /// <summary>
         /// Creates a new font
@@ -221,9 +231,12 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
             }
             catch
             {
-                device.Dispose();
-                device = new WindowRenderTarget(factory, new RenderTargetProperties(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied)), renderTargetProperties);
-                device.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Cleartype;
+                if (!disposing)
+                {
+                    device.Dispose();
+                    device = new WindowRenderTarget(factory, new RenderTargetProperties(new PixelFormat(Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Premultiplied)), renderTargetProperties);
+                    device.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Cleartype;
+                }
             }
         }
 
@@ -237,8 +250,11 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
 
         public override void Dispose()
         {
-            if (this.device != null)
+            if (this.device != null && !disposing)
+            {
+                disposing = true;
                 this.DestroyDevice();
+            }
         }
 
         public override Color GetRendererBackColor()

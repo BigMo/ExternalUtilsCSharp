@@ -15,7 +15,7 @@ namespace ExternalUtilsCSharp.UI
     public abstract class Control<TRenderer, TColor, TVector2, TFont> where TRenderer : Renderer<TColor, TVector2, TFont>
     {
         #region VARIABLES
-        private bool mouseOver;
+        private bool mouseOver, visible;
         private string text;
         private TFont font;
         #endregion
@@ -78,7 +78,18 @@ namespace ExternalUtilsCSharp.UI
         public float MarginBottom { get; set; }
         public float MarginLeft { get; set; }
         public float MarginRight { get; set; }
-        public bool Visible { get; set; }
+        public bool Visible
+        { 
+            get { return this.visible; }
+            set
+            {
+                if(this.visible != value)
+                {
+                    this.visible = value;
+                    OnVisibleChangedEvent(new EventArgs());
+                }
+            }
+        }
         public bool FillParent { get; set; }
         public TVector2 LastMousePos { get; private set; }
         public object Tag { get; set; }
@@ -101,6 +112,7 @@ namespace ExternalUtilsCSharp.UI
         public event EventHandler MouseLeftEvent;
         public event EventHandler TextChangedEvent;
         public event EventHandler FontChangedEvent;
+        public event EventHandler VisibleChangedEvent;
         public event EventHandler<MouseEventArgs> MouseMovedEvent;
         public event EventHandler<MouseEventArgs> MouseClickEventDown;
         public event EventHandler<MouseEventArgs> MouseClickEventUp;
@@ -108,6 +120,11 @@ namespace ExternalUtilsCSharp.UI
         {
             if (TextChangedEvent != null)
                 TextChangedEvent(this, e);
+        }
+        protected virtual void OnVisibleChangedEvent(EventArgs e)
+        {
+            if (VisibleChangedEvent != null)
+                VisibleChangedEvent(this, e);
         }
         protected virtual void OnFontChangedEvent(EventArgs e)
         {
@@ -169,18 +186,18 @@ namespace ExternalUtilsCSharp.UI
         /// </summary>
         /// <param name="secondsElapsed"></param>
         /// <param name="cursorPoint"></param>
-        public virtual void Update(double secondsElapsed, KeyUtils keyUtils, TVector2 cursorPoint)
+        public virtual void Update(double secondsElapsed, KeyUtils keyUtils, TVector2 cursorPoint, bool checkMouse = false)
         {
             #region MOUSE
-            if (Visible)
+            if (Visible && checkMouse)
             {
                 MouseEvent result = new MouseEvent() { Handled = false, Depth = 0 };
-                CheckMouseEvents(cursorPoint, keyUtils, result);
+                CheckMouseEvents(cursorPoint, keyUtils, ref result);
             }
             #endregion
             #region CHILDCONTROLS
             foreach (Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
-                control.Update(secondsElapsed, keyUtils, cursorPoint);
+                control.Update(secondsElapsed, keyUtils, cursorPoint, false);
             #endregion
         }
         /// <summary>
@@ -188,17 +205,19 @@ namespace ExternalUtilsCSharp.UI
         /// </summary>
         /// <param name="cursorPoint"></param>
         /// <param name="result"></param>
-        protected void CheckMouseEvents(TVector2 cursorPoint, KeyUtils keyUtils, MouseEvent result)
+        protected void CheckMouseEvents(TVector2 cursorPoint, KeyUtils keyUtils, ref MouseEvent result)
         {
             foreach(Control<TRenderer,TColor,TVector2,TFont> control in ChildControls)
             {
                 if (result.Handled)
                     return;
+                if (!control.Visible)
+                    continue;
                 result.Depth++;
-                control.CheckMouseEvents(cursorPoint, keyUtils, result);
+                control.CheckMouseEvents(cursorPoint, keyUtils, ref result);
                 result.Depth--;
             }
-            if (!result.Handled && result.Depth == 0)
+            if (!result.Handled)
             {
                 this.MouseOver = this.CheckMouseOver(cursorPoint);
                 if (this.MouseOver)
@@ -220,7 +239,13 @@ namespace ExternalUtilsCSharp.UI
 
                     if(!LastMousePos.Equals(cursorPoint))
                     {
-                        OnMouseMovedEvent(new MouseEventArgs() { Position = cursorPoint });
+                        OnMouseMovedEvent(new MouseEventArgs() 
+                        {
+                            Position = cursorPoint,
+                            LeftButton = keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.LBUTTON),
+                            RightButton = keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.RBUTTON),
+                            MiddleButton = keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.MBUTTON)
+                        });
                         LastMousePos = cursorPoint;
                     }
                 }

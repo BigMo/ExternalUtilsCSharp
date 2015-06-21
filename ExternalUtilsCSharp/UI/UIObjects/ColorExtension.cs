@@ -45,7 +45,7 @@ namespace ExternalUtilsCSharp.UI.UIObjects
         }
         public static int ToRGBA(this System.Drawing.Color clr)
         {
-            return (int)clr.A + ((int)clr.B << 8) + ((int)clr.G << 16) + ((int)clr.R << 24);
+            return (int)clr.R | ((int)clr.G << 8) | ((int)clr.B << 16) | ((int)clr.A << 24);
         }
     }
 }

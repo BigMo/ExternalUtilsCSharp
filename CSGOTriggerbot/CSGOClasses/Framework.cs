@@ -20,6 +20,7 @@ namespace CSGOTriggerbot.CSGOClasses
             clientDllBase, 
             engineDllBase,
             dwIGameResources;
+        private bool mouseEnabled;
         #endregion
         #region PROPERTIES
         public CSLocalPlayer LocalPlayer { get; private set; }
@@ -29,6 +30,7 @@ namespace CSGOTriggerbot.CSGOClasses
         public Tuple<int, Weapon>[] Weapons { get; private set; }
         public Matrix ViewMatrix { get; private set; }
         public Vector3 ViewAngles { get; private set; }
+        public Vector3 NewViewAngles { get; private set; }
         public int[] Kills { get; private set; }
         public int[] Deaths { get; private set; }
         public int[] Assists { get; private set; }
@@ -37,6 +39,21 @@ namespace CSGOTriggerbot.CSGOClasses
         public string[] Clantags { get; private set; }
         public string[] Names { get; private set; }
         public SignOnState State { get; set; }
+        public bool MouseEnabled
+        { 
+            get { return mouseEnabled; }
+            set
+            {
+                if(value != mouseEnabled)
+                {
+                    mouseEnabled = value;
+                    WinAPI.SetCursorPos(WithOverlay.SHDXOverlay.Location.X + WithOverlay.SHDXOverlay.Width / 2, WithOverlay.SHDXOverlay.Location.Y + WithOverlay.SHDXOverlay.Height / 2);
+                    WithOverlay.MemUtils.Write<byte>((IntPtr)(clientDllBase + CSGOOffsets.Misc.MouseEnable), value ? (byte)1 : (byte)0);
+                }
+            }
+        }
+        public bool AimbotActive { get; set; }
+        public bool RCSHandled { get; set; }
         #endregion
 
         #region CONSTRUCTOR
@@ -48,6 +65,8 @@ namespace CSGOTriggerbot.CSGOClasses
             dwEntityList = clientDllBase + CSGOOffsets.Misc.EntityList;
             dwViewMatrix = clientDllBase + CSGOOffsets.Misc.ViewMatrix;
             dwClientState = WithOverlay.MemUtils.Read<int>((IntPtr)(engineDllBase + CSGOOffsets.ClientState.Base));
+            mouseEnabled = true;
+            AimbotActive = false;
         }
         #endregion
 
@@ -58,7 +77,6 @@ namespace CSGOTriggerbot.CSGOClasses
             List<Tuple<int, BaseEntity>> entities = new List<Tuple<int, BaseEntity>>();
             List<Tuple<int, Weapon>> weapons = new List<Tuple<int, Weapon>>();
 
-
             dwLocalPlayer = WithOverlay.MemUtils.Read<int>((IntPtr)(clientDllBase + CSGOOffsets.Misc.LocalPlayer));
             dwIGameResources = WithOverlay.MemUtils.Read<int>((IntPtr)(clientDllBase + CSGOOffsets.GameResources.Base));
             
@@ -68,6 +86,8 @@ namespace CSGOTriggerbot.CSGOClasses
 
             ViewMatrix = WithOverlay.MemUtils.ReadMatrix((IntPtr)dwViewMatrix, 4, 4);
             ViewAngles = WithOverlay.MemUtils.Read<Vector3>((IntPtr)(dwClientState + CSGOOffsets.ClientState.SetViewAngles));
+            NewViewAngles = ViewAngles;
+            RCSHandled = false;
 
             #region Read entities
             byte[] data = new byte[16 * 8192];
@@ -135,12 +155,43 @@ namespace CSGOTriggerbot.CSGOClasses
             Players = players.ToArray();
             Entities = entities.ToArray();
             Weapons = weapons.ToArray();
+
+            #region Aimbot
+            if (WithOverlay.ConfigUtils.GetValue<bool>("aimEnabled"))
+            {
+                if (WithOverlay.ConfigUtils.GetValue<bool>("aimToggle"))
+                {
+                    if (WithOverlay.KeyUtils.KeyWentUp(WithOverlay.ConfigUtils.GetValue<WinAPI.VirtualKeyShort>("aimKey")))
+                        AimbotActive = !AimbotActive;
+                }
+                else if (WithOverlay.ConfigUtils.GetValue<bool>("aimHold"))
+                {
+                    AimbotActive = WithOverlay.KeyUtils.KeyIsDown(WithOverlay.ConfigUtils.GetValue<WinAPI.VirtualKeyShort>("aimKey"));
+                }
+                if (AimbotActive)
+                    DoAimbot();
+            }
+            #endregion
+
+            #region RCS
+            if (WithOverlay.ConfigUtils.GetValue<bool>("rcsEnabled"))
+            {
+                if (!RCSHandled && LocalPlayer.m_iShotsFired > 0)
+                {
+                    NewViewAngles -= LocalPlayer.m_vecPunch * (2f / 100f * WithOverlay.ConfigUtils.GetValue<float>("rcsForce"));
+                    RCSHandled = true;
+                }
+            }
+            #endregion
+
+            #region Set view angles
+            if (NewViewAngles != ViewAngles)
+                SetViewAngles(NewViewAngles);
+            #endregion
         }
 
-        public void SetViewAngles(Vector3 viewAngles, bool clamp = true, bool rcs = true)
+        public void SetViewAngles(Vector3 viewAngles, bool clamp = true)
         {
-            if (rcs && LocalPlayer.m_iShotsFired > 0)
-                viewAngles -= LocalPlayer.m_vecPunch * 2f;
             if (clamp)
                 viewAngles = MathUtils.ClampAngle(viewAngles);
             WithOverlay.MemUtils.Write<Vector3>((IntPtr)(dwClientState + CSGOOffsets.ClientState.SetViewAngles), viewAngles);
@@ -151,11 +202,20 @@ namespace CSGOTriggerbot.CSGOClasses
             return State == SignOnState.SIGNONSTATE_FULL;
         }
 
-        public void Aimbot()
+        public void DoAimbot()
         {
             if (LocalPlayer == null)
                 return;
-            var valid = Players.Where(x => x.Item2.IsValid() && x.Item2.m_iTeamNum != LocalPlayer.m_iTeamNum && x.Item2.m_iHealth != 0);// && x.Item2.SeenBy(LocalPlayer));
+            var valid = Players.Where(x => x.Item2.IsValid() && x.Item2.m_iHealth != 0);
+            if (WithOverlay.ConfigUtils.GetValue<bool>("aimFilterSpotted"))
+                valid = valid.Where(x => x.Item2.SeenBy(LocalPlayer));
+            if (WithOverlay.ConfigUtils.GetValue<bool>("aimFilterSpottedBy"))
+                valid = valid.Where(x => LocalPlayer.SeenBy(x.Item2));
+            if (WithOverlay.ConfigUtils.GetValue<bool>("aimFilterEnemies"))
+                valid = valid.Where(x => x.Item2.m_iTeamNum != LocalPlayer.m_iTeamNum);
+            if (WithOverlay.ConfigUtils.GetValue<bool>("aimFilterAllies"))
+                valid = valid.Where(x => x.Item2.m_iTeamNum == LocalPlayer.m_iTeamNum);
+
             valid = valid.OrderBy(x => (x.Item2.m_vecOrigin - LocalPlayer.m_vecOrigin).Length());
             Vector3 viewAngles = ViewAngles;
             Vector3 closest = Vector3.Zero;
@@ -163,12 +223,12 @@ namespace CSGOTriggerbot.CSGOClasses
             foreach(Tuple<int, CSPlayer> tpl in valid)
             {
                 CSPlayer plr = tpl.Item2;
-                // float tps = 1f / WithOverlay.SHDXOverlay.LogicUpdater.FrameRate;
+                //float tps = 1f / WithOverlay.SHDXOverlay.LogicUpdater.FrameRate;
                 //Vector3 newAngles = MathUtils.CalcAngle(LocalPlayer.m_vecOrigin + LocalPlayer.m_vecViewOffset + LocalPlayer.m_vecVelocity * tps, plr.Bones.Spine3 + plr.m_vecVelocity * tps) - viewAngles;
                 Vector3 newAngles = MathUtils.CalcAngle(LocalPlayer.m_vecOrigin + LocalPlayer.m_vecViewOffset, plr.Bones.Neck) - viewAngles;
                 newAngles = MathUtils.ClampAngle(newAngles);
                 float fov = newAngles.Length() % 360f;
-                if (fov < closestFov)// && fov < 90)
+                if (fov < closestFov && fov < WithOverlay.ConfigUtils.GetValue<float>("aimFov"))
                 {
                     closestFov = fov;
                     closest = newAngles;
@@ -176,9 +236,19 @@ namespace CSGOTriggerbot.CSGOClasses
             }
             if (closest != Vector3.Zero)
             {
-                //viewAngles = MathUtils.SmoothAngle(viewAngles, viewAngles + closest, 0.2f);
-                viewAngles += closest;
-                SetViewAngles(viewAngles);
+                if (WithOverlay.ConfigUtils.GetValue<bool>("rcsEnabled"))
+                {
+                    if (!RCSHandled && LocalPlayer.m_iShotsFired > 0)
+                    {
+                        closest -= LocalPlayer.m_vecPunch * (2f / 100f * WithOverlay.ConfigUtils.GetValue<float>("rcsForce"));
+                        RCSHandled = true;
+                    }
+                }
+                if (WithOverlay.ConfigUtils.GetValue<bool>("aimSmoothEnabled"))
+                    viewAngles = MathUtils.SmoothAngle(viewAngles, viewAngles + closest, WithOverlay.ConfigUtils.GetValue<float>("aimSmoothValue"));
+                else
+                    viewAngles += closest;
+                NewViewAngles = viewAngles;
             }
         }
         #endregion

@@ -58,9 +58,11 @@
     <Compile Include="Controls\Layouts\LinearLayout.cs" />
     <Compile Include="Controls\Layouts\NoneLayout.cs" />
     <Compile Include="Controls\SharpDXButton.cs" />
+    <Compile Include="Controls\SharpDXButtonKey.cs" />
     <Compile Include="Controls\SharpDXCheckable.cs" />
     <Compile Include="Controls\SharpDXCheckBox.cs" />
     <Compile Include="Controls\SharpDXControl.cs" />
+    <Compile Include="Controls\SharpDXCursor.cs" />
     <Compile Include="Controls\SharpDXLabel.cs" />
     <Compile Include="Controls\SharpDXGraph.cs" />
     <Compile Include="Controls\SharpDXPanel.cs" />
@@ -69,6 +71,7 @@
     <Compile Include="Controls\SharpDXRadioButton.cs" />
     <Compile Include="Controls\SharpDXSpacer.cs" />
     <Compile Include="ColorExtension.cs" />
+    <Compile Include="Controls\SharpDXTrackbar.cs" />
     <Compile Include="Controls\SharpDXWindow.cs" />
     <Compile Include="SharpDXConverter.cs" />
     <Compile Include="SharpDXOverlay.cs" />

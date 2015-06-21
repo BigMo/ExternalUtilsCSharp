@@ -25,11 +25,11 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             base.Draw(renderer);
         }
 
-        public override void Update(double secondsElapsed, KeyUtils keyUtils, SharpDX.Vector2 cursorPoint)
+        public override void Update(double secondsElapsed, KeyUtils keyUtils, SharpDX.Vector2 cursorPoint, bool checkMouse = false)
         {
             if (this.Parent != null)
                 this.Width = Parent.Width - this.MarginLeft - this.MarginRight - Parent.MarginLeft - Parent.MarginRight;
-            base.Update(secondsElapsed, keyUtils, cursorPoint);
+            base.Update(secondsElapsed, keyUtils, cursorPoint, checkMouse);
         }
     }
 }

@@ -38,17 +38,20 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
                 return this.Parent.GetAbsoluteLocation() + new Vector2(this.X, this.Y);
         }
 
-        public override void Update(double secondsElapsed, KeyUtils keyUtils, Vector2 cursorPoint)
+        public override void Update(double secondsElapsed, KeyUtils keyUtils, Vector2 cursorPoint, bool checkMouse = false)
         {
             if (this.FillParent && this.Parent != null)
                 this.Width = Parent.Width - Parent.MarginLeft - Parent.MarginRight - this.MarginLeft - this.MarginRight;
-            base.Update(secondsElapsed, keyUtils, cursorPoint);
+            base.Update(secondsElapsed, keyUtils, cursorPoint, checkMouse);
         }
 
         public override Vector2 GetSize()
         {
             return new Vector2(this.Width, this.Height);
         }
+
+        public virtual void ApplySettings(ConfigUtils config)
+        { }
         #endregion
     }
 }

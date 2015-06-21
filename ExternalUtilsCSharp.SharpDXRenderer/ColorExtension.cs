@@ -80,10 +80,10 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
             ColorDictionary.TryGetValue(name,out color);
             return color;
         }
-        public static System.Drawing.Color ToSystemDrawing(this Color color){
+        public static System.Drawing.Color ToSystemDrawingColor(this Color color){
             return System.Drawing.Color.FromArgb(color.A,color.R,color.G,color.B);;
         }        
-        public static Color FromSystemDrawing(this System.Drawing.Color color){
+        public static Color ToSharpDxColor(this System.Drawing.Color color){
             return Color.FromRgba(UI.UIObjects.ColorExtension.ToRGBA(color));;
         }
 

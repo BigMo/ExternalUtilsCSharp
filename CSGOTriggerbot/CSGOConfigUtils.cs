@@ -42,29 +42,52 @@ namespace CSGOTriggerbot
         {
             switch (name)
             {
-                case "triggerbotKey":
-                    this.SetValue("triggerbotKey", ParseEnum<WinAPI.VirtualKeyShort>(value));
-                    break;
-                case "bunnyhopEnabled":
-                    this.SetValue("bunnyhopEnabled", Convert.ToBoolean(value));
-                    break;
+                case "espEnabled":
+                case "espBox":
+                case "espSkeleton":
+                case "espName":
+                case "espHealth":
+                case "aimEnabled":
+                case "aimToggle":
+                case "aimHold":
+                case "aimSmoothEnabled":
+                case "aimFilterSpotted":
+                case "aimFilterSpottedBy":
+                case "aimFilterEnemies":
+                case "aimFilterAllies":
                 case "rcsEnabled":
-                    this.SetValue("rcsEnabled", Convert.ToBoolean(value));
+                    this.SetValue(name, Convert.ToBoolean(value));
                     break;
-                case "rcsFullCompensation":
-                    this.SetValue("rcsFullCompensation", Convert.ToBoolean(value));
+                case "aimFov":
+                case "aimSmoothValue":
+                case "rcsForce":
+                    this.SetValue(name, Convert.ToSingle(value));
                     break;
-                case "aimlockEnabled":
-                    this.SetValue("aimlockEnabled", Convert.ToBoolean(value));
-                    break;
-                case "glowEnabled":
-                    this.SetValue("glowEnabled", Convert.ToBoolean(value));
+                case "aimKey":
+                    this.SetValue(name, ParseEnum<WinAPI.VirtualKeyShort>(value));
                     break;
                 default:
                     Console.WriteLine("Unknown settings-field \"{0}\" (value: \"{1}\")", name, value);
                     break;
             }
         }
+        /*ConfigUtils.SetValue("espEnabled", true);
+            ConfigUtils.SetValue("espBox", false);
+            ConfigUtils.SetValue("espSkeleton", true);
+            ConfigUtils.SetValue("espName", false);
+            ConfigUtils.SetValue("espHealth", true);
+
+            ConfigUtils.SetValue("aimEnabled", true);
+            ConfigUtils.SetValue("aimKey", WinAPI.VirtualKeyShort.XBUTTON1);
+            ConfigUtils.SetValue("aimToggle", false);
+            ConfigUtils.SetValue("aimHold", true);
+            ConfigUtils.SetValue("aimFov", 30f);
+            ConfigUtils.SetValue("aimSmoothEnabled", true);
+            ConfigUtils.SetValue("aimSmoothValue", 0.2f);
+            ConfigUtils.SetValue("aimFilterSpotted", false);
+            ConfigUtils.SetValue("aimFilterSpottedBy", false);
+            ConfigUtils.SetValue("aimFilterEnemies", true);
+            ConfigUtils.SetValue("aimFilterAllies", false);*/
 
         public override byte[] SaveSettings()
         {
