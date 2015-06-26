@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
 {
@@ -30,7 +31,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             return false;
         }
 
-        public override void Update(double secondsElapsed, KeyUtils keyUtils, Vector2 cursorPoint, bool checkMouse = false)
+        public override void Update(double secondsElapsed, InputUtilities keyUtils, Vector2 cursorPoint, bool checkMouse = false)
         {
             this.LastCursorPoint = cursorPoint;
             base.Update(secondsElapsed, keyUtils, cursorPoint, checkMouse);

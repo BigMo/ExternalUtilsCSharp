@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using ExternalUtilsCSharp.InputUtils;
 using ExternalUtilsCSharp.UI;
 using SharpDX;
 using SharpDX.DirectWrite;
@@ -17,7 +19,7 @@ namespace ClickerHeroes
     class WithOverlay
     {
         private static ProcUtils proc;
-        private static KeyUtils keys;
+        private static InputUtilities keys;
         private static Vector2 lastClickerPos;
 
         private static SharpDXOverlay overlay;
@@ -56,7 +58,7 @@ namespace ClickerHeroes
             InitializeComponent();
 
             proc = new ProcUtils("Clicker Heroes", WinAPI.ProcessAccessFlags.QueryLimitedInformation);
-            keys = new KeyUtils();
+            keys = new InputUtilities();
             lastClickerPos = new Vector2();
             using (overlay = new SharpDXOverlay())
             {
@@ -207,9 +209,9 @@ namespace ClickerHeroes
                 e.Overlay.Renderer.FillEllipse(Color.Red, lastClickerPos, new Vector2(16), true);
             }
         }
-        private static void btnToggleMenu_MouseClickEventUp(object sender, SharpDXControl.MouseEventArgs e)
+        private static void btnToggleMenu_MouseClickEventUp(object sender, MouseEventExtArgs e)
         {
-            if (e.LeftButton)
+            if (e.Button == MouseButtons.Left)
                 wndWindow.Visible = !wndWindow.Visible;
         }
         private static void overlay_TickEvent(object sender, SharpDXOverlay.DeltaEventArgs e)
@@ -220,7 +222,7 @@ namespace ClickerHeroes
             segments.Width = overlay.Width;
             segments.Height = overlay.Height;
 
-            if (keys.KeyIsDown(WinAPI.VirtualKeyShort.INSERT))
+            if (keys.keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.INSERT))
                 e.Overlay.Close();
 
             #region AutoClicker

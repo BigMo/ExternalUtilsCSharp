@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace ExternalUtilsCSharp.UI
 {
@@ -211,7 +212,7 @@ namespace ExternalUtilsCSharp.UI
         /// </summary>
         /// <param name="secondsElapsed"></param>
         /// <param name="keys"></param>
-        public abstract void UpdateControls(double secondsElapsed, KeyUtils keys);
+        public abstract void UpdateControls(double secondsElapsed, InputUtilities keys);
         public virtual void Kill()
         {
             updDraw.StopUpdater();

@@ -9,13 +9,15 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace SteamMonsterGame
 {
     class WithOverlay
     {
         private static ProcUtils proc;
-        private static KeyUtils keys;
+        private static InputUtilities keys;
         private static Vector2 lastClickerPos;
         private static IntPtr hWnd;
 
@@ -63,7 +65,7 @@ namespace SteamMonsterGame
             while (hWnd == IntPtr.Zero);
 
             Console.WriteLine("> Initializing utils");
-            keys = new KeyUtils();
+            keys = new InputUtilities();
             lastClickerPos = new Vector2();
 
             Console.WriteLine("> Initializing overlay");
@@ -217,9 +219,9 @@ namespace SteamMonsterGame
                 e.Overlay.Renderer.FillEllipse(Color.Red, lastClickerPos, new Vector2(16), true);
             }
         }
-        private static void btnToggleMenu_MouseClickEventUp(object sender, SharpDXControl.MouseEventArgs e)
+        private static void btnToggleMenu_MouseClickEventUp(object sender, MouseEventExtArgs e)
         {
-            if (e.LeftButton)
+            if (e.Button== MouseButtons.Left)
                 wndWindow.Visible = !wndWindow.Visible;
         }
         private static void overlay_TickEvent(object sender, SharpDXOverlay.DeltaEventArgs e)
@@ -227,14 +229,14 @@ namespace SteamMonsterGame
             keys.Update();
             pnlPanel.Y = overlay.Location.Y + overlay.Height / 2f - pnlPanel.Height;
 
-            if (keys.KeyWentUp(WinAPI.VirtualKeyShort.INSERT))
+            if (keys.keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.INSERT))
                 chbAutoClicker.Checked = !chbAutoClicker.Checked;
-            if (keys.KeyWentUp(WinAPI.VirtualKeyShort.DELETE))
+            if (keys.keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.DELETE))
                 chbMoveMouse.Checked = !chbMoveMouse.Checked;
 
             overlay.UpdateControls(e.SecondsElapsed, keys);
 
-            if (keys.KeyIsDown(WinAPI.VirtualKeyShort.END))
+            if (keys.keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.END))
                 e.Overlay.Close();
 
             #region AutoClicker

@@ -8,12 +8,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace CSGOTriggerbot.UI
 {
     public class PlayerRadar : SharpDXRadar
     {
-        public override void Update(double secondsElapsed, ExternalUtilsCSharp.KeyUtils keyUtils, SharpDX.Vector2 cursorPoint, bool checkMouse = false)
+        public override void Update(double secondsElapsed, InputUtilities keyUtils, SharpDX.Vector2 cursorPoint, bool checkMouse = false)
         {
             base.Update(secondsElapsed, keyUtils, cursorPoint, checkMouse);
             Framework fw = WithOverlay.Framework;

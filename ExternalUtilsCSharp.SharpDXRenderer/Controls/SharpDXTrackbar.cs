@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
 {
@@ -64,15 +66,15 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             this.MouseMovedEvent += SharpDXTrackbar_MouseMovedEvent;
         }
 
-        void SharpDXTrackbar_MouseMovedEvent(object sender, UI.Control<SharpDXRenderer, Color, Vector2, SharpDX.DirectWrite.TextFormat>.MouseEventArgs e)
+        void SharpDXTrackbar_MouseMovedEvent(object sender, MouseEventExtArgs e)
         {
-            if (!e.LeftButton)
+            if (e.Button != MouseButtons.Left)
                 return;
 
             Vector2 size = this.GetSize();
 
             Vector2 trackbarSize = new Vector2(size.X - TrackbarHeight, 0);
-            Vector2 cursorPos = e.Position - trackbarLocation;
+            Vector2 cursorPos = new Vector2(e.Location.X - trackbarLocation.X,e.Location.Y - trackbarLocation.Y);
 
             if (cursorPos.X >= 0 && cursorPos.X <= trackbarSize.X)
             {

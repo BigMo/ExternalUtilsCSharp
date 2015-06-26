@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
 {
@@ -69,11 +71,11 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             base.Draw(renderer);
         }
 
-        void SharpDXWindow_MouseMovedEvent(object sender, UI.Control<SharpDXRenderer, SharpDX.Color, SharpDX.Vector2, SharpDX.DirectWrite.TextFormat>.MouseEventArgs e)
+        void SharpDXWindow_MouseMovedEvent(object sender, MouseEventExtArgs e)
         {
             if (mouseDown)
             {
-                Vector2 offset = e.Position - this.LastMousePos;
+                Vector2 offset = new Vector2(e.Location.X - this.LastMousePos.X, e.Location.Y - this.LastMousePos.Y);
                 this.X += offset.X;
                 this.Y += offset.Y;
             }
@@ -84,19 +86,19 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             mouseDown = false;
         }
 
-        void SharpDXWindow_MouseClickEventDown(object sender, UI.Control<SharpDXRenderer, SharpDX.Color, SharpDX.Vector2, SharpDX.DirectWrite.TextFormat>.MouseEventArgs e)
+        void SharpDXWindow_MouseClickEventDown(object sender, MouseEventExtArgs e)
         {
-            if (e.LeftButton)
+            if (e.Button == MouseButtons.Left)
                 mouseDown = true;
         }
 
-        void SharpDXWindow_MouseClickEventUp(object sender, UI.Control<SharpDXRenderer, SharpDX.Color, SharpDX.Vector2, SharpDX.DirectWrite.TextFormat>.MouseEventArgs e)
+        void SharpDXWindow_MouseClickEventUp(object sender, MouseEventExtArgs e)
         {
-            if (e.LeftButton)
+            if (e.Button == MouseButtons.Left)
                 mouseDown = false;
         }
 
-        public override void Update(double secondsElapsed, KeyUtils keyUtils, Vector2 cursorPoint, bool checkMouse = false)
+        public override void Update(double secondsElapsed, InputUtilities keyUtils, Vector2 cursorPoint, bool checkMouse = false)
         {
             base.Update(secondsElapsed, keyUtils, cursorPoint, checkMouse);
         }

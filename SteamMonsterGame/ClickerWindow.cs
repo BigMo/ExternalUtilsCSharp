@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace SteamMonsterGame
 {
@@ -19,15 +21,15 @@ namespace SteamMonsterGame
             this.MouseClickEventDown += ClickerWindow_MouseClickEventDown;
         }
 
-        void ClickerWindow_MouseClickEventDown(object sender, ExternalUtilsCSharp.UI.Control<ExternalUtilsCSharp.SharpDXRenderer.SharpDXRenderer, Color, Vector2, SharpDX.DirectWrite.TextFormat>.MouseEventArgs e)
+        void ClickerWindow_MouseClickEventDown(object sender, MouseEventExtArgs e)
         {
-            if (e.LeftButton)
+            if (e.Button == MouseButtons.Left)
                 mouseDrag = true;
         }
 
-        void ClickerWindow_MouseClickEventUp(object sender, ExternalUtilsCSharp.UI.Control<ExternalUtilsCSharp.SharpDXRenderer.SharpDXRenderer, Color, Vector2, SharpDX.DirectWrite.TextFormat>.MouseEventArgs e)
+        void ClickerWindow_MouseClickEventUp(object sender, MouseEventExtArgs e)
         {
-            if (e.LeftButton)
+            if (e.Button == MouseButtons.Left)
                 mouseDrag = false;
         }
 
@@ -36,26 +38,26 @@ namespace SteamMonsterGame
             mouseDrag = false;
         }
 
-        void ClickerWindow_MouseMovedEvent(object sender, ExternalUtilsCSharp.UI.Control<ExternalUtilsCSharp.SharpDXRenderer.SharpDXRenderer, Color, Vector2, SharpDX.DirectWrite.TextFormat>.MouseEventArgs e)
+        void ClickerWindow_MouseMovedEvent(object sender, MouseEventExtArgs e)
         {
             Vector2 location = this.GetAbsoluteLocation();
-            Vector2 localMousePos = e.Position - location;
+            Vector2 localMousePos = new Vector2(e.Location.X - location.X,e.Location.Y-location.Y);
             Vector2 localLastMousePos = LastMousePos - location;
             if (mouseDrag)
             {
 
                 if (localLastMousePos.X > this.Width - 8)
                 {
-                    this.Width += e.Position.X - LastMousePos.X;
+                    this.Width += e.Location.X - LastMousePos.X;
                 }
                 if (localLastMousePos.Y > this.Height - 8)
                 {
-                    this.Height += e.Position.Y - LastMousePos.Y;
+                    this.Height += e.Location.Y - LastMousePos.Y;
                 }
                 else
                 {
-                    this.X += e.Position.X - LastMousePos.X;
-                    this.Y += e.Position.Y - LastMousePos.Y;
+                    this.X += e.Location.X - LastMousePos.X;
+                    this.Y += e.Location.Y - LastMousePos.Y;
                 }
             }
         }

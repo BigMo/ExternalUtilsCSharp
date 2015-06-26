@@ -14,13 +14,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace CSGOTriggerbot
 {
     public class WithOverlay
     {
         #region VARIABLES
-        public static KeyUtils KeyUtils;
+        public static InputUtilities KeyUtils;
         private static IntPtr hWnd;
         private static double seconds = 0;
         public static Framework Framework;
@@ -87,7 +88,7 @@ namespace CSGOTriggerbot
             System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
 
             PrintSuccess("[>]=-- Zat's CSGO-ESP");
-            KeyUtils = new KeyUtils();
+            KeyUtils = new InputUtilities();
             ConfigUtils = new CSGOConfigUtils();
 
             ConfigUtils.SetValue("espEnabled", true);
@@ -181,13 +182,13 @@ namespace CSGOTriggerbot
             KeyUtils.Update();
             Framework.Update();
             SHDXOverlay.UpdateControls(e.SecondsElapsed, KeyUtils);
-            if (KeyUtils.KeyWentUp(WinAPI.VirtualKeyShort.DELETE))
+            if (KeyUtils.keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.DELETE))
                 SHDXOverlay.Kill();
-            if (KeyUtils.KeyWentUp(WinAPI.VirtualKeyShort.UP))
+            if (KeyUtils.keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.UP))
                 ctrlRadar.Scaling -= 0.005f;
-            if (KeyUtils.KeyWentUp(WinAPI.VirtualKeyShort.DOWN))
+            if (KeyUtils.keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.DOWN))
                 ctrlRadar.Scaling += 0.005f;
-            if (KeyUtils.KeyWentUp(WinAPI.VirtualKeyShort.INSERT))
+            if (KeyUtils.keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.INSERT))
                 Framework.MouseEnabled = !Framework.MouseEnabled;
             cursor.Visible = !Framework.MouseEnabled;
             if (seconds >= 1)
@@ -369,9 +370,9 @@ namespace CSGOTriggerbot
             SharpDXButtonKey control = (SharpDXButtonKey)sender;
             ConfigUtils.SetValue(control.Tag.ToString(), control.Key);
         }
-        static void button_MouseClickEventUp(object sender, ExternalUtilsCSharp.UI.Control<SharpDXRenderer, SharpDX.Color, SharpDX.Vector2, TextFormat>.MouseEventArgs e)
+        static void button_MouseClickEventUp(object sender, MouseEventExtArgs e)
         {
-            if (!e.LeftButton)
+            if (e.Button != MouseButtons.Left)
                 return;
             SharpDXPanel panel = (SharpDXPanel)((SharpDXButton)sender).Tag;
             panel.Visible = !panel.Visible;

@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CSGOTriggerbot.CSGO.Enums;
 
 namespace CSGOTriggerbot.CSGOClasses
 {
@@ -161,12 +162,12 @@ namespace CSGOTriggerbot.CSGOClasses
             {
                 if (WithOverlay.ConfigUtils.GetValue<bool>("aimToggle"))
                 {
-                    if (WithOverlay.KeyUtils.KeyWentUp(WithOverlay.ConfigUtils.GetValue<WinAPI.VirtualKeyShort>("aimKey")))
+                    if (WithOverlay.KeyUtils.keyUtils.KeyWentUp(WithOverlay.ConfigUtils.GetValue<WinAPI.VirtualKeyShort>("aimKey")))
                         AimbotActive = !AimbotActive;
                 }
                 else if (WithOverlay.ConfigUtils.GetValue<bool>("aimHold"))
                 {
-                    AimbotActive = WithOverlay.KeyUtils.KeyIsDown(WithOverlay.ConfigUtils.GetValue<WinAPI.VirtualKeyShort>("aimKey"));
+                    AimbotActive = WithOverlay.KeyUtils.keyUtils.KeyIsDown(WithOverlay.ConfigUtils.GetValue<WinAPI.VirtualKeyShort>("aimKey"));
                 }
                 if (AimbotActive)
                     DoAimbot();

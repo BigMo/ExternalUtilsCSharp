@@ -57,6 +57,7 @@
     <Compile Include="Controls\Layouts\Layout.cs" />
     <Compile Include="Controls\Layouts\LinearLayout.cs" />
     <Compile Include="Controls\Layouts\NoneLayout.cs" />
+    <Compile Include="Controls\SharpDXButtonNumeric.cs" />
     <Compile Include="Controls\SharpDXButton.cs" />
     <Compile Include="Controls\SharpDXButtonKey.cs" />
     <Compile Include="Controls\SharpDXCheckable.cs" />
@@ -74,7 +75,9 @@
     <Compile Include="Controls\SharpDXTrackbar.cs" />
     <Compile Include="Controls\SharpDXWindow.cs" />
     <Compile Include="SharpDXConverter.cs" />
-    <Compile Include="SharpDXOverlay.cs" />
+    <Compile Include="SharpDXOverlay.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="SharpDXRenderer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
