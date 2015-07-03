@@ -46,7 +46,6 @@
     <Compile Include="InputUtils\InputUtils.cs" />
     <Compile Include="InputUtils\KeyUtils.cs" />
     <Compile Include="InputUtils\MouseHook.cs" />
-    <Compile Include="InputUtils\WindowsHookFunctions.cs" />
     <Compile Include="MathUtils.cs" />
     <Compile Include="MathObjects\Matrix.cs" />
     <Compile Include="MemObjects\PE\COFFHeader.cs" />

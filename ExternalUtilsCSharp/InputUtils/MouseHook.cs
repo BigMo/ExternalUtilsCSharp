@@ -13,16 +13,17 @@ using ExternalUtilsCSharp.MathObjects;
 namespace ExternalUtilsCSharp.InputUtils
 {
     public class MouseHook{
+
         public bool MouseChanged { get; private set; }
         WinAPI.HookProc MouseHookProcedure;
         static IntPtr hMouseHook = IntPtr.Zero; // mouse hook handle
 
         // The following is the definition of these two low-level hook Winuser.h: 
+        private const int WH_MOUSE_LL = 14; 
+
         /// <summary> 
         /// Windows NT/2000/XP: Installs a hook procedure that monitors low-level mouse input events. 
         /// </summary> 
-        private const int WH_MOUSE_LL = 14; 
-
         public void InstallHook()
         {
             try
@@ -35,6 +36,9 @@ namespace ExternalUtilsCSharp.InputUtils
             }
             hMouseHook = WinAPI.SetWindowsHookEx(WH_MOUSE_LL, MouseHookProcedure, WinAPI.GetModuleHandle("user32"), 0);
         }
+        /// <summary> 
+        /// Windows NT/2000/XP: Uninstalls a hook procedure that monitors low-level mouse input events. 
+        /// </summary> 
         public void UnInstallHook()
         {
             MouseEvent = null;
@@ -72,13 +76,13 @@ namespace ExternalUtilsCSharp.InputUtils
                 //Marshall the data from callback.
                 WinAPI.MouseLLHookStruct mouseHookStruct = (WinAPI.MouseLLHookStruct)Marshal.PtrToStructure(lParam, typeof(WinAPI.MouseLLHookStruct));
 
-                //detect button clicked
                 MouseButtons button = MouseButtons.None;
                 short mouseDelta = 0;
                 int clickCount = 0;
                 MouseEventExtArgs.UpDown upDown= MouseEventExtArgs.UpDown.None;
                 bool mouseUp = false;
 
+                //detect button clicked
                 switch ((WinAPI.WindowMessage)wParam)
                 {
                     case WinAPI.WindowMessage.WM_LBUTTONDOWN:
@@ -144,15 +148,23 @@ namespace ExternalUtilsCSharp.InputUtils
             //call next hook
             return WinAPI.CallNextHookEx(hMouseHook, nCode, wParam, lParam);
         }
-        public MouseEventExtArgs LastMouseArgs;
         public MouseEventExtArgs CurrentMouseArgs = new MouseEventExtArgs();
+
         protected virtual void OnMouseChangedEvent(object sender, MouseEventExtArgs e)
         {
             if (MouseEvent != null)
                 MouseEvent(sender, e);
         }
+
+        /// <summary>
+        /// Event can be bound to track changes
+        /// </summary>
         public event EventHandler<MouseEventExtArgs> MouseEvent;
 
+        /// <summary>
+        /// Checking if mouse changed since last update call
+        /// </summary>
+        /// <returns>If mouse changed</returns>
         public bool Update()
         {
             if (CurrentMouseArgs != null && MouseChanged)
@@ -179,8 +191,20 @@ namespace ExternalUtilsCSharp.InputUtils
         {
         }
 
+        /// <summary>
+        /// Used by UI to save cursor position on current form
+        /// </summary>
         public object PosOnForm;
+
+        /// <summary>
+        /// If mouse wheel moved
+        /// </summary>
         public bool Wheel;
+
+        /// <summary>
+        /// Used to check if button is released or pressed
+        /// If Wheel equals true then shows which way wheel is being turned
+        /// </summary>
         public UpDown UpOrDown = UpDown.None;
         public enum UpDown
         {

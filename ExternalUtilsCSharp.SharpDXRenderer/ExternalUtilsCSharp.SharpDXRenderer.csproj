@@ -57,7 +57,6 @@
     <Compile Include="Controls\Layouts\Layout.cs" />
     <Compile Include="Controls\Layouts\LinearLayout.cs" />
     <Compile Include="Controls\Layouts\NoneLayout.cs" />
-    <Compile Include="Controls\SharpDXButtonNumeric.cs" />
     <Compile Include="Controls\SharpDXButton.cs" />
     <Compile Include="Controls\SharpDXButtonKey.cs" />
     <Compile Include="Controls\SharpDXCheckable.cs" />

@@ -208,7 +208,7 @@ namespace ExternalUtilsCSharp.UI
         /// <param name="result"></param>
         protected void CheckMouseEvents(TVector2 cursorPoint, InputUtilities inputUtils, ref MouseEvent result)
         {
-            inputUtils.mouse.CurrentMouseArgs.PosOnForm = cursorPoint;
+            inputUtils.Mouse.CurrentMouseArgs.PosOnForm = cursorPoint;
             foreach(Control<TRenderer,TColor,TVector2,TFont> control in ChildControls)
             {
                 if (result.Handled)
@@ -225,26 +225,26 @@ namespace ExternalUtilsCSharp.UI
                 if (this.MouseOver)
                 {
                     result.Handled = true;
-                    if(!inputUtils.MouseChangedSinceLastUpdate)
+                    if(!inputUtils.MouseChanged)
                         return;
-                    if ((inputUtils.mouse.CurrentMouseArgs.Button == MouseButtons.Left
-                        ||inputUtils.mouse.CurrentMouseArgs.Button == MouseButtons.Right
-                        ||inputUtils.mouse.CurrentMouseArgs.Button == MouseButtons.Middle
-                        ||inputUtils.mouse.CurrentMouseArgs.Wheel)
-                        &&inputUtils.mouse.CurrentMouseArgs.UpOrDown==MouseEventExtArgs.UpDown.Down)
-                        OnMouseClickEventDown(inputUtils.mouse.CurrentMouseArgs);
-                    if ( (inputUtils.mouse.CurrentMouseArgs.Button == MouseButtons.Left
-                        ||inputUtils.mouse.CurrentMouseArgs.Button == MouseButtons.Right
-                        || inputUtils.mouse.CurrentMouseArgs.Button == MouseButtons.Middle
-                        || inputUtils.mouse.CurrentMouseArgs.Wheel)
-                        && inputUtils.mouse.CurrentMouseArgs.UpOrDown == MouseEventExtArgs.UpDown.Up)
-                        OnMouseClickEventUp(inputUtils.mouse.CurrentMouseArgs);
-                    if (inputUtils.mouse.CurrentMouseArgs.Wheel)
-                        OnMouseWheelEvent(inputUtils.mouse.CurrentMouseArgs);
+                    if ((inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Left
+                        ||inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Right
+                        ||inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Middle
+                        ||inputUtils.Mouse.CurrentMouseArgs.Wheel)
+                        &&inputUtils.Mouse.CurrentMouseArgs.UpOrDown==MouseEventExtArgs.UpDown.Down)
+                        OnMouseClickEventDown(inputUtils.Mouse.CurrentMouseArgs);
+                    if ( (inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Left
+                        ||inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Right
+                        || inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Middle
+                        || inputUtils.Mouse.CurrentMouseArgs.Wheel)
+                        && inputUtils.Mouse.CurrentMouseArgs.UpOrDown == MouseEventExtArgs.UpDown.Up)
+                        OnMouseClickEventUp(inputUtils.Mouse.CurrentMouseArgs);
+                    if (inputUtils.Mouse.CurrentMouseArgs.Wheel)
+                        OnMouseWheelEvent(inputUtils.Mouse.CurrentMouseArgs);
 
                     if(!LastMousePos.Equals(cursorPoint))
                     {
-                        OnMouseMovedEvent(inputUtils.mouse.CurrentMouseArgs);
+                        OnMouseMovedEvent(inputUtils.Mouse.CurrentMouseArgs);
                         LastMousePos = cursorPoint;
                     }
                 }

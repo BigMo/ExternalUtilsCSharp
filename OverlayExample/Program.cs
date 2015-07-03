@@ -78,13 +78,13 @@ namespace OverlayExample
         {
             var overlay = (SharpDXOverlay) sender;
             input.Update();
-            if(input.keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.F5))
+            if(input.Keys.KeyWentUp(WinAPI.VirtualKeyShort.F5))
             {             
                 overlay.ChangeHandle(WinAPI.GetForegroundWindow());
             }
             overlay.UpdateControls(e.SecondsElapsed, input);
 
-            if (input.keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.END))
+            if (input.Keys.KeyIsDown(WinAPI.VirtualKeyShort.END))
                 e.Overlay.Close();
             label.Text = "TopMost " + e.Overlay.TopLevel + e.Overlay.TopMost;
             e.Overlay.ShowInactiveTopmost();

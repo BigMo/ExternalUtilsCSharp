@@ -82,7 +82,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
                     skip--;
                     return;
                 }
-                WinAPI.VirtualKeyShort[] buttons = keyUtils.keyUtils.KeysThatWentUp();
+                WinAPI.VirtualKeyShort[] buttons = keyUtils.Keys.KeysThatWentUp();
                 if (buttons.Length > 0)
                 {
                     Key = buttons[0];

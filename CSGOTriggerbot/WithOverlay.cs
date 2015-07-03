@@ -182,13 +182,13 @@ namespace CSGOTriggerbot
             KeyUtils.Update();
             Framework.Update();
             SHDXOverlay.UpdateControls(e.SecondsElapsed, KeyUtils);
-            if (KeyUtils.keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.DELETE))
+            if (KeyUtils.Keys.KeyWentUp(WinAPI.VirtualKeyShort.DELETE))
                 SHDXOverlay.Kill();
-            if (KeyUtils.keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.UP))
+            if (KeyUtils.Keys.KeyWentUp(WinAPI.VirtualKeyShort.UP))
                 ctrlRadar.Scaling -= 0.005f;
-            if (KeyUtils.keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.DOWN))
+            if (KeyUtils.Keys.KeyWentUp(WinAPI.VirtualKeyShort.DOWN))
                 ctrlRadar.Scaling += 0.005f;
-            if (KeyUtils.keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.INSERT))
+            if (KeyUtils.Keys.KeyWentUp(WinAPI.VirtualKeyShort.INSERT))
                 Framework.MouseEnabled = !Framework.MouseEnabled;
             cursor.Visible = !Framework.MouseEnabled;
             if (seconds >= 1)

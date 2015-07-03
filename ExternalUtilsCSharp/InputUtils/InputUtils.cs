@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace ExternalUtilsCSharp.InputUtils
 {
     public class InputUtilities{
-        public KeyUtils keyUtils;
-        public MouseHook mouse;
+        public KeyUtils Keys;
+        public MouseHook Mouse;
    
         public InputUtilities()
         {
@@ -17,16 +17,22 @@ namespace ExternalUtilsCSharp.InputUtils
 
         private void Init()
         {
-            keyUtils = new KeyUtils();
-            mouse = new MouseHook();
-            mouse.InstallHook();
+            Keys = new KeyUtils();
+            Mouse = new MouseHook();
+            Mouse.InstallHook();
         }
+        /// <summary>
+        /// If true mouse changed since last update
+        /// </summary>
+        public bool MouseChanged = false;
 
-        public bool MouseChangedSinceLastUpdate = false;
+        /// <summary>
+        /// Updates keys and mouse
+        /// </summary>
         public void Update()
         {
-            keyUtils.Update();
-            MouseChangedSinceLastUpdate = mouse.Update();
+            Keys.Update();
+            MouseChanged = Mouse.Update();
         }
     }
 }

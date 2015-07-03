@@ -229,14 +229,14 @@ namespace SteamMonsterGame
             keys.Update();
             pnlPanel.Y = overlay.Location.Y + overlay.Height / 2f - pnlPanel.Height;
 
-            if (keys.keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.INSERT))
+            if (keys.Keys.KeyWentUp(WinAPI.VirtualKeyShort.INSERT))
                 chbAutoClicker.Checked = !chbAutoClicker.Checked;
-            if (keys.keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.DELETE))
+            if (keys.Keys.KeyWentUp(WinAPI.VirtualKeyShort.DELETE))
                 chbMoveMouse.Checked = !chbMoveMouse.Checked;
 
             overlay.UpdateControls(e.SecondsElapsed, keys);
 
-            if (keys.keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.END))
+            if (keys.Keys.KeyIsDown(WinAPI.VirtualKeyShort.END))
                 e.Overlay.Close();
 
             #region AutoClicker

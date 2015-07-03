@@ -222,7 +222,7 @@ namespace ClickerHeroes
             segments.Width = overlay.Width;
             segments.Height = overlay.Height;
 
-            if (keys.keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.INSERT))
+            if (keys.Keys.KeyIsDown(WinAPI.VirtualKeyShort.INSERT))
                 e.Overlay.Close();
 
             #region AutoClicker
