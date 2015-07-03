@@ -9,7 +9,7 @@ using Microsoft.SqlServer.Server;
 
 namespace ExternalUtilsCSharp.SharpDXRenderer
 {
-    /// <summary
+    /// <summary>
     /// Extension for SharpDX.Color
     /// </summary>
     // TODO test if working. As i only used System.Drawing.Color before

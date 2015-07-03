@@ -127,15 +127,16 @@ namespace ExternalUtilsCSharp.InputUtils
                 }
 
                 //generate event 
-                if(CurrentMouseArgs!=null)
-                LastMouseArgs = CurrentMouseArgs;
+//                if (CurrentMouseArgs != null)
+//
+//                    UpdateCount += 1; 
                 CurrentMouseArgs = new MouseEventExtArgs(
                                                    button,
                                                    clickCount,
                                                    mouseHookStruct.Point.X,
                                                    mouseHookStruct.Point.Y,
                                                    mouseDelta) { Wheel = mouseDelta != 0, UpOrDown = upDown };
-                 
+                 MouseChanged = true;
 
                 // Raise it 
                 OnMouseChangedEvent(this, CurrentMouseArgs); 
@@ -144,7 +145,7 @@ namespace ExternalUtilsCSharp.InputUtils
             return WinAPI.CallNextHookEx(hMouseHook, nCode, wParam, lParam);
         }
         public MouseEventExtArgs LastMouseArgs;
-        public MouseEventExtArgs CurrentMouseArgs;
+        public MouseEventExtArgs CurrentMouseArgs = new MouseEventExtArgs();
         protected virtual void OnMouseChangedEvent(object sender, MouseEventExtArgs e)
         {
             if (MouseEvent != null)
@@ -152,10 +153,14 @@ namespace ExternalUtilsCSharp.InputUtils
         }
         public event EventHandler<MouseEventExtArgs> MouseEvent;
 
-        public void Update()
+        public bool Update()
         {
-            if (LastMouseArgs != null && CurrentMouseArgs != null)
-                MouseChanged = LastMouseArgs.Equals(CurrentMouseArgs);
+            if (CurrentMouseArgs != null && MouseChanged)
+            {
+                MouseChanged = false;
+                return true;
+            }
+            return false;
         }
     }
     public class MouseEventExtArgs: System.Windows.Forms.MouseEventArgs
@@ -173,9 +178,10 @@ namespace ExternalUtilsCSharp.InputUtils
             : base(b, clickcount, x, y, delta)
         {
         }
-        
+
+        public object PosOnForm;
         public bool Wheel;
-        public UpDown UpOrDown;
+        public UpDown UpOrDown = UpDown.None;
         public enum UpDown
         {
             None,

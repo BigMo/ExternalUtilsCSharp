@@ -22,10 +22,11 @@ namespace ExternalUtilsCSharp.InputUtils
             mouse.InstallHook();
         }
 
+        public bool MouseChangedSinceLastUpdate = false;
         public void Update()
         {
             keyUtils.Update();
-            mouse.Update();
+            MouseChangedSinceLastUpdate = mouse.Update();
         }
     }
 }

@@ -34,6 +34,11 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
             base.Attach(hWnd);
         }
 
+        public void ChangeHandle(IntPtr hWnd)
+        {
+            this.hWnd = hWnd;
+        }
+
         public override void Detach()
         {
             base.Detach();

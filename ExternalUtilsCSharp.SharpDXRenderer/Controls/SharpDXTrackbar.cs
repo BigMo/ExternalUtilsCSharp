@@ -64,6 +64,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             this.TrackbarHeight = 16f;
             this.FillParent = true;
             this.MouseMovedEvent += SharpDXTrackbar_MouseMovedEvent;
+            this.MouseWheelEvent += SharpDXTrackbar_MouseWheelEvent;
         }
 
         void SharpDXTrackbar_MouseMovedEvent(object sender, MouseEventExtArgs e)
@@ -74,18 +75,35 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             Vector2 size = this.GetSize();
 
             Vector2 trackbarSize = new Vector2(size.X - TrackbarHeight, 0);
-            Vector2 cursorPos = new Vector2(e.Location.X - trackbarLocation.X,e.Location.Y - trackbarLocation.Y);
+            Vector2 cursorPos = new Vector2(((Vector2)e.PosOnForm).X - trackbarLocation.X,((Vector2)e.PosOnForm).Y - trackbarLocation.Y);
+
 
             if (cursorPos.X >= 0 && cursorPos.X <= trackbarSize.X)
             {
                 if (cursorPos.Y >= -TrackbarHeight && cursorPos.Y <= TrackbarHeight)
                 {
-                    float percent = 1f / trackbarSize.X * cursorPos.X;
+                    float percent = 1f / trackbarSize.X * cursorPos.X;            
                     float range = Math.Abs(this.Minimum - this.Maximum);
                     float val = range * percent;
                     this.Value = this.Minimum + val;
                 }
             }
+
+        }
+        void SharpDXTrackbar_MouseWheelEvent(object sender, MouseEventExtArgs e)
+        {
+            if (!e.Wheel)
+                return;
+
+            float percent = this.Value/this.Maximum;
+            if (e.UpOrDown == MouseEventExtArgs.UpDown.Up)
+                percent += 0.01f;
+            if (e.UpOrDown == MouseEventExtArgs.UpDown.Down)
+                percent -= 0.01f;
+            float range = Math.Abs(this.Minimum - this.Maximum);
+            float val = range * percent;
+            this.Value = this.Minimum + val;
+            Console.WriteLine("Value"+Value);
         }
         #endregion
 

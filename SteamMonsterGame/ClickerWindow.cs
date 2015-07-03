@@ -41,23 +41,23 @@ namespace SteamMonsterGame
         void ClickerWindow_MouseMovedEvent(object sender, MouseEventExtArgs e)
         {
             Vector2 location = this.GetAbsoluteLocation();
-            Vector2 localMousePos = new Vector2(e.Location.X - location.X,e.Location.Y-location.Y);
+            Vector2 localMousePos = new Vector2(((Vector2)e.PosOnForm).X - location.X,((Vector2)e.PosOnForm).Y-location.Y);
             Vector2 localLastMousePos = LastMousePos - location;
             if (mouseDrag)
             {
 
                 if (localLastMousePos.X > this.Width - 8)
                 {
-                    this.Width += e.Location.X - LastMousePos.X;
+                    this.Width += ((Vector2)e.PosOnForm).X - LastMousePos.X;
                 }
                 if (localLastMousePos.Y > this.Height - 8)
                 {
-                    this.Height += e.Location.Y - LastMousePos.Y;
+                    this.Height += ((Vector2)e.PosOnForm).Y - LastMousePos.Y;
                 }
                 else
                 {
-                    this.X += e.Location.X - LastMousePos.X;
-                    this.Y += e.Location.Y - LastMousePos.Y;
+                    this.X += ((Vector2)e.PosOnForm).X - LastMousePos.X;
+                    this.Y += ((Vector2)e.PosOnForm).Y - LastMousePos.Y;
                 }
             }
         }

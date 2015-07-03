@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExternalUtilsCSharp", "ExternalUtilsCSharp\ExternalUtilsCSharp.csproj", "{E294E4F8-DE32-42C1-8BFD-A3E488EC5820}"
 EndProject
@@ -16,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SteamMonsterGame", "SteamMonsterGame\SteamMonsterGame.csproj", "{AC44A559-744A-4813-BA9B-63008B01355C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExternalUtilsCSharp.JSONConfigUtils", "ExternalUtilsCSharp.JSONConfigUtils\ExternalUtilsCSharp.JSONConfigUtils.csproj", "{1E5DD6A0-A8A2-494B-A84E-9170C89A78AA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OverlayExample", "OverlayExample\OverlayExample.csproj", "{9BFCEF41-A47E-45DD-8A89-63E096658817}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{1E5DD6A0-A8A2-494B-A84E-9170C89A78AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E5DD6A0-A8A2-494B-A84E-9170C89A78AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E5DD6A0-A8A2-494B-A84E-9170C89A78AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9BFCEF41-A47E-45DD-8A89-63E096658817}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9BFCEF41-A47E-45DD-8A89-63E096658817}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9BFCEF41-A47E-45DD-8A89-63E096658817}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9BFCEF41-A47E-45DD-8A89-63E096658817}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -55,5 +61,6 @@ Global
 		{0C392DB2-895E-4F2A-B2A0-1D79849FC5B2} = {20B2DC66-F8DC-495A-8E47-E96FB612E8C1}
 		{42E7D8B0-97A4-4E33-B98B-50EC3E1C0A88} = {20B2DC66-F8DC-495A-8E47-E96FB612E8C1}
 		{AC44A559-744A-4813-BA9B-63008B01355C} = {20B2DC66-F8DC-495A-8E47-E96FB612E8C1}
+		{9BFCEF41-A47E-45DD-8A89-63E096658817} = {20B2DC66-F8DC-495A-8E47-E96FB612E8C1}
 	EndGlobalSection
 EndGlobal
