@@ -103,7 +103,6 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             float range = Math.Abs(this.Minimum - this.Maximum);
             float val = range * percent;
             this.Value = this.Minimum + val;
-            Console.WriteLine("Value"+Value);
         }
         #endregion
 

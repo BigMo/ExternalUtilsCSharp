@@ -28,6 +28,9 @@ namespace OverlayExample
         private static InputUtilities input;
         static void Main(string[] args)
         {
+            Console.WriteLine("Change overlay attached window by pressing F5");
+            Console.WriteLine("It will attach to currently active window");
+            Console.WriteLine("Trackbar can be controled with mouse wheel");
             System.Windows.Forms.Application.EnableVisualStyles();
             System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
             input = new InputUtilities();
