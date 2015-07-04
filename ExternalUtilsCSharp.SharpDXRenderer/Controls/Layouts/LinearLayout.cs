@@ -22,6 +22,10 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls.Layouts
                 var control = parent.ChildControls[i];
                 if (!control.Visible)
                     continue;
+
+                if (control.FillParent)
+                    control.Width = parent.Width - parent.MarginLeft - parent.MarginRight - control.MarginLeft - control.MarginRight;
+
                 if (i == 0)
                 {
                     control.X = control.MarginLeft + parent.MarginLeft;

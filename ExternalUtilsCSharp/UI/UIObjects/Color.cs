@@ -8,6 +8,9 @@ namespace ExternalUtilsCSharp.UI.UIObjects
 {
     public struct Color
     {
+        #region ENUMS
+        public enum ColorFormat { ARGB, RGBA };
+        #endregion
         #region PROPERTIES
         public byte A;
         public byte R;
@@ -39,16 +42,28 @@ namespace ExternalUtilsCSharp.UI.UIObjects
         /// <param name="b">Value of the blue-channel (0-1)</param>
         public Color(float a, float r, float g, float b) : this((byte)(255f * a), (byte)(255f * r), (byte)(255f * g), (byte)(255f * b))
         { }
+        public static Color FromFormat(uint color, ColorFormat format)
+        {
+            switch(format)
+            {
+                case ColorFormat.ARGB:
+                    return new Color((byte)(color >> 24), (byte)(color >> 16), (byte)(color >> 8), (byte)(color));
+                case ColorFormat.RGBA:
+                    return new Color((byte)(color & 0xFF), (byte)((color & 0xFF000000) >> 24), (byte)((color & 0x00FF0000) >> 16), (byte)((color & 0x0000FF00) >> 8));
+                default:
+                    throw new ArgumentException();
+            }
+        }
         #endregion
 
         #region METHODS
-        public int ToARGB()
+        public uint ToARGB()
         {
-            return (int)B + ((int)G << 8) + ((int)R << 16) + ((int)A << 24);
+            return (uint)B + ((uint)G << 8) + ((uint)R << 16) + ((uint)A << 24);
         }
-        public int ToRGBA()
+        public uint ToRGBA()
         {
-            return (int)A + ((int)B << 8) + ((int)G << 16) + ((int)R << 24);
+            return (uint)A + ((uint)B << 8) + ((uint)G << 16) + ((uint)R << 24);
         }
         #endregion
     }

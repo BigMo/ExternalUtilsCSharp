@@ -116,6 +116,8 @@ namespace ExternalUtilsCSharp
         {
             if (File.Exists(file))
                 ReadSettings(File.ReadAllBytes(file));
+            else
+                throw new FileNotFoundException("Settings-file not found", file);
         }
         /// <summary>
         /// Reads settings from a byte-array

@@ -10,7 +10,7 @@ namespace ExternalUtilsCSharp
     /// </summary>
     public class WinAPI
     {
-        #region OpenProcess/CloseProcess
+        #region Process
         [DllImport("kernel32.dll")]
         public static extern IntPtr OpenProcess(
              ProcessAccessFlags processAccess,
@@ -21,6 +21,15 @@ namespace ExternalUtilsCSharp
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CloseHandle(IntPtr hObject);
+
+        [DllImport("kernel32.dll")]
+        public static extern bool Module32Next(IntPtr hSnapshot, ref MODULEENTRY32 lpme);
+
+        [DllImport("kernel32.dll")]
+        public static extern bool Module32First(IntPtr hSnapshot, ref MODULEENTRY32 lpme);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr CreateToolhelp32Snapshot(SnapshotFlags dwFlags, uint th32ProcessID);
 
         [Flags]
         public enum ProcessAccessFlags : uint
@@ -38,6 +47,37 @@ namespace ExternalUtilsCSharp
             QueryInformation = 0x00000400,
             QueryLimitedInformation = 0x00001000,
             Synchronize = 0x00100000
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MODULEENTRY32
+        {
+            private const int MAX_PATH = 255;
+            public uint dwSize;
+            public uint th32ModuleID;
+            public uint th32ProcessID;
+            public uint GlblcntUsage;
+            public uint ProccntUsage;
+            public IntPtr modBaseAddr;
+            public uint modBaseSize;
+            public IntPtr hModule;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH + 1)]
+            public string szModule;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH + 5)]
+            public string szExePath;
+        }
+
+        [Flags]
+        public enum SnapshotFlags : uint
+        {
+            HeapList = 0x00000001,
+            Process = 0x00000002,
+            Thread = 0x00000004,
+            Module = 0x00000008,
+            Module32 = 0x00000010,
+            All = (HeapList | Process | Thread | Module),
+            Inherit = 0x80000000,
+            NoHeaps = 0x40000000
+
         }
         #endregion
         #region RPM/WPM
@@ -101,6 +141,74 @@ namespace ExternalUtilsCSharp
         public static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
         [DllImport("dwmapi.dll", PreserveSig = true)]
         public static extern int DwmExtendFrameIntoClientArea(IntPtr hwnd, ref MARGINS margins);
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool BringWindowToTop(IntPtr hWnd);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool BringWindowToTop(HandleRef hWnd);
+        [return: MarshalAs(UnmanagedType.Bool)]
+        [DllImport("user32", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
+        public static extern bool SetForegroundWindow(IntPtr hwnd);
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr hWnd, WindowShowStyle nCmdShow);
+        public enum WindowShowStyle : uint
+        {
+            /// <summary>Hides the window and activates another window.</summary>
+            /// <remarks>See SW_HIDE</remarks>
+            Hide = 0,
+            /// <summary>Activates and displays a window. If the window is minimized 
+            /// or maximized, the system restores it to its original size and 
+            /// position. An application should specify this flag when displaying 
+            /// the window for the first time.</summary>
+            /// <remarks>See SW_SHOWNORMAL</remarks>
+            ShowNormal = 1,
+            /// <summary>Activates the window and displays it as a minimized window.</summary>
+            /// <remarks>See SW_SHOWMINIMIZED</remarks>
+            ShowMinimized = 2,
+            /// <summary>Activates the window and displays it as a maximized window.</summary>
+            /// <remarks>See SW_SHOWMAXIMIZED</remarks>
+            ShowMaximized = 3,
+            /// <summary>Maximizes the specified window.</summary>
+            /// <remarks>See SW_MAXIMIZE</remarks>
+            Maximize = 3,
+            /// <summary>Displays a window in its most recent size and position. 
+            /// This value is similar to "ShowNormal", except the window is not 
+            /// actived.</summary>
+            /// <remarks>See SW_SHOWNOACTIVATE</remarks>
+            ShowNormalNoActivate = 4,
+            /// <summary>Activates the window and displays it in its current size 
+            /// and position.</summary>
+            /// <remarks>See SW_SHOW</remarks>
+            Show = 5,
+            /// <summary>Minimizes the specified window and activates the next 
+            /// top-level window in the Z order.</summary>
+            /// <remarks>See SW_MINIMIZE</remarks>
+            Minimize = 6,
+            /// <summary>Displays the window as a minimized window. This value is 
+            /// similar to "ShowMinimized", except the window is not activated.</summary>
+            /// <remarks>See SW_SHOWMINNOACTIVE</remarks>
+            ShowMinNoActivate = 7,
+            /// <summary>Displays the window in its current size and position. This 
+            /// value is similar to "Show", except the window is not activated.</summary>
+            /// <remarks>See SW_SHOWNA</remarks>
+            ShowNoActivate = 8,
+            /// <summary>Activates and displays the window. If the window is 
+            /// minimized or maximized, the system restores it to its original size 
+            /// and position. An application should specify this flag when restoring 
+            /// a minimized window.</summary>
+            /// <remarks>See SW_RESTORE</remarks>
+            Restore = 9,
+            /// <summary>Sets the show state based on the SW_ value specified in the 
+            /// STARTUPINFO structure passed to the CreateProcess function by the 
+            /// program that started the application.</summary>
+            /// <remarks>See SW_SHOWDEFAULT</remarks>
+            ShowDefault = 10,
+            /// <summary>Windows 2000/XP: Minimizes a window, even if the thread 
+            /// that owns the window is hung. This flag should only be used when 
+            /// minimizing windows from a different thread.</summary>
+            /// <remarks>See SW_FORCEMINIMIZE</remarks>
+            ForceMinimized = 11
+        }
 
         [StructLayout(LayoutKind.Sequential)]
         public struct RECT

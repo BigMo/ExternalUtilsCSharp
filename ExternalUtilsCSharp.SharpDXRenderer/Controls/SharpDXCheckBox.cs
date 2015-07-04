@@ -39,6 +39,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             Vector2 location = this.GetAbsoluteLocation();
             Vector2 box = new Vector2(fontSize, fontSize);
             Vector2 boxLocation = new Vector2(location.X, location.Y + this.Height / 2f - box.Y / 2f);
+            
             if(this.MouseOver)
                 renderer.FillRectangle(this.BackColor, 
                     new Vector2(location.X - MarginLeft, location.Y - MarginTop),

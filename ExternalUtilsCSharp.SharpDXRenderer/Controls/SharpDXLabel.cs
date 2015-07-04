@@ -12,13 +12,8 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
     /// </summary>
     public class SharpDXLabel : SharpDXControl
     {
-        #region ENUMS
-        public enum TextAlignment { Left, Center, Right };
-        #endregion
-
         #region PROPERTIES
         public bool FixedWidth { get; set; }
-        public TextAlignment TextAlign { get; set; }
         #endregion
         
         #region CONSTRUCTOR

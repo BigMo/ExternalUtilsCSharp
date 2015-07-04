@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigObjects\IniConfigUtils.cs" />
     <Compile Include="ConfigUtils.cs" />
     <Compile Include="KeyUtils.cs" />
     <Compile Include="MathUtils.cs" />
@@ -52,6 +53,8 @@
     <Compile Include="MemObjects\PE\PEOptHeader.cs" />
     <Compile Include="MemObjects\ScanResult.cs" />
     <Compile Include="MemUtils.cs" />
+    <Compile Include="MiscObjects\CachedField.cs" />
+    <Compile Include="MiscObjects\CachedObject.cs" />
     <Compile Include="MiscUtils.cs" />
     <Compile Include="ProcUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
