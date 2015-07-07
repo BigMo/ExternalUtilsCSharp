@@ -22,6 +22,20 @@ namespace ExternalUtilsCSharp.MathObjects
         {
             get { return new Vector2(0, 0); }
         }
+        /// <summary>
+        /// Returns a new Vector3 at (1,0)
+        /// </summary>
+        public static Vector2 UnitX
+        {
+            get { return new Vector2(1, 0); }
+        }
+        /// <summary>
+        /// Returns a new Vector2 at (0,1)
+        /// </summary>
+        public static Vector2 UnitY
+        {
+            get { return new Vector2(0, 1); }
+        }
         #endregion
 
         #region CONSTRUCTOR

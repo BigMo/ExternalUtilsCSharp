@@ -40,13 +40,6 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             this.BackColor = new Color(0.9f, 0.9f, 0.9f, 1f);
             this.ContentLayout = LinearLayout.Instance;
             this.FontChangedEvent += SharpDXPanel_FontChangedEvent;
-            this.VisibleChangedEvent+=SharpDXPanel_VisibleChangedEvent;
-        }
-
-        void SharpDXPanel_VisibleChangedEvent(object sender, EventArgs e)
-        {
-            foreach (SharpDXControl control in this.ChildControls)
-                control.Visible = this.Visible;
         }
 
         void SharpDXPanel_FontChangedEvent(object sender, EventArgs e)
@@ -62,7 +55,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             base.Update(secondsElapsed, keyUtils, cursorPoint, checkMouse);
             if (this.Visible)
             {
-                //this.ContentLayout.ApplyLayout(this);
+                this.ContentLayout.ApplyLayout(this);
                 float width = 0, height = 0;
                 Control<SharpDXRenderer, Color, Vector2, TextFormat> lastControl = null;
 
@@ -71,16 +64,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
                     var control = this.ChildControls[i];
                     if (!control.Visible)
                         continue;
-                    if (lastControl == null)
-                    {
-                        control.X = control.MarginLeft + this.MarginLeft;
-                        control.Y = control.MarginTop;
-                    }
-                    else
-                    {
-                        control.X = lastControl.X;
-                        control.Y = lastControl.Y + lastControl.Height + lastControl.MarginBottom + control.MarginTop;
-                    }
+
                     lastControl = control;
                     if (this.DynamicWidth)
                         if (control.Width + control.MarginLeft + control.MarginRight > width)
@@ -88,8 +72,12 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
                 }
 
                 if (this.DynamicHeight)
-                    if (lastControl != null)
-                        height = lastControl.Y + lastControl.Height + lastControl.MarginBottom;
+                {
+                    if(ChildControls.Count(x=>x.Visible)>0)
+                        height = ChildControls.Where(x => x.Visible).Max(x => x.Y + x.Height);
+                }
+                    //if (lastControl != null)
+                    //    height = lastControl.Y + lastControl.Height + lastControl.MarginBottom;
                 if (this.DynamicWidth)
                     this.Width = width + this.MarginLeft + this.MarginRight;
                 if (this.DynamicHeight)
@@ -106,12 +94,14 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             Vector2 location = this.GetAbsoluteLocation();
             Vector2 boxLocation = new Vector2(location.X - this.MarginLeft, location.Y - this.MarginTop);
             Vector2 boxSize = new Vector2(this.Width + this.MarginLeft + this.MarginRight, this.Height + this.MarginBottom + this.MarginTop);
-            renderer.FillRectangle(this.BackColor,
-                boxLocation,
-                boxSize);
-            renderer.DrawRectangle(this.ForeColor,
-                boxLocation,
-                boxSize);
+            if(this.DrawBackground)
+                renderer.FillRectangle(this.BackColor,
+                    boxLocation,
+                    boxSize);
+            if(this.DrawBackground)
+                renderer.DrawRectangle(this.ForeColor,
+                    boxLocation,
+                    boxSize);
             base.Draw(renderer);
         }
 

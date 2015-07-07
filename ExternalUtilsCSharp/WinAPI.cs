@@ -10,7 +10,7 @@ namespace ExternalUtilsCSharp
     /// </summary>
     public class WinAPI
     {
-        #region OpenProcess/CloseProcess
+        #region Process
         [DllImport("kernel32.dll")]
         public static extern IntPtr OpenProcess(
              ProcessAccessFlags processAccess,
@@ -21,6 +21,15 @@ namespace ExternalUtilsCSharp
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool CloseHandle(IntPtr hObject);
+
+        [DllImport("kernel32.dll")]
+        public static extern bool Module32Next(IntPtr hSnapshot, ref MODULEENTRY32 lpme);
+
+        [DllImport("kernel32.dll")]
+        public static extern bool Module32First(IntPtr hSnapshot, ref MODULEENTRY32 lpme);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr CreateToolhelp32Snapshot(SnapshotFlags dwFlags, uint th32ProcessID);
 
         [Flags]
         public enum ProcessAccessFlags : uint
@@ -38,6 +47,37 @@ namespace ExternalUtilsCSharp
             QueryInformation = 0x00000400,
             QueryLimitedInformation = 0x00001000,
             Synchronize = 0x00100000
+        }
+        [StructLayout(LayoutKind.Sequential)]
+        public struct MODULEENTRY32
+        {
+            private const int MAX_PATH = 255;
+            public uint dwSize;
+            public uint th32ModuleID;
+            public uint th32ProcessID;
+            public uint GlblcntUsage;
+            public uint ProccntUsage;
+            public IntPtr modBaseAddr;
+            public uint modBaseSize;
+            public IntPtr hModule;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH + 1)]
+            public string szModule;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH + 5)]
+            public string szExePath;
+        }
+
+        [Flags]
+        public enum SnapshotFlags : uint
+        {
+            HeapList = 0x00000001,
+            Process = 0x00000002,
+            Thread = 0x00000004,
+            Module = 0x00000008,
+            Module32 = 0x00000010,
+            All = (HeapList | Process | Thread | Module),
+            Inherit = 0x80000000,
+            NoHeaps = 0x40000000
+
         }
         #endregion
         #region RPM/WPM
@@ -104,6 +144,16 @@ namespace ExternalUtilsCSharp
         public static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
         [DllImport("dwmapi.dll", PreserveSig = true)]
         public static extern int DwmExtendFrameIntoClientArea(IntPtr hwnd, ref MARGINS margins);
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool BringWindowToTop(IntPtr hWnd);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern bool BringWindowToTop(HandleRef hWnd);
+        [return: MarshalAs(UnmanagedType.Bool)]
+        [DllImport("user32", CharSet = CharSet.Ansi, SetLastError = true, ExactSpelling = true)]
+        public static extern bool SetForegroundWindow(IntPtr hwnd);
+        [DllImport("user32.dll")]
+        public static extern bool ShowWindow(IntPtr hWnd, WindowShowStyle nCmdShow);
 
         [StructLayout(LayoutKind.Sequential)]
         public struct RECT

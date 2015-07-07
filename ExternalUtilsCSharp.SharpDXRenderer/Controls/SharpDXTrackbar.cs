@@ -40,7 +40,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         {
             get
             {
-                return 1f / Math.Abs(this.Minimum - this.Maximum) * this.value;
+                return 1f / Math.Abs(this.Minimum - this.Maximum) * (this.value - (float)Math.Abs(this.Minimum));
             }
         }
         #endregion
@@ -146,6 +146,15 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             if (this.Tag != null)
                 if (config.HasKey(this.Tag.ToString()))
                     this.Value = config.GetValue<float>(this.Tag.ToString());
+        }
+
+        public void SetValue(float value)
+        {
+            if (value < Minimum)
+                value = Minimum;
+            if (value > Maximum)
+                value = Maximum;
+            this.value = value;
         }
         #endregion
     }

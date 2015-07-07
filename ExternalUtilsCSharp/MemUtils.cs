@@ -403,7 +403,7 @@ namespace ExternalUtilsCSharp
                 found = true;
                 for (int chr = 0; chr < mask.Length; chr++)
                 {
-                    if (mask[chr] != '?')
+                    if (mask[chr] != wildcard)
                     {
                         if (data[idx + chr] != pattern[chr])
                         {

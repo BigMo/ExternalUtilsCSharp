@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace ExternalUtilsCSharp
@@ -98,7 +99,7 @@ namespace ExternalUtilsCSharp
         /// <param name="processName">Name of the process</param>
         /// <param name="handleFlags">ProcessAccessFlags to use</param>
         public ProcUtils(string processName, WinAPI.ProcessAccessFlags handleFlags)
-            : this(Process.GetProcessesByName(processName)[0],handleFlags)
+            : this(Process.GetProcessesByName(processName)[0], handleFlags)
         { }
         /// <summary>
         /// Initializes a new ProcUtils
@@ -139,6 +140,36 @@ namespace ExternalUtilsCSharp
             }
             catch { }
             return null;
+        }
+        /// <summary>
+        /// Retrieves the process-module with the given name, returns null if not found
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public WinAPI.MODULEENTRY32 GetModule32ByName(string name)
+        {
+            WinAPI.MODULEENTRY32 xModule = new WinAPI.MODULEENTRY32();
+            try
+            {
+                IntPtr hSnap;
+                hSnap = WinAPI.CreateToolhelp32Snapshot(WinAPI.SnapshotFlags.Module, (uint)this.Process.Id);
+                xModule.dwSize = (uint)Marshal.SizeOf(typeof(WinAPI.MODULEENTRY32));
+                if (WinAPI.Module32First(hSnap, ref xModule))
+                {
+                    while (WinAPI.Module32Next(hSnap, ref xModule))
+                    {
+                        if (xModule.szModule == name)
+                        {
+                            WinAPI.CloseHandle(hSnap);
+                            return xModule;
+                        }
+                    }
+                }
+                WinAPI.CloseHandle(hSnap);
+            }
+            catch { }
+            xModule.szModule = "";
+            return xModule;
         }
         #endregion
     }

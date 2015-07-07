@@ -86,8 +86,7 @@ namespace OverlayExample
 
             if (input.Keys.KeyIsDown(WinAPI.VirtualKeyShort.END))
                 e.Overlay.Close();
-            label.Text = "TopMost " + e.Overlay.TopLevel + e.Overlay.TopMost;
-            e.Overlay.ShowInactiveTopmost();
+           // e.Overlay.ShowInactiveTopmost();
 
         }
         private static void InitRadioButton(ref SharpDXRadioButton control, string text, object tag, bool bChecked)

@@ -62,6 +62,7 @@ namespace ExternalUtilsCSharp
         }
         /// <summary>
         /// Merges the given arrays to one single array (preserves the order of all elements)
+        /// Improved version written by aev1tas, about 4x faster(https://www.unknowncheats.me/forum/1264082-post81.html)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="arrays">Arrays to merge</param>

@@ -19,6 +19,7 @@ namespace ExternalUtilsCSharp.UI
         #region VARIABLES
         private Updater updLogic, updDraw;
         private long lastTimerTick, lastDrawTick;
+        private IntPtr handle;
         #endregion
 
         #region PROPERTIES
@@ -111,6 +112,7 @@ namespace ExternalUtilsCSharp.UI
             this.DrawOnlyWhenInForeground = true;
             this.TrackTargetWindow = true;
             this.ChildControls = new List<UI.Control<TRenderer, TColor, TVector2, TFont>>();
+            this.handle = this.Handle;
         }
 
         void updDraw_TickEvent(object sender, Updater.DeltaEventArgs e)
@@ -163,13 +165,15 @@ namespace ExternalUtilsCSharp.UI
         /// Perform your logic-operations here
         /// </summary>
         /// <param name="seconds">Time in seconds since the last Tick-call</param>
-        protected virtual void OnTick(double seconds) 
+        protected virtual void OnTick(double seconds)
         {
             if (this.TrackTargetWindow)
             {
                 WinAPI.WINDOWINFO info = new WinAPI.WINDOWINFO();
                 if(WinAPI.GetWindowInfo(this.hWnd, ref info))
                 {
+                    int width = info.rcWindow.Right - info.rcWindow.Left;
+                    int height = info.rcWindow.Bottom - info.rcWindow.Top;
                     if(this.Location.X != info.rcClient.Left ||
                         this.Location.Y != info.rcClient.Top)
                     {
@@ -178,9 +182,10 @@ namespace ExternalUtilsCSharp.UI
                     if(this.Width != info.rcClient.Right - info.rcClient.Left ||
                         this.Height != info.rcClient.Bottom - info.rcClient.Top)
                     {
-                            this.Size = new System.Drawing.Size(info.rcClient.Right - info.rcClient.Left, info.rcClient.Bottom - info.rcClient.Top);
+                        this.Size = new System.Drawing.Size(info.rcClient.Right - info.rcClient.Left, info.rcClient.Bottom - info.rcClient.Top);
                             this.OnResize();
                     }
+                    WinAPI.SetWindowPos(this.hWnd, this.handle, info.rcWindow.Left, info.rcWindow.Top, width, height, 0);
                 }
             }
             
@@ -227,6 +232,10 @@ namespace ExternalUtilsCSharp.UI
             WinAPI.SetWindowPos(this.Handle, (IntPtr)WinAPI.SetWindpwPosHWNDFlags.TopMost,
             this.Left, this.Top, this.Width, this.Height,
             (uint)WinAPI.SetWindowPosFlags.NOACTIVATE);
+        }
+        public void ResetTopmost()
+        {
+            WinAPI.BringWindowToTop(this.Handle);
         }
         #endregion
     }

@@ -21,6 +21,11 @@ namespace ExternalUtilsCSharp.UI
         private string text;
         private TFont font;
         #endregion
+
+        #region ENUMS
+        public enum TextAlignment { Left, Center, Right };
+        #endregion
+
         #region PROPERTIES
         public float X { get; set; }
         public float Y { get; set; }
@@ -43,9 +48,9 @@ namespace ExternalUtilsCSharp.UI
         public Rectangle Rectangle { get { return new Rectangle(this.X, this.Y, this.Width, this.Height); } }
         public Control<TRenderer, TColor, TVector2, TFont> Parent { get; set; }
         public List<Control<TRenderer, TColor, TVector2, TFont>> ChildControls { get; set; }
-        public string Text 
+        public string Text
         {
-            get 
+            get
             {
                 return text;
             }
@@ -60,11 +65,11 @@ namespace ExternalUtilsCSharp.UI
         }
         public bool MouseOver
         {
-            get 
-            { 
-                return mouseOver; 
+            get
+            {
+                return mouseOver;
             }
-            protected set 
+            protected set
             {
                 if (mouseOver != value)
                 {
@@ -81,11 +86,11 @@ namespace ExternalUtilsCSharp.UI
         public float MarginLeft { get; set; }
         public float MarginRight { get; set; }
         public bool Visible
-        { 
+        {
             get { return this.visible; }
             set
             {
-                if(this.visible != value)
+                if (this.visible != value)
                 {
                     this.visible = value;
                     OnVisibleChangedEvent(new EventArgs());
@@ -95,6 +100,7 @@ namespace ExternalUtilsCSharp.UI
         public bool FillParent { get; set; }
         public TVector2 LastMousePos { get; private set; }
         public object Tag { get; set; }
+        public TextAlignment TextAlign { get; set; }
         #endregion
         #region EVENTS
         protected struct MouseEvent
@@ -179,7 +185,7 @@ namespace ExternalUtilsCSharp.UI
         public virtual void Draw(TRenderer renderer)
         {
             foreach (Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
-                if(control.Visible)
+                if (control.Visible)
                     control.Draw(renderer);
         }
         /// <summary>
@@ -189,13 +195,16 @@ namespace ExternalUtilsCSharp.UI
         /// <param name="cursorPoint"></param>
         public virtual void Update(double secondsElapsed, InputUtilities inputUtils, TVector2 cursorPoint, bool checkMouse = false)
         {
-            #region MOUSE
-            if (Visible && checkMouse)
+            bool canUpdate = this.visible;
+            if (this.Parent != null)
+                if (!this.Parent.Visible)
+                    canUpdate = false;
+
+            if (canUpdate&&checkMouse)
             {
                 MouseEvent result = new MouseEvent() { Handled = false, Depth = 0 };
                 CheckMouseEvents(cursorPoint, inputUtils, ref result);
             }
-            #endregion
             #region CHILDCONTROLS
             foreach (Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
                 control.Update(secondsElapsed, inputUtils, cursorPoint, false);
@@ -215,6 +224,8 @@ namespace ExternalUtilsCSharp.UI
                     return;
                 if (!control.Visible)
                     continue;
+                if (!inputUtils.MouseChanged)
+                    continue;
                 result.Depth++;
                 control.CheckMouseEvents(cursorPoint, inputUtils, ref result);
                 result.Depth--;
@@ -225,7 +236,7 @@ namespace ExternalUtilsCSharp.UI
                 if (this.MouseOver)
                 {
                     result.Handled = true;
-                    if(!inputUtils.MouseChanged)
+                    if (!inputUtils.MouseChanged)
                         return;
                     if ((inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Left
                         ||inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Right
@@ -242,7 +253,7 @@ namespace ExternalUtilsCSharp.UI
                     if (inputUtils.Mouse.CurrentMouseArgs.Wheel)
                         OnMouseWheelEvent(inputUtils.Mouse.CurrentMouseArgs);
 
-                    if(!LastMousePos.Equals(cursorPoint))
+                    if (!LastMousePos.Equals(cursorPoint))
                     {
                         OnMouseMovedEvent(inputUtils.Mouse.CurrentMouseArgs);
                         LastMousePos = cursorPoint;

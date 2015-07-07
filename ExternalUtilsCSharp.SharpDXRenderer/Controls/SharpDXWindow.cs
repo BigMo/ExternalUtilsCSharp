@@ -26,6 +26,8 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         {
             this.Caption = new SharpDXLabel();
             this.Panel = new SharpDXPanel();
+            this.Panel.DrawBackground = false;
+            this.Panel.DrawBorder = false;
             this.mouseDown = false;
             //this.DynamicHeight = false;
             //this.DynamicWidth = false;

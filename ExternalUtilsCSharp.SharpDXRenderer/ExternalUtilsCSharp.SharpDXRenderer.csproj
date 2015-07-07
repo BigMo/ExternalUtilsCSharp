@@ -54,13 +54,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\Crosshairs\CircleCrosshair.cs" />
     <Compile Include="Controls\Layouts\Layout.cs" />
     <Compile Include="Controls\Layouts\LinearLayout.cs" />
     <Compile Include="Controls\Layouts\NoneLayout.cs" />
+    <Compile Include="Controls\Layouts\TableLayout.cs" />
     <Compile Include="Controls\SharpDXButton.cs" />
     <Compile Include="Controls\SharpDXButtonKey.cs" />
     <Compile Include="Controls\SharpDXCheckable.cs" />
     <Compile Include="Controls\SharpDXCheckBox.cs" />
+    <Compile Include="Controls\SharpDXColorControl.cs" />
+    <Compile Include="Controls\SharpDXComboValue.cs" />
     <Compile Include="Controls\SharpDXControl.cs" />
     <Compile Include="Controls\SharpDXCursor.cs" />
     <Compile Include="Controls\SharpDXLabel.cs" />
@@ -71,8 +75,10 @@
     <Compile Include="Controls\SharpDXRadioButton.cs" />
     <Compile Include="Controls\SharpDXSpacer.cs" />
     <Compile Include="ColorExtension.cs" />
+    <Compile Include="Controls\SharpDXTabControl.cs" />
     <Compile Include="Controls\SharpDXTrackbar.cs" />
     <Compile Include="Controls\SharpDXWindow.cs" />
+    <Compile Include="Controls\Crosshairs\Crosshair.cs" />
     <Compile Include="SharpDXConverter.cs" />
     <Compile Include="SharpDXOverlay.cs">
       <SubType>Form</SubType>
@@ -89,6 +95,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigObjects\IniConfigUtils.cs" />
     <Compile Include="ConfigUtils.cs" />
     <Compile Include="InputUtils\InputUtils.cs" />
     <Compile Include="InputUtils\KeyUtils.cs" />
@@ -54,6 +55,8 @@
     <Compile Include="MemObjects\PE\PEOptHeader.cs" />
     <Compile Include="MemObjects\ScanResult.cs" />
     <Compile Include="MemUtils.cs" />
+    <Compile Include="MiscObjects\CachedField.cs" />
+    <Compile Include="MiscObjects\CachedObject.cs" />
     <Compile Include="MiscUtils.cs" />
     <Compile Include="ProcUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -62,6 +65,7 @@
     <Compile Include="UI\Overlay.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="UI\UIObjects\Color.cs" />
     <Compile Include="UI\UIObjects\ColorExtension.cs" />
     <Compile Include="UI\Control.cs" />
     <Compile Include="UI\UIObjects\Rectangle.cs" />

@@ -27,6 +27,10 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
         private bool disposing;
         #endregion
 
+        #region PROPERTIES
+        public WindowRenderTarget Device { get { return this.device; } }
+        #endregion
+
         #region CONSTRUCTOR
         public SharpDXRenderer() : base()
         {

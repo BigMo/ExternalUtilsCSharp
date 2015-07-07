@@ -58,5 +58,15 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
                 vecs[i] = Vector3EUCtoSDX(vec[i]);
             return vecs;
         }
+
+        public static SharpDX.Color ColorEUCtoSDX(UI.UIObjects.Color color)
+        {
+            return new SharpDX.Color(color.R, color.G, color.B, color.A);
+        }
+
+        public static UI.UIObjects.Color ColorSDXtoDSX(SharpDX.Color color)
+        {
+            return new UI.UIObjects.Color(color.R, color.G, color.B, color.A);
+        }
     }
 }
