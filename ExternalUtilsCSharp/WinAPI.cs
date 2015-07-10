@@ -31,6 +31,40 @@ namespace ExternalUtilsCSharp
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern IntPtr CreateToolhelp32Snapshot(SnapshotFlags dwFlags, uint th32ProcessID);
 
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr GetModuleHandle(string lpModuleName);
+
+        [DllImport("kernel32", SetLastError = true, CharSet = CharSet.Ansi)]
+        public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool FreeLibrary(IntPtr hModule);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr VirtualAllocEx(IntPtr hProcess, IntPtr lpAddress, IntPtr dwSize, uint flAllocationType, uint flProtect);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr CreateRemoteThread(IntPtr hProcess, IntPtr lpThreadAttribute, IntPtr dwStackSize, IntPtr lpStartAddress,
+            IntPtr lpParameter, uint dwCreationFlags, IntPtr lpThreadId);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern UInt32 WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
+        [DllImport("kernel32.dll")]
+        public static extern bool GetExitCodeThread(IntPtr hThread, out IntPtr lpExitCode);
+        
+        [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
+        public static extern bool VirtualFreeEx(IntPtr hProcess, IntPtr lpAddress,
+           int dwSize, FreeType dwFreeType);
+
+        [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool IsWow64Process([In] IntPtr hProcess, [Out] out bool lpSystemInfo);
+
         [Flags]
         public enum ProcessAccessFlags : uint
         {
@@ -65,7 +99,6 @@ namespace ExternalUtilsCSharp
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = MAX_PATH + 5)]
             public string szExePath;
         }
-
         [Flags]
         public enum SnapshotFlags : uint
         {
@@ -78,6 +111,47 @@ namespace ExternalUtilsCSharp
             Inherit = 0x80000000,
             NoHeaps = 0x40000000
 
+        }
+        [Flags]
+        public enum AllocationType
+        {
+            Commit = 0x1000,
+            Reserve = 0x2000,
+            Decommit = 0x4000,
+            Release = 0x8000,
+            Reset = 0x80000,
+            Physical = 0x400000,
+            TopDown = 0x100000,
+            WriteWatch = 0x200000,
+            LargePages = 0x20000000
+        }
+        [Flags]
+        public enum MemoryProtection
+        {
+            Execute = 0x10,
+            ExecuteRead = 0x20,
+            ExecuteReadWrite = 0x40,
+            ExecuteWriteCopy = 0x80,
+            NoAccess = 0x01,
+            ReadOnly = 0x02,
+            ReadWrite = 0x04,
+            WriteCopy = 0x08,
+            GuardModifierflag = 0x100,
+            NoCacheModifierflag = 0x200,
+            WriteCombineModifierflag = 0x400
+        }
+        public enum WaitForSingleObjectMilliseconds : uint
+        {
+            INFINITE = 0xFFFFFFFF,
+            WAIT_ABANDONED = 0x00000080,
+            WAIT_OBJECT_0 = 0x00000000,
+            WAIT_TIMEOUT = 0x00000102,
+        }
+        [Flags]
+        public enum FreeType
+        {
+            Decommit = 0x4000,
+            Release = 0x8000,
         }
         #endregion
         #region RPM/WPM
@@ -502,7 +576,7 @@ namespace ExternalUtilsCSharp
         public enum GetWindowLongFlags
         {
             GWL_EXSTYLE = -20,
-            GWL_HINSTANCE= -6,
+            GWL_HINSTANCE = -6,
             GWL_HWNDPARENT = -8,
             GWL_ID = -12,
             GWL_STYLE = -16,
@@ -1530,7 +1604,7 @@ namespace ExternalUtilsCSharp
         public static extern bool AllocConsole();
 
         [DllImport("kernel32.dll", SetLastError = true, ExactSpelling = true)]
-        static extern bool FreeConsole();
+        public static extern bool FreeConsole();
         #endregion
 
         public static int MakeLParam(int LoWord, int HiWord)

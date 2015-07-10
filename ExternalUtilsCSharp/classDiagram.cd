@@ -10,7 +10,7 @@
   <Class Name="ExternalUtilsCSharp.MathUtils">
     <Position X="4" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>CAAAIAAAAAAAgAAAAAkgGAIAAAAAAAAAAAAAAAAEIAA=</HashCode>
+      <HashCode>CAAAIAAAAAAAgAAAAAkgGAIAAAAAAAACAAAAAAAEIAA=</HashCode>
       <FileName>MathUtils.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -20,14 +20,14 @@
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
     <TypeIdentifier>
-      <HashCode>AAAgAAAAAABAAAACAiAQAAgiAAAAgwIQAAAAAAEIAAA=</HashCode>
+      <HashCode>AAAgAAAAAABAAAACAiAQAAgiAAAAowIQAAAAgAEoAAA=</HashCode>
       <FileName>MemUtils.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ExternalUtilsCSharp.ProcUtils">
     <Position X="2.25" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAgAAAAAAAAAAAAAIhAAQQAABAAAAAIAAAAAgAAAAAA=</HashCode>
+      <HashCode>AAgAAAAAAAAAAAAAIhAAwQAABAAAAAIAAAAAgAAAAAA=</HashCode>
       <FileName>ProcUtils.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -67,6 +67,11 @@
           <NewMemberFileName>WinAPI.cs</NewMemberFileName>
         </TypeIdentifier>
       </Struct>
+      <Enum Name="ExternalUtilsCSharp.WinAPI.WindowShowStyle" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>WinAPI.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
       <Enum Name="ExternalUtilsCSharp.WinAPI.MOUSEEVENTF" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>WinAPI.cs</NewMemberFileName>
@@ -92,17 +97,22 @@
           <NewMemberFileName>WinAPI.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
+      <Struct Name="ExternalUtilsCSharp.WinAPI.MODULEENTRY32" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>WinAPI.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
       <Enum Name="ExternalUtilsCSharp.WinAPI.SetWindowPosFlags" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>WinAPI.cs</NewMemberFileName>
         </TypeIdentifier>
       </Enum>
-      <Struct Name="ExternalUtilsCSharp.WinAPI.HARDWAREINPUT" Collapsed="true">
+      <Struct Name="ExternalUtilsCSharp.WinAPI.KEYBDINPUT" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>WinAPI.cs</NewMemberFileName>
         </TypeIdentifier>
       </Struct>
-      <Struct Name="ExternalUtilsCSharp.WinAPI.KEYBDINPUT" Collapsed="true">
+      <Struct Name="ExternalUtilsCSharp.WinAPI.HARDWAREINPUT" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>WinAPI.cs</NewMemberFileName>
         </TypeIdentifier>
@@ -112,7 +122,7 @@
           <NewMemberFileName>WinAPI.cs</NewMemberFileName>
         </TypeIdentifier>
       </Struct>
-      <Enum Name="ExternalUtilsCSharp.WinAPI.SetWindpwPosHWNDFlags" Collapsed="true">
+      <Enum Name="ExternalUtilsCSharp.WinAPI.SnapshotFlags" Collapsed="true">
         <TypeIdentifier>
           <NewMemberFileName>WinAPI.cs</NewMemberFileName>
         </TypeIdentifier>
@@ -137,9 +147,14 @@
           <NewMemberFileName>WinAPI.cs</NewMemberFileName>
         </TypeIdentifier>
       </Struct>
+      <Enum Name="ExternalUtilsCSharp.WinAPI.SetWindpwPosHWNDFlags" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>WinAPI.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AEAAAABAAIABAFkKICABAGQIABACAAAEAggAgASAgAo=</HashCode>
+      <HashCode>AUAAAABAAIABgFkKICABAGQIABACCAAEiggAgATggIo=</HashCode>
       <FileName>WinAPI.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -157,35 +172,6 @@
       <FileName>ConfigUtils.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="ExternalUtilsCSharp.UI.Controls.Control&lt;TRenderer, TColor, TVector2, TFont&gt;">
-    <Position X="4" Y="11.25" Width="1.5" />
-    <Compartments>
-      <Compartment Name="Nested Types" Collapsed="false" />
-    </Compartments>
-    <NestedTypes>
-      <Struct Name="ExternalUtilsCSharp.UI.Controls.Control&lt;TRenderer, TColor, TVector2, TFont&gt;.MouseEvent">
-        <TypeIdentifier>
-          <NewMemberFileName>UI\Controls\Control.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Struct>
-      <Class Name="ExternalUtilsCSharp.UI.Controls.Control&lt;TRenderer, TColor, TVector2, TFont&gt;.MouseClickEventArgs">
-        <TypeIdentifier>
-          <NewMemberFileName>UI\Controls\Control.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-    </NestedTypes>
-    <TypeIdentifier>
-      <HashCode>EAQFgQQCBgAAEgCAAIASQEAACCAiAAAACAAACAAHYIE=</HashCode>
-      <FileName>UI\Controls\Control.cs</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Class Name="ExternalUtilsCSharp.UI.Controls.CheckBox&lt;TRenderer, TColor, TVector2, TFont&gt;">
-    <Position X="5.75" Y="11.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAIgIAAAAAAACAAAAAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>UI\Controls\CheckBox.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="ExternalUtilsCSharp.UI.Overlay&lt;TRenderer, TColor, TVector2, TFont&gt;">
     <Position X="15.25" Y="0.5" Width="1.5" />
     <NestedTypes>
@@ -201,7 +187,7 @@
       </Class>
     </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAghkAMAAAAAAIAQgBQIAAAAIAACAAAwACACIwAACA=</HashCode>
+      <HashCode>AAAwBkAIAEAAAAIAQgBQIAAAEIAACEAAxACCDAwABCA=</HashCode>
       <FileName>UI\Overlay.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -216,14 +202,14 @@
   <Struct Name="ExternalUtilsCSharp.MathObjects.Vector2">
     <Position X="0.5" Y="6.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAACA6AEAAABAAQAAAIAAAAAAAAAAYiA=</HashCode>
+      <HashCode>AAAAIAAAAAAAAACE6AEAQABAAQAAAIAAAAAAAAAAYiA=</HashCode>
       <FileName>MathObjects\Vector2.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="ExternalUtilsCSharp.MathObjects.Vector3">
     <Position X="2.75" Y="6.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAACA6AEAAABAAQAAAIAAAAAAAAAAYiE=</HashCode>
+      <HashCode>AAAAIgAAAAAAAACE6AEAQABAAQAAAIAAAAAAAAAAYiE=</HashCode>
       <FileName>MathObjects\Vector3.cs</FileName>
     </TypeIdentifier>
   </Struct>
@@ -263,16 +249,23 @@
     </TypeIdentifier>
   </Struct>
   <Struct Name="ExternalUtilsCSharp.UI.UIObjects.Rectangle">
-    <Position X="2.25" Y="11.25" Width="1.5" />
+    <Position X="2.75" Y="12" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAABAAAAAAAAAIUAEAAAAAYAAAACACAAAAAYAA=</HashCode>
       <FileName>UI\UIObjects\Rectangle.cs</FileName>
     </TypeIdentifier>
   </Struct>
   <Struct Name="ExternalUtilsCSharp.UI.UIObjects.Color">
-    <Position X="0.5" Y="11.25" Width="1.5" />
+    <Position X="0.5" Y="12" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="ExternalUtilsCSharp.UI.UIObjects.Color.ColorFormat" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>UI\UIObjects\Color.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAQAAAAAAAAAAAAAABAAAAAKAEAAQA=</HashCode>
+      <HashCode>AAAAAAAAAAAAABAQAAAAAAAAAAAAAABAAAAAKAEAAQA=</HashCode>
       <FileName>UI\UIObjects\Color.cs</FileName>
     </TypeIdentifier>
   </Struct>

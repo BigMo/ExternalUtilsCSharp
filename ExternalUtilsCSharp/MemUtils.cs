@@ -308,11 +308,11 @@ namespace ExternalUtilsCSharp
         {
             if (codeSectionOnly)
             {
-                PEInfo info = new PEInfo(module, this);
+                PEInfo info = PEInfo.FromMemory(module, this);
                 return PerformSignatureScan(
                     pattern,
                     mask,
-                    (IntPtr)(info.PEOptHeaderAddress.ToInt64() + info.PEOptHeader.BaseOfCode),
+                    (IntPtr)(module.BaseAddress.ToInt32() + info.PEOptHeaderAddress + info.PEOptHeader.BaseOfCode),
                     info.PEOptHeader.SizeOfCode,
                     wildcard);
             }
