@@ -48,11 +48,6 @@ namespace DotNetInjector
             InitializeComponent();
             LoadRuntimeVersions();
             RefreshProcessList();
-            txbBootstrapperDLL.Text = @"C:\Users\Mo\Documents\Visual Studio 2013\Projects\ExternalUtilsCSharp\Debug\DotNetBoorstrapper.dll";
-            txbManagedAssemblyPath.Text = @"C:\Users\Mo\Documents\Visual Studio 2013\Projects\ExternalUtilsCSharp\SampleManagedLibrary\bin\Debug\SampleManagedLibrary.dll";
-            txbManagedAssemblyType.Text = "SampleManagedLibrary.SampleClass";
-            txbManagedAssemblyMethod.Text = "SampleMethod";
-            txbManagedAssemblyArgument.Text = "SampleArgument";
         }
         #endregion
 
