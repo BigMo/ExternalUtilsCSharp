@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace ExternalUtilsCSharp.UI
 {
@@ -106,22 +108,16 @@ namespace ExternalUtilsCSharp.UI
             public bool Handled;
             public int Depth;
         }
-        public class MouseEventArgs : EventArgs
-        {
-            public bool LeftButton;
-            public bool RightButton;
-            public bool MiddleButton;
 
-            public TVector2 Position;
-        }
         public event EventHandler MouseEnteredEvent;
         public event EventHandler MouseLeftEvent;
         public event EventHandler TextChangedEvent;
         public event EventHandler FontChangedEvent;
         public event EventHandler VisibleChangedEvent;
-        public event EventHandler<MouseEventArgs> MouseMovedEvent;
-        public event EventHandler<MouseEventArgs> MouseClickEventDown;
-        public event EventHandler<MouseEventArgs> MouseClickEventUp;
+        public event EventHandler<MouseEventExtArgs> MouseMovedEvent;
+        public event EventHandler<MouseEventExtArgs> MouseClickEventDown;
+        public event EventHandler<MouseEventExtArgs> MouseClickEventUp;
+        public event EventHandler<MouseEventExtArgs> MouseWheelEvent;
         protected virtual void OnTextChangedEvent(EventArgs e)
         {
             if (TextChangedEvent != null)
@@ -147,20 +143,25 @@ namespace ExternalUtilsCSharp.UI
             if (MouseLeftEvent != null)
                 MouseLeftEvent(this, e);
         }
-        protected virtual void OnMouseMovedEvent(MouseEventArgs e)
+        protected virtual void OnMouseMovedEvent(MouseEventExtArgs e)
         {
             if (MouseMovedEvent != null)
                 MouseMovedEvent(this, e);
         }
-        protected virtual void OnMouseClickEventDown(MouseEventArgs e)
+        protected virtual void OnMouseClickEventDown(MouseEventExtArgs e)
         {
             if (MouseClickEventDown != null)
                 MouseClickEventDown(this, e);
         }
-        protected virtual void OnMouseClickEventUp(MouseEventArgs e)
+        protected virtual void OnMouseClickEventUp(MouseEventExtArgs e)
         {
             if (MouseClickEventUp != null)
                 MouseClickEventUp(this, e);
+        }        
+        protected virtual void OnMouseWheelEvent(MouseEventExtArgs e)
+        {
+            if (MouseWheelEvent != null)
+                MouseWheelEvent(this, e);
         }
         #endregion
         #region CONSTRUCTOR
@@ -192,44 +193,41 @@ namespace ExternalUtilsCSharp.UI
         /// </summary>
         /// <param name="secondsElapsed"></param>
         /// <param name="cursorPoint"></param>
-        public virtual void Update(double secondsElapsed, KeyUtils keyUtils, TVector2 cursorPoint, bool checkMouse = false)
+        public virtual void Update(double secondsElapsed, InputUtilities inputUtils, TVector2 cursorPoint, bool checkMouse = false)
         {
             bool canUpdate = this.visible;
             if (this.Parent != null)
                 if (!this.Parent.Visible)
                     canUpdate = false;
 
-            if (canUpdate)
+            if (canUpdate&&checkMouse)
             {
-                #region MOUSE
-                if (checkMouse)
-                {
-                    MouseEvent result = new MouseEvent() { Handled = false, Depth = 0 };
-                    CheckMouseEvents(cursorPoint, keyUtils, ref result);
-                }
-                #endregion
-                #region CHILDCONTROLS
-
-                foreach (Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
-                    control.Update(secondsElapsed, keyUtils, cursorPoint, false);
-                #endregion
+                MouseEvent result = new MouseEvent() { Handled = false, Depth = 0 };
+                CheckMouseEvents(cursorPoint, inputUtils, ref result);
             }
+            #region CHILDCONTROLS
+            foreach (Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
+                control.Update(secondsElapsed, inputUtils, cursorPoint, false);
+            #endregion
         }
         /// <summary>
         /// Checks whether the mouse left or entered this control (or one of its childcontrols)
         /// </summary>
         /// <param name="cursorPoint"></param>
         /// <param name="result"></param>
-        protected void CheckMouseEvents(TVector2 cursorPoint, KeyUtils keyUtils, ref MouseEvent result)
+        protected void CheckMouseEvents(TVector2 cursorPoint, InputUtilities inputUtils, ref MouseEvent result)
         {
-            foreach (Control<TRenderer, TColor, TVector2, TFont> control in ChildControls)
+            inputUtils.Mouse.CurrentMouseArgs.PosOnForm = cursorPoint;
+            foreach(Control<TRenderer,TColor,TVector2,TFont> control in ChildControls)
             {
                 if (result.Handled)
                     return;
                 if (!control.Visible)
                     continue;
+                if (!inputUtils.MouseChanged)
+                    continue;
                 result.Depth++;
-                control.CheckMouseEvents(cursorPoint, keyUtils, ref result);
+                control.CheckMouseEvents(cursorPoint, inputUtils, ref result);
                 result.Depth--;
             }
             if (!result.Handled)
@@ -238,29 +236,26 @@ namespace ExternalUtilsCSharp.UI
                 if (this.MouseOver)
                 {
                     result.Handled = true;
-                    if (keyUtils.KeyWentDown(WinAPI.VirtualKeyShort.LBUTTON))
-                        OnMouseClickEventDown(new MouseEventArgs() { LeftButton = true, Position = cursorPoint });
-                    if (keyUtils.KeyWentDown(WinAPI.VirtualKeyShort.RBUTTON))
-                        OnMouseClickEventDown(new MouseEventArgs() { RightButton = true, Position = cursorPoint });
-                    if (keyUtils.KeyWentDown(WinAPI.VirtualKeyShort.MBUTTON))
-                        OnMouseClickEventDown(new MouseEventArgs() { MiddleButton = true, Position = cursorPoint });
-
-                    if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.LBUTTON))
-                        OnMouseClickEventUp(new MouseEventArgs() { LeftButton = true, Position = cursorPoint });
-                    if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.RBUTTON))
-                        OnMouseClickEventUp(new MouseEventArgs() { RightButton = true, Position = cursorPoint });
-                    if (keyUtils.KeyWentUp(WinAPI.VirtualKeyShort.MBUTTON))
-                        OnMouseClickEventUp(new MouseEventArgs() { MiddleButton = true, Position = cursorPoint });
+                    if (!inputUtils.MouseChanged)
+                        return;
+                    if ((inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Left
+                        ||inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Right
+                        ||inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Middle
+                        ||inputUtils.Mouse.CurrentMouseArgs.Wheel)
+                        &&inputUtils.Mouse.CurrentMouseArgs.UpOrDown==MouseEventExtArgs.UpDown.Down)
+                        OnMouseClickEventDown(inputUtils.Mouse.CurrentMouseArgs);
+                    if ( (inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Left
+                        ||inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Right
+                        || inputUtils.Mouse.CurrentMouseArgs.Button == MouseButtons.Middle
+                        || inputUtils.Mouse.CurrentMouseArgs.Wheel)
+                        && inputUtils.Mouse.CurrentMouseArgs.UpOrDown == MouseEventExtArgs.UpDown.Up)
+                        OnMouseClickEventUp(inputUtils.Mouse.CurrentMouseArgs);
+                    if (inputUtils.Mouse.CurrentMouseArgs.Wheel)
+                        OnMouseWheelEvent(inputUtils.Mouse.CurrentMouseArgs);
 
                     if (!LastMousePos.Equals(cursorPoint))
                     {
-                        OnMouseMovedEvent(new MouseEventArgs()
-                        {
-                            Position = cursorPoint,
-                            LeftButton = keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.LBUTTON),
-                            RightButton = keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.RBUTTON),
-                            MiddleButton = keyUtils.KeyIsDown(WinAPI.VirtualKeyShort.MBUTTON)
-                        });
+                        OnMouseMovedEvent(inputUtils.Mouse.CurrentMouseArgs);
                         LastMousePos = cursorPoint;
                     }
                 }

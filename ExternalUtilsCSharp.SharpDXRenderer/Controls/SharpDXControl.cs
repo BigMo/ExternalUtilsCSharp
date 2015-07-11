@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
 {
@@ -51,7 +52,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
                 return this.Parent.GetAbsoluteLocation() + new Vector2(this.X, this.Y);
         }
 
-        public override void Update(double secondsElapsed, KeyUtils keyUtils, Vector2 cursorPoint, bool checkMouse = false)
+        public override void Update(double secondsElapsed, InputUtilities keyUtils, Vector2 cursorPoint, bool checkMouse = false)
         {
             //if (this.FillParent && this.Parent != null)
             //    this.Width = Parent.Width - Parent.MarginLeft - Parent.MarginRight - this.MarginLeft - this.MarginRight;
