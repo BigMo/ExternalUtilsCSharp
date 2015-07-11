@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
 {
@@ -49,9 +51,9 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         #endregion
 
         #region METHODS
-        void SharpDXButtonKey_MouseClickEventUp(object sender, UI.Control<SharpDXRenderer, SharpDX.Color, SharpDX.Vector2, SharpDX.DirectWrite.TextFormat>.MouseEventArgs e)
+        void SharpDXButtonKey_MouseClickEventUp(object sender, MouseEventExtArgs e)
         {
-            if (!e.LeftButton)
+            if (e.Button != MouseButtons.Left)
                 return;
             listen = true;
             skip = 10;
@@ -70,7 +72,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             this.Text = orig;
         }
 
-        public override void Update(double secondsElapsed, KeyUtils keyUtils, SharpDX.Vector2 cursorPoint, bool checkMouse = false)
+        public override void Update(double secondsElapsed, InputUtilities keyUtils, SharpDX.Vector2 cursorPoint, bool checkMouse = false)
         {
             base.Update(secondsElapsed, keyUtils, cursorPoint, checkMouse);
             if (listen)
@@ -80,7 +82,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
                     skip--;
                     return;
                 }
-                WinAPI.VirtualKeyShort[] buttons = keyUtils.KeysThatWentUp();
+                WinAPI.VirtualKeyShort[] buttons = keyUtils.Keys.KeysThatWentUp();
                 if (buttons.Length > 0)
                 {
                     Key = buttons[0];

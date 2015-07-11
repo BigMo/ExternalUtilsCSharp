@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
 {
@@ -49,7 +50,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         #endregion
 
         #region METHODS
-        public override void Update(double secondsElapsed, KeyUtils keyUtils, SharpDX.Vector2 cursorPoint, bool checkMouse = false)
+        public override void Update(double secondsElapsed, InputUtilities keyUtils, SharpDX.Vector2 cursorPoint, bool checkMouse = false)
         {
             base.Update(secondsElapsed, keyUtils, cursorPoint, checkMouse);
             if (this.Visible)

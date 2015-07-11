@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace ExternalUtilsCSharp.SharpDXRenderer
 {
@@ -33,6 +34,11 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
             base.Attach(hWnd);
         }
 
+        public void ChangeHandle(IntPtr hWnd)
+        {
+            this.hWnd = hWnd;
+        }
+
         public override void Detach()
         {
             base.Detach();
@@ -53,7 +59,7 @@ namespace ExternalUtilsCSharp.SharpDXRenderer
             this.Renderer.Resize(new Vector2(this.Width, this.Height));
         }
 
-        public override void UpdateControls(double secondsElapsed, KeyUtils keys)
+        public override void UpdateControls(double secondsElapsed, InputUtilities keys)
         {
             Vector2 cursor = new Vector2(this.CursorPosition.X, this.CursorPosition.Y);
             foreach (ExternalUtilsCSharp.UI.Control<SharpDXRenderer, Color, Vector2, TextFormat> control in this.ChildControls)

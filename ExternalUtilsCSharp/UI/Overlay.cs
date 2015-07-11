@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace ExternalUtilsCSharp.UI
 {
@@ -91,6 +92,7 @@ namespace ExternalUtilsCSharp.UI
             this.Text = "";
             this.Name = "";
             this.TopMost = true;
+            this.TopLevel = true;
 
             //Make form transparent and fully topmost
             int initialStyle = WinAPI.GetWindowLong(this.Handle, (int)WinAPI.GetWindowLongFlags.GWL_EXSTYLE);
@@ -216,12 +218,24 @@ namespace ExternalUtilsCSharp.UI
         /// </summary>
         /// <param name="secondsElapsed"></param>
         /// <param name="keys"></param>
-        public abstract void UpdateControls(double secondsElapsed, KeyUtils keys);
+        public abstract void UpdateControls(double secondsElapsed, InputUtilities keys);
         public virtual void Kill()
         {
             updDraw.StopUpdater();
             updLogic.StopUpdater();
             Application.Exit();
+        }
+
+        public void ShowInactiveTopmost()
+        {
+            WinAPI.ShowWindow(this.Handle, (int)WinAPI.WindowShowStyle.ShowNoActivate);
+            WinAPI.SetWindowPos(this.Handle, (IntPtr)WinAPI.SetWindpwPosHWNDFlags.TopMost,
+            this.Left, this.Top, this.Width, this.Height,
+            (uint)WinAPI.SetWindowPosFlags.NOACTIVATE);
+        }
+        public void ResetTopmost()
+        {
+            WinAPI.BringWindowToTop(this.Handle);
         }
         #endregion
     }

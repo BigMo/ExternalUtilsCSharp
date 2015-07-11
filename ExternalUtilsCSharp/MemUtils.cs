@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -30,7 +31,7 @@ namespace ExternalUtilsCSharp
         /// Implementation of unsafe code comes from:
         /// https://github.com/Aevitas/bluerain/blob/master/src/BlueRain/ExternalProcessMemory.cs
         /// </summary>
-        public bool UseUnsafeReadWrite { get; set; }
+        public static bool UseUnsafeReadWrite { get; set; }
         public long BytesRead { get; private set; }
         public long BytesWritten { get; private set; }
         #endregion
@@ -120,7 +121,7 @@ namespace ExternalUtilsCSharp
         /// <param name="address">The address to read data at</param>
         /// <param name="length">The number of elements to read</param>
         /// <returns></returns>
-        public T[] ReadArray<T>(IntPtr address, int length) where T: struct
+        public T[] ReadArray<T>(IntPtr address, int length) where T : struct
         {
             byte[] data;
             int size = Marshal.SizeOf(typeof(T));
@@ -432,32 +433,20 @@ namespace ExternalUtilsCSharp
             return new string(chr);
         }
         #endregion
-        #endregion
-    }
-    /// <summary>
-    /// Generic object methods
-    /// </summary>
-    public static class MemStatic{
-        public static T GetStructure<T>(byte[] data)
-        {
-            GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
-            T structure = (T)Marshal.PtrToStructure(handle.AddrOfPinnedObject(), typeof(T));
-            handle.Free();
-            return structure;
-        }
-        public static T GetStructure<T>(this byte[] data, int offset, int length)
-        {
-            byte[] dt = new byte[length];
-            Array.Copy(data, offset, dt, 0, length);
-            return GetStructure<T>(dt);
-        }
+        #region MISC
         /// <summary>
         /// Gets size of T object
         /// </summary>
         /// <returns>Size of object</returns>
-        public static int SizeOf<T>(this T obj)
+        public static int SizeOf<T>(T obj)
         {
             return Marshal.SizeOf(typeof(T));
         }
+        public static string GetMemberName<T, TValue>(Expression<Func<T, TValue>> memberAccess)
+        {
+            return ((MemberExpression)memberAccess.Body).Member.Name;
+        }
+        #endregion
+        #endregion
     }
 }

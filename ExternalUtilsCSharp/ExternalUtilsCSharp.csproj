@@ -44,7 +44,10 @@
   <ItemGroup>
     <Compile Include="ConfigObjects\IniConfigUtils.cs" />
     <Compile Include="ConfigUtils.cs" />
-    <Compile Include="KeyUtils.cs" />
+    <Compile Include="InputUtils\InputUtilities.cs" />
+    <Compile Include="InputUtils\KeyUtils.cs" />
+    <Compile Include="InputUtils\MouseEventExtArgs.cs" />
+    <Compile Include="InputUtils\MouseHook.cs" />
     <Compile Include="MathUtils.cs" />
     <Compile Include="MathObjects\Matrix.cs" />
     <Compile Include="MemObjects\PE\COFFHeader.cs" />
@@ -64,6 +67,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="UI\UIObjects\Color.cs" />
+    <Compile Include="UI\UIObjects\ColorExtension.cs" />
     <Compile Include="UI\Control.cs" />
     <Compile Include="UI\UIObjects\Rectangle.cs" />
     <Compile Include="UI\Renderer.cs" />

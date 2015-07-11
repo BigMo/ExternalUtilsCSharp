@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
 {
@@ -49,14 +51,14 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
 
         #region METHODS
 
-        void SharpDXTabControl_MouseClickEventUp(object sender, UI.Control<SharpDXRenderer, Color, Vector2, SharpDX.DirectWrite.TextFormat>.MouseEventArgs e)
+        void SharpDXTabControl_MouseClickEventUp(object sender, MouseEventExtArgs e)
         {
-            if (!e.LeftButton)
+            if (e.Button != MouseButtons.Left)
                 return;
             if (TabHeaders == null)
                 return;
 
-            Vector2 cursorPoint = e.Position - this.GetAbsoluteLocation();
+            Vector2 cursorPoint = (Vector2)e.PosOnForm - this.GetAbsoluteLocation();
             RectangleF cursor = new RectangleF(cursorPoint.X, cursorPoint.Y, 1, 1);
             for(int i = 0; i < TabHeaders.Length; i++)
             {
@@ -67,9 +69,9 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
                 }
             }
         }
-        public override void Update(double secondsElapsed, KeyUtils keyUtils, SharpDX.Vector2 cursorPoint, bool checkMouse = false)
+        public override void Update(double secondsElapsed, InputUtilities inputUtils, SharpDX.Vector2 cursorPoint, bool checkMouse = false)
         {
-            base.Update(secondsElapsed, keyUtils, cursorPoint, checkMouse);
+            base.Update(secondsElapsed, inputUtils, cursorPoint, checkMouse);
             if (TabHeaders == null)
                 return;
 

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
 {
@@ -23,9 +25,9 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
         #endregion
         #region METHODS
 
-        void SharpDXCheckBox_MouseClickEventUp(object sender, UI.Control<SharpDXRenderer, Color, Vector2, SharpDX.DirectWrite.TextFormat>.MouseEventArgs e)
+        void SharpDXCheckBox_MouseClickEventUp(object sender, MouseEventExtArgs e)
         {
-            if (e.LeftButton)
+            if (e.Button == MouseButtons.Left)
                 this.Checked = !this.Checked;
         }
         public override void Draw(SharpDXRenderer renderer)

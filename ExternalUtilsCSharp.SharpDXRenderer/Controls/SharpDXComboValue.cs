@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ExternalUtilsCSharp.InputUtils;
 
 namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
 {
@@ -64,12 +65,12 @@ namespace ExternalUtilsCSharp.SharpDXRenderer.Controls
             this.MouseClickEventUp += SharpDXComboValue_MouseClickEventUp;
         }
 
-        void SharpDXComboValue_MouseClickEventUp(object sender, UI.Control<SharpDXRenderer, Color, Vector2, SharpDX.DirectWrite.TextFormat>.MouseEventArgs e)
+        void SharpDXComboValue_MouseClickEventUp(object sender, MouseEventExtArgs e)
         {
             Vector2 location = this.GetAbsoluteLocation();
             Vector2 size = this.GetSize();
 
-            Vector2 clickPoint = e.Position - location;
+            Vector2 clickPoint = (Vector2)e.PosOnForm - location;
             if (clickPoint.X < size.X / 2f)
                 this.SelectedIndex--;
             else
